@@ -6,30 +6,46 @@ updated: 2026-10-29
 
 # Deployment
 
+| | |
+|---|---|
+| **Production** | https://tamoney.vercel.app |
+| **Vercel project** | `tamoney` (dihubungkan via `vercel link`, `.vercel/` di-gitignore) |
+| **Supabase project** | `lunelnmwgcccapnjolht` (eu-west-1, Postgres 17) |
+| **Supabase MCP** | `.mcp.json` (scope project) — autentikasi lewat `/mcp` |
+
 ## Env vars
 
 | Nama | Isi |
 |---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | URL project Supabase |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon/publishable key |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://lunelnmwgcccapnjolht.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | publishable key (`sb_publishable_…`) — aman di browser |
 
-Lokal: salin `.env.example` → `.env.local`. Tidak ada service role key di app.
+Sudah diset di Vercel untuk production, preview, development. Lokal: `.env.local` (gitignored; juga berisi akun uji `TEST_USER_EMAIL/PASSWORD` untuk smoke test lokal). Tidak ada service role key di app.
 
-## Supabase
+## Migrasi
 
-1. Buat project di supabase.com (gratis).
-2. `npx supabase login` → `npx supabase link --project-ref <ref>` → `npx supabase db push`.
-3. Auth → URL Configuration: Site URL = domain Vercel; Redirect URLs: `https://<domain>/auth/callback`, `http://localhost:3000/auth/callback`.
+File di `supabase/migrations/`, diterapkan lewat Supabase MCP `apply_migration`:
 
-## Vercel
+1. `20261029000000_init.sql` — skema, RLS (`to authenticated`), grant, view saldo, trigger signup
+2. `20261029010000_owner_scoped_fks.sql` — FK komposit `(id, user_id)` agar transaksi tidak bisa menunjuk dompet/kategori user lain
+3. `20261029020000_fk_indexes.sql` — index untuk FK komposit
 
-1. Push repo ke GitHub.
-2. `npx vercel login` → `npx vercel link`.
-3. `npx vercel env add NEXT_PUBLIC_SUPABASE_URL` dan `NEXT_PUBLIC_SUPABASE_ANON_KEY` (production + preview).
-4. `npx vercel --prod`.
+Setelah perubahan skema: jalankan advisor (MCP `get_advisors` security + performance). Lihat [[database]].
 
-## Smoke test
+## Supabase Auth — URL Configuration (wajib, lewat dashboard)
 
-Daftar → verifikasi email → buat dompet → catat transaksi → cek analitik. Akun kedua tidak boleh melihat data akun pertama.
+Authentication → URL Configuration:
+- **Site URL:** `https://tamoney.vercel.app`
+- **Redirect URLs:** `https://tamoney.vercel.app/auth/callback`, `http://localhost:3000/auth/callback`
+
+Tanpa ini, link verifikasi email & reset password mengarah ke `localhost:3000`.
+
+## Deploy ulang
+
+`npx vercel deploy --prod` (atau hubungkan repo GitHub di Vercel untuk auto-deploy).
+
+## Log
+
+`npx vercel logs --deployment tamoney.vercel.app --query 'level:error'` (plan Hobby: retensi 30 menit).
 
 Lihat [[architecture]], [[database]].
