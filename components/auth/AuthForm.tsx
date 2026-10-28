@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { ActionState } from "@/lib/actions/state";
 import { Button } from "@/components/ui/Button";
 import { Field, FormError, Input } from "@/components/ui/Field";
+import { useFormDone } from "@/components/ui/useFormDone";
 
 type FieldDef = { name: string; label: string; type: string; autoComplete: string };
 
@@ -23,7 +24,7 @@ export function AuthForm({
   successMessage?: string;
   footer?: ReactNode;
 }) {
-  const [state, formAction, pending] = useActionState(action, {});
+  const { state, pending, onSubmit } = useFormDone(action);
 
   return (
     <div className="space-y-5">
@@ -33,7 +34,7 @@ export function AuthForm({
           {successMessage}
         </p>
       ) : (
-        <form action={formAction} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4">
           {fields.map((f) => (
             <Field key={f.name} label={f.label}>
               <Input name={f.name} type={f.type} autoComplete={f.autoComplete} required />

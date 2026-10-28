@@ -29,7 +29,7 @@ export function Dialog({
       ref={ref}
       onClose={onClose}
       onClick={(e) => e.target === ref.current && onClose()}
-      className="m-0 mt-auto w-full max-w-none rounded-t-3xl bg-card p-0 text-on-surface shadow-2xl backdrop:bg-primary-fixed/40 backdrop:backdrop-blur-sm md:m-auto md:max-w-md md:rounded-3xl"
+      className="m-0 mt-auto w-full text-left max-w-none rounded-t-3xl bg-card p-0 text-on-surface shadow-2xl backdrop:bg-primary-fixed/40 backdrop:backdrop-blur-sm md:m-auto md:max-w-md md:rounded-3xl"
     >
       {open && (
         <div className="max-h-[85vh] overflow-y-auto p-6">

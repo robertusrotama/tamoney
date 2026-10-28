@@ -1,4 +1,5 @@
 import "server-only";
+import { fetchAllPages } from "./paging";
 import type { Supabase } from "./supabase/server";
 import type { Category, Tx, Wallet } from "./types";
 
@@ -38,13 +39,17 @@ const flatten = (rows: TxRow[]): TxWithCategory[] =>
 
 /** Transactions with occurred_at in [startIso, endIso), newest first. */
 export async function getTransactionsBetween(sb: Supabase, startIso: string, endIso: string): Promise<TxWithCategory[]> {
-  const rows = must(
-    await sb
-      .from("transactions")
-      .select(TX_COLUMNS)
-      .gte("occurred_at", startIso)
-      .lt("occurred_at", endIso)
-      .order("occurred_at", { ascending: false }),
+  const rows = await fetchAllPages(async (from, to) =>
+    must(
+      await sb
+        .from("transactions")
+        .select(TX_COLUMNS)
+        .gte("occurred_at", startIso)
+        .lt("occurred_at", endIso)
+        .order("occurred_at", { ascending: false })
+        .order("id") // stable order so pages don't overlap
+        .range(from, to),
+    ),
   );
   return flatten(rows as unknown as TxRow[]);
 }
