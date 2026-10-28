@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   categoryBreakdown,
+  filterHistory,
   monthKey,
+  parseMonth,
   monthlyTrend,
   monthRange,
   monthTotals,
@@ -61,6 +63,33 @@ describe("wibGreeting", () => {
     expect(wibGreeting(new Date("2026-10-29T09:00:00Z"))).toBe("Selamat Sore"); // 16:00
     expect(wibGreeting(new Date("2026-10-29T13:00:00Z"))).toBe("Selamat Malam"); // 20:00
     expect(wibGreeting(new Date("2026-10-28T20:00:00Z"))).toBe("Selamat Pagi"); // 03:00
+  });
+});
+
+describe("parseMonth", () => {
+  it("accepts YYYY-MM and falls back otherwise", () => {
+    expect(parseMonth("2026-02", "2026-10")).toBe("2026-02");
+    for (const bad of [undefined, "", "2026-13", "2026-1", "x"]) expect(parseMonth(bad, "2026-10")).toBe("2026-10");
+  });
+});
+
+describe("filterHistory", () => {
+  const rows = [
+    { ...exp(10, "A"), note: "Mie Ayam", wallet_id: "w1", to_wallet_id: null },
+    { ...inc(20), note: null, wallet_id: "w2", to_wallet_id: null },
+    { ...transfer(30), note: null, wallet_id: "w1", to_wallet_id: "w2" },
+  ];
+
+  it("searches note and category name, case-insensitive", () => {
+    expect(filterHistory(rows, { q: "mie" })).toHaveLength(1);
+    expect(filterHistory(rows, { q: "gaji" })).toHaveLength(1);
+  });
+
+  it("filters by kind, category and wallet (either side of a transfer)", () => {
+    expect(filterHistory(rows, { kind: "transfer" })).toHaveLength(1);
+    expect(filterHistory(rows, { category: "A" })).toHaveLength(1);
+    expect(filterHistory(rows, { wallet: "w2" })).toHaveLength(2);
+    expect(filterHistory(rows, {})).toHaveLength(3);
   });
 });
 

@@ -94,6 +94,25 @@ export function categoryBreakdown(
     .sort((a, b) => b.amount - a.amount);
 }
 
+export function parseMonth(value: string | undefined, fallback: string): string {
+  return value && /^\d{4}-(0[1-9]|1[0-2])$/.test(value) ? value : fallback;
+}
+
+export type HistoryFilter = { q?: string; wallet?: string; category?: string; kind?: string };
+
+export function filterHistory<
+  T extends ReportTx & Pick<Tx, "note" | "wallet_id" | "to_wallet_id">,
+>(txs: T[], f: HistoryFilter): T[] {
+  const q = f.q?.trim().toLowerCase();
+  return txs.filter(
+    (t) =>
+      (!q || `${t.note ?? ""} ${t.category_name ?? ""}`.toLowerCase().includes(q)) &&
+      (!f.kind || f.kind === "all" || t.kind === f.kind) &&
+      (!f.category || t.category_id === f.category) &&
+      (!f.wallet || t.wallet_id === f.wallet || t.to_wallet_id === f.wallet),
+  );
+}
+
 export function pctChange(cur: number, prev: number): number | null {
   return prev === 0 ? null : (cur - prev) / prev;
 }
