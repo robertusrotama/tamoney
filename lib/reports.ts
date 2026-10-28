@@ -13,6 +13,17 @@ export function monthKey(iso: string): string {
   return wibDate(iso).slice(0, 7);
 }
 
+export function todayWib(now = new Date()): string {
+  return wibDate(now.toISOString());
+}
+
+/** A picked WIB date + the current WIB time; an edit that keeps the date keeps its original timestamp. */
+export function toOccurredAt(date: string, previousIso?: string, now = new Date()): string {
+  if (previousIso && wibDate(previousIso) === date) return previousIso;
+  const time = new Date(now.getTime() + WIB_MS).toISOString().slice(10); // "THH:MM:SS.sssZ"
+  return new Date(Date.parse(`${date}${time}`) - WIB_MS).toISOString();
+}
+
 export function shiftMonth(month: string, delta: number): string {
   const [y, m] = month.split("-").map(Number);
   const d = new Date(Date.UTC(y, m - 1 + delta, 1));

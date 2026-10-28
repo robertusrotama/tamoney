@@ -17,6 +17,10 @@ export async function getWallets(sb: Supabase, { includeArchived = false } = {})
   return must(wallets).map((w) => ({ ...w, initial_balance: Number(w.initial_balance), balance: byId.get(w.id) ?? 0 }));
 }
 
+export async function getActiveWalletIds(sb: Supabase): Promise<string[]> {
+  return must(await sb.from("wallets").select("id").is("archived_at", null)).map((w) => w.id as string);
+}
+
 export async function getCategories(sb: Supabase): Promise<Category[]> {
   return must(await sb.from("categories").select("id,kind,name,icon").order("created_at"));
 }

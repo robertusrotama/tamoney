@@ -7,6 +7,8 @@ import {
   monthTotals,
   pctChange,
   shiftMonth,
+  toOccurredAt,
+  todayWib,
   wibDate,
   type ReportTx,
 } from "./reports";
@@ -32,6 +34,22 @@ describe("WIB date helpers", () => {
   it("shifts months across years", () => {
     expect(shiftMonth("2026-01", -1)).toBe("2025-12");
     expect(shiftMonth("2025-12", 1)).toBe("2026-01");
+  });
+});
+
+describe("toOccurredAt", () => {
+  const now = new Date("2026-10-29T05:15:00Z"); // 12:15 WIB
+
+  it("stamps a picked date with the current WIB time", () => {
+    expect(toOccurredAt("2026-10-20", undefined, now)).toBe("2026-10-20T05:15:00.000Z");
+  });
+
+  it("keeps the original timestamp when an edit leaves the date unchanged", () => {
+    expect(toOccurredAt("2026-10-31", "2026-10-31T16:30:00Z", now)).toBe("2026-10-31T16:30:00Z");
+  });
+
+  it("gives today in WIB", () => {
+    expect(todayWib(new Date("2026-10-31T17:30:00Z"))).toBe("2026-11-01");
   });
 });
 
