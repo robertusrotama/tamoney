@@ -135,6 +135,8 @@ Fungsi murni yang menerima daftar transaksi dan mengembalikan:
 
 ## 8. Knowledge base (`docs/knowledge/`)
 
+Folder ini adalah **vault Obsidian**: setiap catatan punya frontmatter YAML (`title`, `tags`, `updated`), saling terhubung dengan `[[wikilink]]`, gambar di-embed `![[file.png]]`, dan `README.md` berfungsi sebagai MOC. Keputusan & fakta proyek disimpan sebagai **memory** di `docs/knowledge/memory/`, satu catatan per keputusan.
+
 | File | Isi |
 |---|---|
 | `README.md` | Indeks dan cara memakai dokumen ini |
