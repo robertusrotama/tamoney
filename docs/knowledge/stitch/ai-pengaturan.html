@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+
+<html lang="id"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"primary-fixed":"#dce1ff","secondary-container":"#82f5c1","on-primary-container":"#90a8ff","on-primary-fixed-variant":"#264191","tertiary-fixed":"#e1e0ff","surface":"#faf8ff","secondary-fixed":"#85f8c4","on-background":"#131b2e","tertiary-container":"#2724b8","background":"#faf8ff","primary-fixed-dim":"#b6c4ff","surface-bright":"#faf8ff","secondary-fixed-dim":"#68dba9","on-error":"#ffffff","surface-container-highest":"#dae2fd","surface-container":"#eaedff","on-secondary-container":"#00714e","tertiary":"#0d0097","on-tertiary-fixed-variant":"#2f2ebe","on-primary":"#ffffff","inverse-primary":"#b6c4ff","on-error-container":"#93000a","on-tertiary-container":"#a1a4ff","on-tertiary-fixed":"#07006c","error":"#ba1a1a","on-secondary":"#ffffff","inverse-surface":"#283044","secondary":"#006c4a","surface-variant":"#dae2fd","inverse-on-surface":"#eef0ff","on-surface-variant":"#444651","on-surface":"#131b2e","primary-container":"#1e3a8a","primary":"#00236f","on-secondary-fixed":"#002114","surface-tint":"#4059aa","outline-variant":"#c5c5d3","on-secondary-fixed-variant":"#005137","on-primary-fixed":"#00164e","tertiary-fixed-dim":"#c0c1ff","surface-container-high":"#e2e7ff","surface-container-low":"#f2f3ff","error-container":"#ffdad6","surface-dim":"#d2d9f4","on-tertiary":"#ffffff","outline":"#757682","surface-container-lowest":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-xl":"2rem","space-md":"1rem","space-sm":"0.5rem","space-xs":"0.25rem","gutter":"1.5rem","margin":"2rem","space-lg":"1.5rem"},"fontFamily":{"display-lg":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"title-sm":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"label-lg":["JetBrains Mono"],"label-sm":["JetBrains Mono"],"headline-md":["Plus Jakarta Sans"],"title-lg":["Plus Jakarta Sans"],"title-md":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"display-md":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"label-md":["JetBrains Mono"]},"fontSize":{"display-lg":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"800"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"title-sm":["14px",{"lineHeight":"20px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"500"}],"label-sm":["10px",{"lineHeight":"14px","letterSpacing":"0.03em","fontWeight":"500"}],"headline-md":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"600"}],"title-lg":["20px",{"lineHeight":"28px","fontWeight":"600"}],"title-md":["16px",{"lineHeight":"24px","fontWeight":"600"}],"headline-sm":["24px",{"lineHeight":"32px","fontWeight":"600"}],"display-md":["44px",{"lineHeight":"52px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"500"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between py-space-lg"><div class="flex flex-col gap-space-lg"><div class="flex items-center gap-space-sm px-space-lg"><img alt="FinFlow Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XcqTKecNz3GfjX0ysvOFjWIeg3nlkrVhp5ho6o1jMY_CaIHyDHcGwXinRKzt3FSa7BAxpr_2vcsp_nwg6eR65kfmdOitiZ1q0t1HiMzsKIDVKsLe84_tvJa84Y1Jkf8vlRHHw6HV1Y70Ss1mkYLBlmw0w0rmARJy0xxH5YYlGT68iCFzm6TmWsPVXoVH7rNH7naFJDDVO3IdIVZhqBpWEMvf__UsGj-2yz09O5z1MZ9A"/><div class="flex flex-col"><span class="font-title-lg text-title-lg tracking-tight text-primary leading-none">FinFlow</span><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-space-xs">Kelola Finansial</span></div></div><div class="px-space-md"><nav class="flex flex-col gap-space-xs" data-active-classes="bg-primary-container text-on-primary font-title-sm shadow-sm"><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-title-sm text-title-sm" data-path="dashboard" href="#"><span class="material-symbols-outlined text-title-lg">dashboard</span><span>Dashboard</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-title-sm text-title-sm" data-path="analitik-dan-riwayat" href="#"><span class="material-symbols-outlined text-title-lg">query_stats</span><span>Analitik &amp; Riwayat</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-title-sm text-title-sm" data-path="kelola-dompet" href="#"><span class="material-symbols-outlined text-title-lg">account_balance_wallet</span><span>Kelola Dompet</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-title-sm text-title-sm" data-path="tanya-ai-dan-setelan" href="#"><span class="material-symbols-outlined text-title-lg">auto_awesome</span><span>Tanya AI &amp; Setelan</span></a></nav></div></div><div class="px-space-md flex flex-col gap-space-sm"><div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-xs"><div class="flex items-center justify-between"><span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Status Dompet</span><span class="h-2 w-2 rounded-full bg-secondary"></span></div><span class="font-title-sm text-title-sm text-on-surface">Aktif &amp; Terhubung</span><span class="font-body-sm text-body-sm text-on-surface-variant">Sinkronisasi bank real-time</span></div><div class="flex items-center justify-between px-space-sm py-space-xs text-on-surface-variant"><span class="font-label-sm text-label-sm">FinFlow v2.4 (ID)</span><span class="material-symbols-outlined text-title-sm text-on-surface-variant cursor-pointer hover:text-on-surface transition-colors">help</span></div></div></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 h-16 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-xl"><div class="flex items-center gap-space-lg flex-1 max-w-xl"><div class="relative w-full flex items-center"><span class="material-symbols-outlined absolute left-space-md text-on-surface-variant text-title-md pointer-events-none">search</span><input class="w-full bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-outline pl-11 pr-space-md py-space-xs rounded-xl border-none outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all" placeholder="Cari transaksi, pos belanja, atau catatan..." type="search"/></div></div><div class="flex items-center gap-space-md"><button class="flex items-center gap-space-xs bg-primary text-on-primary font-title-sm text-title-sm px-space-md py-space-xs rounded-full hover:bg-primary-container transition-all active:scale-[0.98] shadow-sm" type="button"><span class="material-symbols-outlined text-title-md">add</span><span>Catat Transaksi</span></button><button aria-label="Pemberitahuan" class="relative p-space-xs rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-title-lg">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full ring-2 ring-surface"></span></button><div class="flex items-center gap-space-sm pl-space-sm"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8lKHcbIGgjms-eu9Lb9fRKqetJc9gdlUQ1Nq87benWqAbHvot8JU-6BWwoFGImNxDAabiDRg_VpICgWTKa9r4-l8uL51tsACGbmLOxucxMvTrFjITRH764GNJqK2dFsottuB66MYoW4DVmUIqNlUWJJkhy29yIH_1n60TuWamD-IMuOq11eJ8woRudsEmwS1DBNbFqHVxF-zO4zP89GEuJhX7DAgDppDt-8Q4VXWf"/><div class="hidden xl:flex flex-col text-left"><span class="font-title-sm text-title-sm text-on-surface leading-tight">Budi Santoso</span><span class="font-label-sm text-label-sm text-on-surface-variant">Nasabah Prioritas</span></div></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="p-space-xl flex flex-col gap-space-lg">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md bg-surface-container-lowest p-space-lg rounded-2xl shadow-sm">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="inline-flex items-center justify-center p-1 rounded-lg bg-primary-fixed text-primary text-title-sm">
+<span class="material-symbols-outlined text-title-sm">psychology</span>
+</span>
+<span class="font-label-sm text-label-sm text-primary font-bold uppercase tracking-wider">Modul Cerdas &amp; Utilitas</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-surface tracking-tight">Asisten AI FinFlow &amp; Pengaturan Sistem</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5">Konsultasi finansial berbasis data riil Anda dan pengaturan preferensi akun</p>
+</div>
+<div class="flex items-center gap-space-sm self-start md:self-auto">
+<div class="flex items-center gap-2 px-space-md py-1.5 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md">
+<span class="h-2 w-2 rounded-full bg-secondary animate-pulse"></span>
+<span>Model FinLLM v3.2 Terhubung</span>
+</div>
+<button class="p-2 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors" type="button">
+<span class="material-symbols-outlined text-title-md">history</span>
+</button>
+</div>
+</div>
+<!-- Main 12-Column Split Content -->
+<div class="grid grid-cols-12 gap-space-lg items-start">
+<!-- LEFT SIDE: AI Chatbot Assistant (7 cols) -->
+<section class="col-span-12 lg:col-span-7 flex flex-col gap-space-md">
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col h-[740px]">
+<!-- Chat Header -->
+<div class="flex items-center justify-between pb-space-md bg-surface-container-lowest">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary-container to-tertiary-container flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-title-lg">auto_awesome</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-title-md text-title-md text-on-surface">FinFlow Intelligence</span>
+<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-primary text-label-sm font-semibold">Aktif</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-body-sm text-secondary">database</span>
+                  Terhubung ke 84 transaksi Mei 2024
+                </span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors" title="Bersihkan riwayat dialog" type="button">
+<span class="material-symbols-outlined text-title-md">cleaning_services</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors" title="Unduh log saran AI" type="button">
+<span class="material-symbols-outlined text-title-md">share</span>
+</button>
+</div>
+</div>
+<!-- Chat Conversation Scroll Area -->
+<div class="flex-1 overflow-y-auto space-y-space-md pr-space-xs py-space-sm" id="chat-stream">
+<!-- System Timestamp Pill -->
+<div class="flex justify-center">
+<span class="px-space-md py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
+                Hari ini • Sesi Analisis Keuangan Aktif
+              </span>
+</div>
+<!-- User Bubble -->
+<div class="flex items-start justify-end gap-space-sm pl-8">
+<div class="flex flex-col items-end gap-1 max-w-[85%]">
+<div class="bg-primary text-on-primary rounded-2xl rounded-tr-xs p-space-md shadow-sm">
+<p class="font-body-md text-body-md leading-relaxed">
+                    Bagaimana cara saya menekan pengeluaran sebesar 15% bulan depan tanpa mengorbankan kebutuhan pokok?
+                  </p>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mr-1">14:28 • Dibaca</span>
+</div>
+<img class="w-8 h-8 rounded-full object-cover shadow-sm mt-1" data-alt="Portrait photo of a young professional Indonesian woman Sarah Amalia looking focused and confident, wearing modest elegant contemporary attire with soft warm lighting in an office setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmov9wR_jLGYWA47Q-NdEpmTihnJf-9VUnacmzgaivvJ4PbZp2kcgoUxrpgJ8yklG7EcSrB9AGJiq0dVCKNvdUNsvVd1vch9zEjtzPIVvm8noLOcgeGfCGzxKv1M1reO7oKNgdCKPVKJuI966T7zasUbsmUx7C3pr5ut3TJM5KGOaIi_eEeg_HtS4qiod077V_v_kcGrMUGKhoGSgjLaNnzpxZk-1uUpcGOvP9FQYc"/>
+</div>
+<!-- AI Bubble -->
+<div class="flex items-start gap-space-sm pr-4">
+<div class="w-8 h-8 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shrink-0 shadow-sm mt-1">
+<span class="material-symbols-outlined text-title-sm">auto_awesome</span>
+</div>
+<div class="flex flex-col gap-space-sm max-w-[90%]">
+<div class="bg-surface-container-low text-on-surface rounded-2xl rounded-tl-xs p-space-md shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm text-primary font-bold">
+<span class="material-symbols-outlined text-title-sm">insights</span>
+<span>ANALISIS POLA ARUS KAS (MEI 2024)</span>
+</div>
+<p class="font-body-md text-body-md leading-relaxed text-on-surface">
+                    Berdasarkan data Anda 3 bulan terakhir, pengeluaran terbesar yang bersifat fleksibel ada pada kategori <strong class="text-primary font-semibold">Makanan Luar &amp; Kopi</strong> (rata-rata Rp 2.400.000/bln) dan <strong class="text-primary font-semibold">Langganan Hiburan tidak aktif</strong> (Rp 250.000). Mengurangi frekuensi delivery 2x seminggu dan menjeda 2 langganan streaming akan otomatis menghemat <span class="font-label-lg font-semibold text-secondary">Rp 780.000</span> (~12,3% dari total belanjaan).
+                  </p>
+<!-- Embedded Rich Widget: Smart Recommendation Action Card -->
+<div class="mt-space-xs p-space-md bg-surface-container-lowest rounded-xl shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-title-md">savings</span>
+<span class="font-title-sm text-title-sm text-on-surface">Saran Hemat Otomatis</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-container px-2 py-0.5 rounded-full font-bold">+Rp 780.000/bln</span>
+</div>
+<!-- Mini Visual Breakdown -->
+<div class="grid grid-cols-2 gap-space-sm py-space-xs">
+<div class="bg-surface-container-low p-space-sm rounded-lg flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Pos Makanan Siap Saji</span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Rp 1.800.000</span>
+<span class="font-body-sm text-body-sm text-secondary">-Rp 600.000 target</span>
+</div>
+<div class="bg-surface-container-low p-space-sm rounded-lg flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Streaming Subscriptions</span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Rp 70.000</span>
+<span class="font-body-sm text-body-sm text-secondary">-Rp 180.000 target</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Dampaknya: Target tabungan 15% tercapai di Juni.</span>
+<button class="flex items-center gap-1.5 px-space-md py-2 rounded-full bg-primary text-on-primary font-title-sm text-title-sm shadow-sm hover:bg-primary-container transition-all active:scale-95" id="btn-apply-rec" type="button">
+<span class="material-symbols-outlined text-title-sm">tune</span>
+<span>Terapkan Rekomendasi Anggaran</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md px-1 text-on-surface-variant font-label-sm text-label-sm">
+<span>14:29 • Dihasilkan dalam 1.2 detik</span>
+<div class="flex items-center gap-1">
+<button class="p-1 hover:text-on-surface transition-colors" title="Bermanfaat"><span class="material-symbols-outlined text-title-sm">thumb_up</span></button>
+<button class="p-1 hover:text-on-surface transition-colors" title="Kurang relevan"><span class="material-symbols-outlined text-title-sm">thumb_down</span></button>
+<button class="p-1 hover:text-on-surface transition-colors" title="Salin saran"><span class="material-symbols-outlined text-title-sm">content_copy</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Prompt Suggestions Pills -->
+<div class="pt-space-sm pb-space-sm flex flex-col gap-1.5 bg-surface-container-lowest">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Saran Pertanyaan Lanjutan:</span>
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+<button class="prompt-pill shrink-0 flex items-center gap-1.5 px-space-md py-1.5 rounded-full bg-surface-container text-on-surface hover:bg-primary-fixed hover:text-primary transition-colors text-title-sm font-title-sm shadow-sm" type="button">
+<span class="material-symbols-outlined text-title-sm text-primary">fastfood</span>
+<span>Analisis kebiasaan jajan saya</span>
+</button>
+<button class="prompt-pill shrink-0 flex items-center gap-1.5 px-space-md py-1.5 rounded-full bg-surface-container text-on-surface hover:bg-primary-fixed hover:text-primary transition-colors text-title-sm font-title-sm shadow-sm" type="button">
+<span class="material-symbols-outlined text-title-sm text-secondary">trending_up</span>
+<span>Prediksi sisa saldo akhir bulan</span>
+</button>
+<button class="prompt-pill shrink-0 flex items-center gap-1.5 px-space-md py-1.5 rounded-full bg-surface-container text-on-surface hover:bg-primary-fixed hover:text-primary transition-colors text-title-sm font-title-sm shadow-sm" type="button">
+<span class="material-symbols-outlined text-title-sm text-tertiary">devices</span>
+<span>Apakah saya aman beli gadget baru bulan ini?</span>
+</button>
+</div>
+</div>
+<!-- Input Bar -->
+<div class="pt-space-xs bg-surface-container-lowest">
+<form class="relative flex items-center gap-space-xs bg-surface-container-low rounded-2xl p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-primary-container transition-all" id="chat-form">
+<button class="p-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Lampirkan berkas mutasi / nota" type="button">
+<span class="material-symbols-outlined text-title-lg">attach_file</span>
+</button>
+<input autocomplete="off" class="flex-1 bg-transparent text-on-surface placeholder:text-outline font-body-md text-body-md px-space-xs py-2 outline-none" id="chat-input" placeholder="Ketik pertanyaan finansial Anda..." type="text"/>
+<button class="p-2 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Gunakan masukan suara" type="button">
+<span class="material-symbols-outlined text-title-lg">mic</span>
+</button>
+<button class="flex items-center justify-center p-2.5 rounded-xl bg-primary text-on-primary hover:bg-primary-container transition-all active:scale-95 shadow-sm" type="submit">
+<span class="material-symbols-outlined text-title-md">send</span>
+</button>
+</form>
+<div class="flex items-center justify-between px-2 pt-1.5 text-on-surface-variant">
+<span class="font-label-sm text-label-sm">FinFlow AI dilatih pada standar privasi perbankan Indonesia (ISO 27001).</span>
+<span class="font-label-sm text-label-sm font-mono">Kerahasiaan Terenkripsi</span>
+</div>
+</div>
+</div>
+</section>
+<!-- RIGHT SIDE: Profile, Currency, Alerts & Exports (5 cols) -->
+<section class="col-span-12 lg:col-span-5 flex flex-col gap-space-lg">
+<!-- 1. Profile Summary Card -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Profil Pengguna &amp; Akun</span>
+<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-semibold">Tier Utama</span>
+</div>
+<div class="flex items-center gap-space-md bg-surface-container-low p-space-md rounded-xl">
+<div class="relative">
+<img class="w-14 h-14 rounded-full object-cover shadow-sm ring-2 ring-primary-fixed" data-alt="Portrait photography of Indonesian woman Sarah Amalia smiling softly in an executive corporate headshot style against clean studio backdrop with soft blue fill lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCamo3wpcof-i1_JKGEMXPIQL32OncLRysNj0wEzE2aTyblbGIWPmIWmqLQo7zYk6nuP6MKgkMSBC32NJNeU3pn-1y1AaycgRr3yOtxeeZLvzGlXIV6b65jMHOhCWobUEyy73yqybX_1oi420A-CuaFfnqoEP2v0FZHE4fqtSNvnWGnmOBhaa1bfAP504GIsFnVYKx6pXcq7EWiSEEQUm-2C9Enf9GVgbddAEO3ClM7"/>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-secondary ring-2 ring-surface-container-low"></span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<h2 class="font-title-lg text-title-lg text-on-surface truncate">Sarah Amalia</h2>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">sarah.amalia@finflow.id</span>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="material-symbols-outlined text-title-sm text-tertiary">verified</span>
+<span class="font-label-sm text-label-sm font-semibold text-tertiary">Paket Premium FinFlow • Aktif s/d 2025</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 2. Preferensi Finansial & Format Mata Uang -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-title-md">payments</span>
+<h3 class="font-title-md text-title-md text-on-surface">Preferensi Mata Uang &amp; Wilayah</h3>
+</div>
+<div class="grid grid-cols-1 gap-space-sm">
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant font-semibold uppercase" for="currency-select">Mata Uang Dasar</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-low text-on-surface font-body-md text-body-md px-space-md py-2.5 rounded-xl border-none outline-none focus:ring-2 focus:ring-primary-container pr-10 cursor-pointer" id="currency-select">
+<option selected="" value="IDR">IDR - Rupiah Indonesia (Rp)</option>
+<option value="USD">USD - Dolar Amerika Serikat ($)</option>
+<option value="SGD">SGD - Dolar Singapura (S$)</option>
+<option value="EUR">EUR - Euro Uni Eropa (€)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-3 text-on-surface-variant pointer-events-none text-title-md">expand_more</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-space-sm pt-1">
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant font-semibold uppercase" for="number-format">Format Angka</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-low text-on-surface font-body-md text-body-md px-space-md py-2.5 rounded-xl border-none outline-none focus:ring-2 focus:ring-primary-container pr-10 cursor-pointer" id="number-format">
+<option selected="">1.000.000,00 (ID)</option>
+<option>1,000,000.00 (US)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-3 text-on-surface-variant pointer-events-none text-title-md">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant font-semibold uppercase" for="fiscal-cycle">Siklus Gajian</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-low text-on-surface font-body-md text-body-md px-space-md py-2.5 rounded-xl border-none outline-none focus:ring-2 focus:ring-primary-container pr-10 cursor-pointer" id="fiscal-cycle">
+<option selected="">Tanggal 25 Tiap Bulan</option>
+<option>Tanggal 1 Tiap Bulan</option>
+<option>Tanggal 28 Tiap Bulan</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-3 text-on-surface-variant pointer-events-none text-title-md">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 3. Pengingat Harian & Otomasi Notifikasi -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-title-md">alarm</span>
+<h3 class="font-title-md text-title-md text-on-surface">Pengingat Harian (Jadwal Notifikasi)</h3>
+</div>
+<span class="material-symbols-outlined text-secondary text-title-md">notifications_active</span>
+</div>
+<div class="flex items-center justify-between p-space-md rounded-xl bg-surface-container-low gap-space-md">
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">Catat Pengeluaran Harian</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                Kirim notifikasi pengingat catat pengeluaran setiap pukul <span class="font-mono font-semibold text-primary">20:00 WIB</span>
+</p>
+</div>
+<!-- Custom Accessible Toggle Switch -->
+<label class="relative inline-flex items-center cursor-pointer shrink-0">
+<input checked="" class="sr-only peer" id="toggle-daily-reminder" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between p-space-md rounded-xl bg-surface-container-low gap-space-md">
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">Peringatan Budget Menipis</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                Beritahu jika kategori belanja melampaui 80% dari batas pagu.
+              </p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer shrink-0">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+</div>
+<!-- 4. Ekspor Data & Pelaporan -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-title-md">ios_share</span>
+<h3 class="font-title-md text-title-md text-on-surface">Ekspor Data &amp; Laporan</h3>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">Format Lengkap</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Unduh rekapan mutasi debit/kredit dan laporan analitik untuk keperluan pembukuan pribadi atau pajak tahunan.
+          </p>
+<div class="grid grid-cols-2 gap-space-sm">
+<button class="flex flex-col items-start p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors group" type="button">
+<div class="p-2 rounded-lg bg-secondary-container text-on-secondary-container mb-2 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-title-md">table_view</span>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface">Ekspor ke Excel/CSV</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Format .xlsx &amp; .csv</span>
+</button>
+<button class="flex flex-col items-start p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors group" type="button">
+<div class="p-2 rounded-lg bg-error-container text-on-error-container mb-2 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-title-md">picture_as_pdf</span>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface">Unduh Laporan (PDF)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Ringkasan Bulan Mei</span>
+</button>
+</div>
+</div>
+<!-- 5. Keamanan & Akun -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col gap-space-sm">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="material-symbols-outlined text-primary text-title-md">security</span>
+<h3 class="font-title-md text-title-md text-on-surface">Keamanan &amp; Sesi Akun</h3>
+</div>
+<!-- Setting item rows -->
+<div class="divide-y divide-transparent flex flex-col gap-1">
+<a class="flex items-center justify-between p-space-sm rounded-xl hover:bg-surface-container-low transition-colors" href="#">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-title-md">lock_reset</span>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">Ganti Kata Sandi</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Terakhir diubah 45 hari yang lalu</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-title-md">chevron_right</span>
+</a>
+<div class="flex items-center justify-between p-space-sm rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-title-md">shield</span>
+<div class="flex flex-col">
+<span class="font-title-sm text-title-sm text-on-surface">Autentikasi 2-Langkah (2FA)</span>
+<span class="font-body-sm text-body-sm text-secondary font-medium">Aktif melalui Google Authenticator</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">Tervalidasi</span>
+</div>
+<button class="w-full flex items-center justify-between p-space-sm rounded-xl text-error hover:bg-error-container/40 transition-colors mt-1" type="button">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-title-md">logout</span>
+<span class="font-title-sm text-title-sm">Keluar Sesi (Logout)</span>
+</div>
+<span class="font-label-sm text-label-sm">Desktop Mac OS • ID-JKT-09</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<script>
+  // Interactive Prompt Pill & Chat behavior
+  document.addEventListener('DOMContentLoaded', () => {
+    const chatInput = document.getElementById('chat-input');
+    const chatForm = document.getElementById('chat-form');
+    const chatStream = document.getElementById('chat-stream');
+    const pills = document.querySelectorAll('.prompt-pill');
+    const btnApplyRec = document.getElementById('btn-apply-rec');
+
+    // Clicking prompt pills injects query and simulates reaction
+    pills.forEach((pill) => {
+      pill.addEventListener('click', () => {
+        const text = pill.innerText.trim();
+        chatInput.value = text;
+        chatInput.focus();
+      });
+    });
+
+    if (chatForm) {
+      chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const msg = chatInput.value.trim();
+        if (!msg) return;
+
+        // Append user bubble
+        const userDiv = document.createElement('div');
+        userDiv.className = 'flex items-start justify-end gap-space-sm pl-8';
+        userDiv.innerHTML = `
+          <div class="flex flex-col items-end gap-1 max-w-[85%]">
+            <div class="bg-primary text-on-primary rounded-2xl rounded-tr-xs p-space-md shadow-sm">
+              <p class="font-body-md text-body-md leading-relaxed">${msg}</p>
+            </div>
+            <span class="font-label-sm text-label-sm text-on-surface-variant mr-1">Baru saja</span>
+          </div>
+          <div class="w-8 h-8 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold text-label-md mt-1">SA</div>
+        `;
+        chatStream.appendChild(userDiv);
+        chatInput.value = '';
+        chatStream.scrollTop = chatStream.scrollHeight;
+
+        // Simulate AI thinking and reply
+        setTimeout(() => {
+          const aiDiv = document.createElement('div');
+          aiDiv.className = 'flex items-start gap-space-sm pr-4';
+          aiDiv.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shrink-0 shadow-sm mt-1">
+              <span class="material-symbols-outlined text-title-sm">auto_awesome</span>
+            </div>
+            <div class="flex flex-col gap-1 max-w-[90%]">
+              <div class="bg-surface-container-low text-on-surface rounded-2xl rounded-tl-xs p-space-md shadow-sm">
+                <p class="font-body-md text-body-md leading-relaxed">
+                  Pertanyaan Anda sedang diproses oleh FinFlow Intelligence: menganalisis mutasi rekening untuk: <em>"${msg}"</em>. Estimasi simulasi menunjukkan sisa saldo akhir bulan Anda tetap di atas target aman Rp 4.200.000.
+                </p>
+              </div>
+              <span class="font-label-sm text-label-sm text-on-surface-variant ml-1">Baru saja &bull; Prediksi real-time</span>
+            </div>
+          `;
+          chatStream.appendChild(aiDiv);
+          chatStream.scrollTop = chatStream.scrollHeight;
+        }, 650);
+      });
+    }
+
+    if (btnApplyRec) {
+      btnApplyRec.addEventListener('click', function() {
+        this.innerHTML = '<span class="material-symbols-outlined text-title-sm">check_circle</span><span>Anggaran Telah Disesuaikan!</span>';
+        this.classList.remove('bg-primary');
+        this.classList.add('bg-secondary');
+      });
+    }
+  });
+</script></main></div></body></html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html lang="id"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"primary-fixed":"#dce1ff","secondary-container":"#82f5c1","on-primary-container":"#90a8ff","on-primary-fixed-variant":"#264191","tertiary-fixed":"#e1e0ff","surface":"#faf8ff","secondary-fixed":"#85f8c4","on-background":"#131b2e","tertiary-container":"#2724b8","background":"#faf8ff","primary-fixed-dim":"#b6c4ff","surface-bright":"#faf8ff","secondary-fixed-dim":"#68dba9","on-error":"#ffffff","surface-container-highest":"#dae2fd","surface-container":"#eaedff","on-secondary-container":"#00714e","tertiary":"#0d0097","on-tertiary-fixed-variant":"#2f2ebe","on-primary":"#ffffff","inverse-primary":"#b6c4ff","on-error-container":"#93000a","on-tertiary-container":"#a1a4ff","on-tertiary-fixed":"#07006c","error":"#ba1a1a","on-secondary":"#ffffff","inverse-surface":"#283044","secondary":"#006c4a","surface-variant":"#dae2fd","inverse-on-surface":"#eef0ff","on-surface-variant":"#444651","on-surface":"#131b2e","primary-container":"#1e3a8a","primary":"#00236f","on-secondary-fixed":"#002114","surface-tint":"#4059aa","outline-variant":"#c5c5d3","on-secondary-fixed-variant":"#005137","on-primary-fixed":"#00164e","tertiary-fixed-dim":"#c0c1ff","surface-container-high":"#e2e7ff","surface-container-low":"#f2f3ff","error-container":"#ffdad6","surface-dim":"#d2d9f4","on-tertiary":"#ffffff","outline":"#757682","surface-container-lowest":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-xl":"2rem","space-md":"1rem","space-sm":"0.5rem","space-xs":"0.25rem","gutter":"1.5rem","margin":"2rem","space-lg":"1.5rem"},"fontFamily":{"display-lg":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"title-sm":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"label-lg":["JetBrains Mono"],"label-sm":["JetBrains Mono"],"headline-md":["Plus Jakarta Sans"],"title-lg":["Plus Jakarta Sans"],"title-md":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"display-md":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"label-md":["JetBrains Mono"]},"fontSize":{"display-lg":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"800"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"title-sm":["14px",{"lineHeight":"20px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"500"}],"label-sm":["10px",{"lineHeight":"14px","letterSpacing":"0.03em","fontWeight":"500"}],"headline-md":["28px",{"lineHeight":"36px","letterSpacing":"-0.01em","fontWeight":"600"}],"title-lg":["20px",{"lineHeight":"28px","fontWeight":"600"}],"title-md":["16px",{"lineHeight":"24px","fontWeight":"600"}],"headline-sm":["24px",{"lineHeight":"32px","fontWeight":"600"}],"display-md":["44px",{"lineHeight":"52px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"500"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between py-space-lg"><div class="flex flex-col gap-space-lg"><div class="flex items-center gap-space-sm px-space-lg"><img alt="FinFlow Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XcqTKecNz3GfjX0ysvOFjWIeg3nlkrVhp5ho6o1jMY_CaIHyDHcGwXinRKzt3FSa7BAxpr_2vcsp_nwg6eR65kfmdOitiZ1q0t1HiMzsKIDVKsLe84_tvJa84Y1Jkf8vlRHHw6HV1Y70Ss1mkYLBlmw0w0rmARJy0xxH5YYlGT68iCFzm6TmWsPVXoVH7rNH7naFJDDVO3IdIVZhqBpWEMvf__UsGj-2yz09O5z1MZ9A"/><div class="flex flex-col"><span class="font-title-lg text-title-lg tracking-tight text-primary leading-none">FinFlow</span><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mt-space-xs">Kelola Finansial</span></div></div><div class="px-space-md"><nav class="flex flex-col gap-space-xs" data-active-classes="bg-primary-container text-on-primary font-title-sm shadow-sm"><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-title-sm text-title-sm" data-path="dashboard" href="#"><span class="material-symbols-outlined text-title-lg">dashboard</span><span>Dashboard</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-title-sm text-title-sm" data-path="analitik-dan-riwayat" href="#"><span class="material-symbols-outlined text-title-lg">query_stats</span><span>Analitik &amp; Riwayat</span></a><a aria-current="page" class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl transition-colors bg-primary-container text-on-primary font-title-sm shadow-sm" data-path="kelola-dompet" href="#"><span class="material-symbols-outlined text-title-lg">account_balance_wallet</span><span>Kelola Dompet</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-title-sm text-title-sm" data-path="tanya-ai-dan-setelan" href="#"><span class="material-symbols-outlined text-title-lg">auto_awesome</span><span>Tanya AI &amp; Setelan</span></a></nav></div></div><div class="px-space-md flex flex-col gap-space-sm"><div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-xs"><div class="flex items-center justify-between"><span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Status Dompet</span><span class="h-2 w-2 rounded-full bg-secondary"></span></div><span class="font-title-sm text-title-sm text-on-surface">Aktif &amp; Terhubung</span><span class="font-body-sm text-body-sm text-on-surface-variant">Sinkronisasi bank real-time</span></div><div class="flex items-center justify-between px-space-sm py-space-xs text-on-surface-variant"><span class="font-label-sm text-label-sm">FinFlow v2.4 (ID)</span><span class="material-symbols-outlined text-title-sm text-on-surface-variant cursor-pointer hover:text-on-surface transition-colors">help</span></div></div></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 h-16 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-xl"><div class="flex items-center gap-space-lg flex-1 max-w-xl"><div class="relative w-full flex items-center"><span class="material-symbols-outlined absolute left-space-md text-on-surface-variant text-title-md pointer-events-none">search</span><input class="w-full bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-outline pl-11 pr-space-md py-space-xs rounded-xl border-none outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container transition-all" placeholder="Cari transaksi, pos belanja, atau catatan..." type="search"/></div></div><div class="flex items-center gap-space-md"><button class="flex items-center gap-space-xs bg-primary text-on-primary font-title-sm text-title-sm px-space-md py-space-xs rounded-full hover:bg-primary-container transition-all active:scale-[0.98] shadow-sm" type="button"><span class="material-symbols-outlined text-title-md">add</span><span>Catat Transaksi</span></button><button aria-label="Pemberitahuan" class="relative p-space-xs rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-title-lg">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full ring-2 ring-surface"></span></button><div class="flex items-center gap-space-sm pl-space-sm"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8lKHcbIGgjms-eu9Lb9fRKqetJc9gdlUQ1Nq87benWqAbHvot8JU-6BWwoFGImNxDAabiDRg_VpICgWTKa9r4-l8uL51tsACGbmLOxucxMvTrFjITRH764GNJqK2dFsottuB66MYoW4DVmUIqNlUWJJkhy29yIH_1n60TuWamD-IMuOq11eJ8woRudsEmwS1DBNbFqHVxF-zO4zP89GEuJhX7DAgDppDt-8Q4VXWf"/><div class="hidden xl:flex flex-col text-left"><span class="font-title-sm text-title-sm text-on-surface leading-tight">Budi Santoso</span><span class="font-label-sm text-label-sm text-on-surface-variant">Nasabah Prioritas</span></div></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="px-space-xl py-space-lg flex flex-col gap-space-xl max-w-[1600px] mx-auto w-full">
+<!-- Top Action Bar & Header Context -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary px-space-sm py-0.5 rounded-full bg-secondary-container">Aktif &amp; Terverifikasi</span>
+<span class="font-label-sm text-label-sm text-outline">•</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-label-md">FinFlow Vault Engine</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Kelola Dompet &amp; Rekening</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Pantau saldo terpisah, tambah akun perbankan, dan kelola dompet digital Anda secara terpusat.</p>
+</div>
+<div class="flex items-center gap-space-sm flex-wrap">
+<button class="flex items-center gap-space-xs bg-surface-container-high text-primary hover:bg-surface-container-highest transition-all px-space-md py-space-sm rounded-full font-title-sm text-title-sm shadow-sm active:scale-[0.98]" type="button">
+<span class="material-symbols-outlined text-title-md">sync_alt</span>
+<span>Transfer Antar Dompet</span>
+</button>
+<button class="flex items-center gap-space-xs bg-primary text-on-primary hover:bg-primary-container transition-all px-space-md py-space-sm rounded-full font-title-sm text-title-sm shadow-md active:scale-[0.98]" type="button">
+<span class="material-symbols-outlined text-title-md">add_circle</span>
+<span>+ Tambah Wallet Baru</span>
+</button>
+</div>
+</div>
+<!-- Ringkasan Total Saldo Multi-Wallet Bar -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-space-lg">
+<div class="flex flex-col sm:flex-row items-start sm:items-center gap-space-lg">
+<div class="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-headline-sm">account_balance_wallet</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Total Likuiditas Tergabung</span>
+<span class="material-symbols-outlined text-body-sm text-secondary" title="Data real-time disinkronkan">verified</span>
+</div>
+<div class="flex items-baseline gap-space-xs mt-0.5">
+<span class="font-label-lg text-title-md text-on-surface-variant">IDR</span>
+<span class="font-display-md text-display-md text-on-surface tracking-tight">48.750.000</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-md pt-space-md xl:pt-0 border-t border-surface-container xl:border-t-0">
+<div class="flex flex-col bg-surface-container-low px-space-md py-space-sm rounded-xl">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Dompet Aktif</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-title-lg">4</span>
+<span class="font-body-sm text-body-sm text-secondary flex items-center gap-0.5 mt-0.5">
+<span class="material-symbols-outlined text-body-sm">check_circle</span> 100% Siap Pakai
+          </span>
+</div>
+<div class="flex flex-col bg-surface-container-low px-space-md py-space-sm rounded-xl">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Diarsipkan</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-title-lg">1</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Disimpan aman</span>
+</div>
+<div class="flex flex-col bg-surface-container-low px-space-md py-space-sm rounded-xl">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Porsi Terbesar</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-title-lg">66.7%</span>
+<span class="font-body-sm text-body-sm text-primary mt-0.5">BCA Prioritas</span>
+</div>
+<div class="flex flex-col bg-surface-container-low px-space-md py-space-sm rounded-xl">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Biaya Admin Bulanan</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-title-lg">Rp 15.000</span>
+<span class="font-body-sm text-body-sm text-outline mt-0.5">Terkontrol efisien</span>
+</div>
+</div>
+</div>
+<!-- Grid Kartu Dompet (Premium Cards Section) -->
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<h2 class="font-title-lg text-title-lg text-on-surface">Portofolio Dompet Aktif</h2>
+<span class="font-label-sm text-label-sm px-space-xs py-0.5 rounded-md bg-surface-container text-on-surface-variant">4 Rekening</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-title-sm">drag_indicator</span>
+<span>Seret kartu untuk mengubah urutan prioritas</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-space-lg">
+<!-- Kartu 1: BCA Prioritas (Rekening Utama) -->
+<div class="group relative flex flex-col justify-between h-[230px] rounded-2xl p-space-lg bg-gradient-to-br from-primary via-primary-container to-on-primary-fixed-variant text-on-primary shadow-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+<div class="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-white/5 pointer-events-none blur-2xl"></div>
+<div class="absolute right-1/3 -bottom-10 w-36 h-36 rounded-full bg-secondary/15 pointer-events-none blur-xl"></div>
+<div class="flex items-start justify-between relative z-10">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center">
+<span class="material-symbols-outlined text-title-lg">account_balance</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-title-md text-title-md leading-snug">BCA Prioritas</span>
+<span class="px-space-xs py-0.5 rounded text-[10px] bg-secondary-container text-on-secondary-container font-label-sm uppercase tracking-wider font-semibold">Utama</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary-fixed opacity-90">Rekening Tabungan Valas &amp; IDR</span>
+</div>
+</div>
+<div class="relative">
+<button aria-label="Menu BCA" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-title-sm">more_vert</span>
+</button>
+</div>
+</div>
+<div class="relative z-10 my-auto">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary-fixed opacity-80 block mb-0.5">Saldo Tersedia</span>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-label-sm text-title-sm opacity-80 font-mono">Rp</span>
+<span class="font-headline-lg text-headline-lg tracking-tight font-bold">32.500.000</span>
+</div>
+</div>
+<div class="flex items-center justify-between relative z-10 pt-space-xs border-t border-white/10">
+<div class="flex items-center gap-space-xs font-label-md text-label-md tracking-widest text-primary-fixed opacity-90">
+<span class="material-symbols-outlined text-title-sm">credit_card</span>
+<span>**** 8821</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-primary-fixed">BCA KlikPay Terhubung</span>
+</div>
+</div>
+</div>
+<!-- Kartu 2: Mandiri Payroll -->
+<div class="group relative flex flex-col justify-between h-[230px] rounded-2xl p-space-lg bg-surface-container-lowest text-on-surface shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-xl bg-surface-container-high text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-title-lg">payments</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-title-md text-title-md leading-snug">Mandiri Payroll</span>
+<span class="px-space-xs py-0.5 rounded text-[10px] bg-primary-fixed text-on-primary-fixed font-label-sm uppercase tracking-wider font-semibold">Gaji</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">PT Teknologi Nusantara</span>
+</div>
+</div>
+<button aria-label="Menu Mandiri" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-title-sm">more_vert</span>
+</button>
+</div>
+<div class="my-auto">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant block mb-0.5">Saldo Tersedia</span>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-label-sm text-title-sm text-on-surface-variant font-mono">Rp</span>
+<span class="font-headline-lg text-headline-lg tracking-tight font-bold text-on-surface">8.200.000</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs border-t border-surface-container">
+<div class="flex items-center gap-space-xs font-label-md text-label-md text-on-surface-variant tracking-wider">
+<span class="material-symbols-outlined text-title-sm text-outline">credit_card</span>
+<span>**** 1042</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary flex items-center gap-1 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Auto-Debit Aktif
+            </span>
+</div>
+</div>
+<!-- Kartu 3: GoPay & GoPay Tabungan -->
+<div class="group relative flex flex-col justify-between h-[230px] rounded-2xl p-space-lg bg-surface-container-lowest text-on-surface shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-title-lg">account_balance_wallet</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-title-md text-title-md leading-snug">GoPay &amp; Tabungan</span>
+<span class="px-space-xs py-0.5 rounded text-[10px] bg-secondary-container text-on-secondary-container font-label-sm uppercase tracking-wider font-semibold">E-Wallet</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Bunga Jago 3.75% p.a.</span>
+</div>
+</div>
+<button aria-label="Menu GoPay" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-title-sm">more_vert</span>
+</button>
+</div>
+<div class="my-auto">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant block mb-0.5">Saldo Tersedia</span>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-label-sm text-title-sm text-on-surface-variant font-mono">Rp</span>
+<span class="font-headline-lg text-headline-lg tracking-tight font-bold text-on-surface">3.850.000</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs border-t border-surface-container">
+<div class="flex items-center gap-space-xs font-label-md text-label-md text-on-surface-variant">
+<span class="material-symbols-outlined text-title-sm text-outline">phone_iphone</span>
+<span>0812-****-4421</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">GoPay Plus</span>
+</div>
+</div>
+<!-- Kartu 4: Kas Tunai / Brankas Pribadi -->
+<div class="group relative flex flex-col justify-between h-[230px] rounded-2xl p-space-lg bg-surface-container-lowest text-on-surface shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-title-lg">savings</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-title-md text-title-md leading-snug">Kas Tunai Fisik</span>
+<span class="px-space-xs py-0.5 rounded text-[10px] bg-tertiary-fixed text-on-tertiary-fixed font-label-sm uppercase tracking-wider font-semibold">Cash</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Dompet Saku &amp; Brankas Rumah</span>
+</div>
+</div>
+<button aria-label="Menu Kas Tunai" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-title-sm">more_vert</span>
+</button>
+</div>
+<div class="my-auto">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant block mb-0.5">Estimasi Uang Fisik</span>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-label-sm text-title-sm text-on-surface-variant font-mono">Rp</span>
+<span class="font-headline-lg text-headline-lg tracking-tight font-bold text-on-surface">4.200.000</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs border-t border-surface-container">
+<div class="flex items-center gap-space-xs font-label-md text-label-md text-on-surface-variant">
+<span class="material-symbols-outlined text-title-sm text-outline">inventory_2</span>
+<span>Audit Manual</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Update 2 Hari Lalu</span>
+</div>
+</div>
+<!-- Kartu 5: Placeholder Tambah Dompet Baru -->
+<div class="flex flex-col justify-between h-[230px] rounded-2xl p-space-lg bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer group shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs text-primary font-title-sm text-title-sm">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-title-md">add</span>
+</div>
+<span>Tambah Rekening Baru</span>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+<div class="flex flex-col gap-space-xs my-auto">
+<span class="font-title-sm text-title-sm text-on-surface">Integrasi Finansial Terbuka</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Hubungkan instan melalui Open Banking API atau catat akun manual.</p>
+</div>
+<div class="flex items-center gap-space-xs flex-wrap pt-space-xs">
+<span class="px-space-xs py-1 rounded-md bg-surface-container-highest text-on-surface font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-body-sm">account_balance</span> Bank Transfer
+            </span>
+<span class="px-space-xs py-1 rounded-md bg-surface-container-highest text-on-surface font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-body-sm">wallet</span> E-Wallet
+            </span>
+<span class="px-space-xs py-1 rounded-md bg-surface-container-highest text-on-surface font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-body-sm">credit_card</span> Kartu Kredit
+            </span>
+<span class="px-space-xs py-1 rounded-md bg-surface-container-highest text-on-surface font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-body-sm">trending_up</span> Investasi
+            </span>
+</div>
+</div>
+<!-- Kartu 6: AI Cashflow Insights Highlight -->
+<div class="flex flex-col justify-between h-[230px] rounded-2xl p-space-lg bg-gradient-to-br from-[#F5F3FF] to-[#EEF2FF] shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-tertiary-container font-semibold px-space-xs py-0.5 rounded-full bg-tertiary-fixed flex items-center gap-1">
+<span class="material-symbols-outlined text-body-sm">auto_awesome</span> Wawasan Cerdas
+            </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Prediksi 7 Hari</span>
+</div>
+<div class="flex flex-col gap-1 my-auto">
+<span class="font-title-sm text-title-sm text-on-surface">Likuiditas Cukup untuk Tagihan</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Siklus gaji Mandiri tiba dalam 8 hari. Saldo BCA aman menutupi tagihan internet &amp; kartu kredit Rp 2.450.000.</p>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-label-sm text-label-sm text-secondary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-body-sm">trending_up</span> Arus Kas Sehat (+14%)
+            </span>
+<button class="text-primary font-title-sm text-body-sm hover:underline flex items-center gap-0.5" type="button">
+<span>Detail</span>
+<span class="material-symbols-outlined text-body-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Mutasi & Transfer Antar Dompet Terbaru Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-space-lg items-start">
+<!-- List Mutasi Internal (2 Cols) -->
+<div class="lg:col-span-2 bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<h3 class="font-title-lg text-title-lg text-on-surface">Mutasi &amp; Transfer Antar Dompet</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Log pemindahan saldo internal tanpa biaya transaksi</span>
+</div>
+<a class="font-title-sm text-title-sm text-primary hover:text-primary-container flex items-center gap-0.5 transition-colors" href="#">
+<span>Lihat Semua Log</span>
+<span class="material-symbols-outlined text-title-sm">arrow_forward</span>
+</a>
+</div>
+<div class="flex flex-col gap-space-xs">
+<!-- Item 1 -->
+<div class="flex items-center justify-between p-space-md rounded-xl hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center group-hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-title-md">sync_alt</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-title-sm text-title-sm text-on-surface">BCA Prioritas</span>
+<span class="material-symbols-outlined text-body-sm text-on-surface-variant">arrow_forward</span>
+<span class="font-title-sm text-title-sm text-on-surface">GoPay Dompet</span>
+<span class="px-space-xs py-0.2 rounded text-[10px] bg-secondary-container text-on-secondary-container font-label-sm font-semibold">Bebas Admin</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Top-up saldo belanja mingguan • Hari ini, 09:24 WIB</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">Rp 500.000</span>
+<span class="font-label-sm text-label-sm text-secondary">Berhasil</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center justify-between p-space-md rounded-xl hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center group-hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-title-md">atm</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-title-sm text-title-sm text-on-surface">Mandiri Payroll</span>
+<span class="material-symbols-outlined text-body-sm text-on-surface-variant">arrow_forward</span>
+<span class="font-title-sm text-title-sm text-on-surface">Kas Tunai Fisik</span>
+<span class="px-space-xs py-0.2 rounded text-[10px] bg-surface-container-highest text-on-surface-variant font-label-sm font-semibold">Tarik Tunai</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Penarikan ATM Mandiri KCP Sudirman • Kemarin, 17:40 WIB</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">Rp 1.000.000</span>
+<span class="font-label-sm text-label-sm text-secondary">Berhasil</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex items-center justify-between p-space-md rounded-xl hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center group-hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-title-md">currency_exchange</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="font-title-sm text-title-sm text-on-surface">Mandiri Payroll</span>
+<span class="material-symbols-outlined text-body-sm text-on-surface-variant">arrow_forward</span>
+<span class="font-title-sm text-title-sm text-on-surface">BCA Prioritas</span>
+<span class="px-space-xs py-0.2 rounded text-[10px] bg-surface-container-highest text-on-surface-variant font-label-sm font-semibold">BI-FAST</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Konsolidasi tabungan dana darurat • 24 Okt 2024</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">Rp 3.500.000</span>
+<span class="font-label-sm text-label-sm text-secondary">Berhasil</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Transfer Action Panel (1 Col) -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<h3 class="font-title-md text-title-md text-on-surface">Pemindahan Saldo Cepat</h3>
+<span class="material-symbols-outlined text-on-surface-variant">bolt</span>
+</div>
+<form class="flex flex-col gap-space-sm" onsubmit="event.preventDefault();">
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Dari Dompet (Sumber)</label>
+<select class="w-full bg-surface-container-low text-on-surface font-title-sm text-title-sm p-space-sm rounded-xl border-none outline-none focus:ring-2 focus:ring-primary">
+<option value="bca">BCA Prioritas (Rp 32.500.000)</option>
+<option value="mandiri">Mandiri Payroll (Rp 8.200.000)</option>
+<option value="gopay">GoPay (Rp 3.850.000)</option>
+<option value="cash">Kas Tunai (Rp 4.200.000)</option>
+</select>
+</div>
+<div class="flex justify-center -my-1">
+<button aria-label="Tukar Posisi Dompet" class="p-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-primary transition-transform active:rotate-180" type="button">
+<span class="material-symbols-outlined text-body-lg">swap_vert</span>
+</button>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Ke Dompet (Tujuan)</label>
+<select class="w-full bg-surface-container-low text-on-surface font-title-sm text-title-sm p-space-sm rounded-xl border-none outline-none focus:ring-2 focus:ring-primary">
+<option value="gopay">GoPay &amp; Tabungan (Rp 3.850.000)</option>
+<option value="bca">BCA Prioritas (Rp 32.500.000)</option>
+<option value="mandiri">Mandiri Payroll (Rp 8.200.000)</option>
+<option value="cash">Kas Tunai Fisik (Rp 4.200.000)</option>
+</select>
+</div>
+<div class="flex flex-col gap-1 mt-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Nominal Transfer (Rp)</label>
+<div class="relative flex items-center">
+<span class="absolute left-space-sm font-label-md text-label-md text-on-surface-variant">Rp</span>
+<input class="w-full bg-surface-container-low text-on-surface font-label-lg text-title-md pl-10 pr-space-sm py-space-sm rounded-xl border-none outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary font-semibold" type="text" value="500.000"/>
+</div>
+</div>
+<div class="flex items-center justify-between text-body-sm text-body-sm text-on-surface-variant px-1 pt-1">
+<span>Biaya Layanan Internal:</span>
+<span class="text-secondary font-semibold">Gratis (Rp 0)</span>
+</div>
+<button class="mt-space-sm w-full bg-primary text-on-primary py-space-sm rounded-xl font-title-sm text-title-sm hover:bg-primary-container transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-space-xs" type="submit">
+<span class="material-symbols-outlined text-title-sm">send</span>
+<span>Konfirmasi &amp; Eksekusi</span>
+</button>
+</form>
+</div>
+</div>
+<!-- Section Tab 'Dompet Diarsipkan' -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-xl bg-surface-container text-outline flex items-center justify-center">
+<span class="material-symbols-outlined text-title-md">archive</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<h3 class="font-title-lg text-title-lg text-on-surface">Dompet &amp; Rekening Diarsipkan</h3>
+<span class="font-label-sm text-label-sm px-space-xs py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant">1 Akun</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Rekening nonaktif yang disimpan untuk pelacakan data historis pajak &amp; pembukuan</span>
+</div>
+</div>
+<button class="text-primary hover:text-primary-container font-title-sm text-title-sm flex items-center gap-1 self-start sm:self-auto" type="button">
+<span class="material-symbols-outlined text-title-sm">tune</span>
+<span>Setelan Retensi Arsip</span>
+</button>
+</div>
+<!-- Item Diarsipkan -->
+<div class="bg-surface-container-low rounded-xl p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-surface-dim text-outline flex items-center justify-center">
+<span class="material-symbols-outlined text-headline-sm">account_balance</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-title-md text-title-md text-on-surface">BNI Taplus Bisnis Lama</span>
+<span class="font-label-sm text-label-sm px-space-xs py-0.5 rounded bg-surface-container-highest text-outline font-semibold">Diarsipkan sejak Feb 2024</span>
+</div>
+<div class="flex items-center gap-space-sm text-body-sm text-on-surface-variant mt-0.5">
+<span class="font-label-sm text-label-sm">No. Rek: **** 4099</span>
+<span>•</span>
+<span class="font-mono">Saldo Terakhir: Rp 0 (Tutup Buku)</span>
+<span>•</span>
+<span>142 Riwayat Transaksi Tersimpan</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-sm self-end md:self-auto">
+<button class="flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-highest hover:bg-surface-container text-on-surface font-title-sm text-title-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-title-sm text-secondary">unarchive</span>
+<span>Pulihkan Dompet</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-space-xs rounded-full hover:bg-error-container hover:text-on-error-container text-error font-title-sm text-title-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-title-sm">delete_forever</span>
+<span>Hapus Permanen</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div></main></div></body></html>
