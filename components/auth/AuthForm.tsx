@@ -1,0 +1,59 @@
+"use client";
+
+import Link from "next/link";
+import { useActionState, type ReactNode } from "react";
+import type { ActionState } from "@/lib/actions/state";
+import { Button } from "@/components/ui/Button";
+import { Field, FormError, Input } from "@/components/ui/Field";
+
+type FieldDef = { name: string; label: string; type: string; autoComplete: string };
+
+export function AuthForm({
+  title,
+  action,
+  fields,
+  submitLabel,
+  successMessage,
+  footer,
+}: {
+  title: string;
+  action: (prev: ActionState, fd: FormData) => Promise<ActionState>;
+  fields: FieldDef[];
+  submitLabel: string;
+  successMessage?: string;
+  footer?: ReactNode;
+}) {
+  const [state, formAction, pending] = useActionState(action, {});
+
+  return (
+    <div className="space-y-5">
+      <h1 className="text-xl font-bold">{title}</h1>
+      {state.ok && successMessage ? (
+        <p role="status" className="rounded-xl bg-positive-container px-4 py-3 text-sm text-on-positive-container">
+          {successMessage}
+        </p>
+      ) : (
+        <form action={formAction} className="space-y-4">
+          {fields.map((f) => (
+            <Field key={f.name} label={f.label}>
+              <Input name={f.name} type={f.type} autoComplete={f.autoComplete} required />
+            </Field>
+          ))}
+          <FormError message={state.error} />
+          <Button type="submit" disabled={pending} className="w-full">
+            {pending ? "Memproses…" : submitLabel}
+          </Button>
+        </form>
+      )}
+      {footer && <div className="space-y-1 text-center text-sm text-on-surface-variant">{footer}</div>}
+    </div>
+  );
+}
+
+export function AuthLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link href={href} className="font-semibold text-primary hover:underline">
+      {children}
+    </Link>
+  );
+}

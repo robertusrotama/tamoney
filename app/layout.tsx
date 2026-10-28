@@ -14,7 +14,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="id" className={`${jakarta.variable} ${jetbrains.variable} h-full antialiased`}>
       <head>
-        {/* eslint-disable-next-line @next/next/no-page-custom-font -- icon font, same as Stitch HTML */}
+        {/* eslint-disable-next-line @next/next/no-page-custom-font, @next/next/google-font-display -- icon font; "block" hides raw ligature names while loading */}
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
