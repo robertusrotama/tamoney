@@ -5,7 +5,7 @@ import { walletError } from "@/lib/guards";
 import { getActiveWalletIds } from "@/lib/queries";
 import { toOccurredAt } from "@/lib/reports";
 import { requireUser } from "@/lib/supabase/server";
-import { firstError, transferSchema } from "@/lib/validation";
+import { firstError, transferSchema, txSchema } from "@/lib/validation";
 import type { ActionState } from "./state";
 
 type Supabase = Awaited<ReturnType<typeof requireUser>>["supabase"];
@@ -24,6 +24,31 @@ async function write(sb: Supabase, id: FormDataEntryValue | null, row: Record<st
   if (error) return { error: "Gagal menyimpan, coba lagi" };
   revalidatePath("/", "layout");
   return { ok: true };
+}
+
+export async function saveTransaction(_: ActionState, fd: FormData): Promise<ActionState> {
+  const parsed = txSchema.safeParse(Object.fromEntries(fd));
+  if (!parsed.success) return { error: firstError(parsed.error) };
+  const t = parsed.data;
+  const { supabase } = await requireUser();
+
+  const [prev, category] = await Promise.all([
+    existing(supabase, fd.get("id")),
+    supabase.from("categories").select("kind").eq("id", t.category_id).maybeSingle(),
+  ]);
+  if (fd.get("id") && (!prev || prev.kind === "transfer")) return { error: "Transaksi tidak ditemukan" };
+  if (category.data?.kind !== t.kind) return { error: "Kategori tidak sesuai jenis transaksi" };
+  const err = walletError([t.wallet_id], await getActiveWalletIds(supabase), prev ? [prev.wallet_id] : []);
+  if (err) return { error: err };
+
+  return write(supabase, fd.get("id"), {
+    kind: t.kind,
+    amount: t.amount,
+    wallet_id: t.wallet_id,
+    category_id: t.category_id,
+    note: t.note,
+    occurred_at: toOccurredAt(t.occurred_at, prev?.occurred_at),
+  });
 }
 
 export async function saveTransfer(_: ActionState, fd: FormData): Promise<ActionState> {

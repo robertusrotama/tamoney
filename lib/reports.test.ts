@@ -10,6 +10,7 @@ import {
   toOccurredAt,
   todayWib,
   wibDate,
+  wibGreeting,
   type ReportTx,
 } from "./reports";
 
@@ -50,6 +51,16 @@ describe("toOccurredAt", () => {
 
   it("gives today in WIB", () => {
     expect(todayWib(new Date("2026-10-31T17:30:00Z"))).toBe("2026-11-01");
+  });
+});
+
+describe("wibGreeting", () => {
+  it("follows the WIB clock", () => {
+    expect(wibGreeting(new Date("2026-10-29T01:00:00Z"))).toBe("Selamat Pagi"); // 08:00
+    expect(wibGreeting(new Date("2026-10-29T05:00:00Z"))).toBe("Selamat Siang"); // 12:00
+    expect(wibGreeting(new Date("2026-10-29T09:00:00Z"))).toBe("Selamat Sore"); // 16:00
+    expect(wibGreeting(new Date("2026-10-29T13:00:00Z"))).toBe("Selamat Malam"); // 20:00
+    expect(wibGreeting(new Date("2026-10-28T20:00:00Z"))).toBe("Selamat Pagi"); // 03:00
   });
 });
 

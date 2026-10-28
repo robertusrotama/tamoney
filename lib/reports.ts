@@ -1,6 +1,6 @@
 import type { Tx } from "./types";
 
-export type ReportTx = Pick<Tx, "kind" | "amount" | "occurred_at" | "category_id"> & { category_name?: string };
+export type ReportTx = Pick<Tx, "kind" | "amount" | "occurred_at" | "category_id"> & { category_name?: string | null };
 
 // Asia/Jakarta is a fixed UTC+7 with no DST, so a constant offset is exact.
 const WIB_MS = 7 * 60 * 60 * 1000;
@@ -9,12 +9,21 @@ export function wibDate(iso: string): string {
   return new Date(new Date(iso).getTime() + WIB_MS).toISOString().slice(0, 10);
 }
 
+export function wibTime(iso: string): string {
+  return new Date(new Date(iso).getTime() + WIB_MS).toISOString().slice(11, 16);
+}
+
 export function monthKey(iso: string): string {
   return wibDate(iso).slice(0, 7);
 }
 
 export function todayWib(now = new Date()): string {
   return wibDate(now.toISOString());
+}
+
+export function wibGreeting(now = new Date()): string {
+  const h = new Date(now.getTime() + WIB_MS).getUTCHours();
+  return h < 11 ? "Selamat Pagi" : h < 15 ? "Selamat Siang" : h < 18 ? "Selamat Sore" : "Selamat Malam";
 }
 
 /** A picked WIB date + the current WIB time; an edit that keeps the date keeps its original timestamp. */

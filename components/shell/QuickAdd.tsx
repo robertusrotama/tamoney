@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { TxForm } from "@/components/transactions/TxForm";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { Icon } from "@/components/ui/Icon";
+import type { Category, Wallet } from "@/lib/types";
 
 /** "Catat Transaksi" in the top bar (desktop) and a floating + (mobile), both opening the same form. */
-export function QuickAdd() {
+export function QuickAdd({ wallets, categories }: { wallets: Wallet[]; categories: Category[] }) {
   const [open, setOpen] = useState(false);
+  const close = useCallback(() => setOpen(false), []);
   return (
     <>
       <Button onClick={() => setOpen(true)} className="hidden md:inline-flex">
@@ -21,8 +24,8 @@ export function QuickAdd() {
       >
         <Icon name="add" className="text-3xl" />
       </button>
-      <Dialog open={open} onClose={() => setOpen(false)} title="Catat Transaksi">
-        <p className="text-sm text-on-surface-variant">Segera.</p>
+      <Dialog open={open} onClose={close} title="Catat Transaksi">
+        <TxForm wallets={wallets} categories={categories} onDone={close} />
       </Dialog>
     </>
   );
