@@ -56,14 +56,18 @@ alter table public.wallets enable row level security;
 alter table public.categories enable row level security;
 alter table public.transactions enable row level security;
 
-create policy "own profile" on public.profiles for all
+create policy "own profile" on public.profiles for all to authenticated
   using (id = (select auth.uid())) with check (id = (select auth.uid()));
-create policy "own wallets" on public.wallets for all
+create policy "own wallets" on public.wallets for all to authenticated
   using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
-create policy "own categories" on public.categories for all
+create policy "own categories" on public.categories for all to authenticated
   using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
-create policy "own transactions" on public.transactions for all
+create policy "own transactions" on public.transactions for all to authenticated
   using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+
+-- Data API access for signed-in users only (rows still filtered by RLS above)
+revoke all on public.profiles, public.wallets, public.categories, public.transactions from anon;
+grant select, insert, update, delete on public.profiles, public.wallets, public.categories, public.transactions to authenticated;
 
 -- Balances are derived, never stored (docs/knowledge/memory/balance-from-view.md)
 create view public.wallet_balances with (security_invoker = true) as
@@ -80,6 +84,9 @@ select
 from public.wallets w
 left join public.transactions t on t.wallet_id = w.id or t.to_wallet_id = w.id
 group by w.id;
+
+revoke all on public.wallet_balances from anon;
+grant select on public.wallet_balances to authenticated;
 
 -- New user: profile + default categories
 create function public.handle_new_user() returns trigger
@@ -103,6 +110,9 @@ begin
   return new;
 end;
 $$;
+
+-- Trigger-only; never callable through the Data API.
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
 
 create trigger on_auth_user_created
   after insert on auth.users
