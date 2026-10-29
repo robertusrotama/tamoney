@@ -5,27 +5,30 @@ import { signIn } from "@/lib/actions/auth";
 export default async function MasukPage({ searchParams }: PageProps<"/masuk">) {
   const { error } = await searchParams;
   return (
-    <>
+    <div className="space-y-6">
       {error === "link" && <FormError message="Link sudah kedaluwarsa atau tidak valid. Coba lagi." />}
       <AuthForm
-        title="Masuk"
+        title="Selamat datang kembali"
+        subtitle="Masuk untuk lanjut mencatat keuanganmu"
         action={signIn}
         submitLabel="Masuk"
         fields={[
-          { name: "email", label: "Email", type: "email", autoComplete: "email" },
-          { name: "password", label: "Password", type: "password", autoComplete: "current-password" },
+          { name: "email", label: "Email", type: "email", autoComplete: "email", placeholder: "nama@email.com" },
+          {
+            name: "password",
+            label: "Password",
+            type: "password",
+            autoComplete: "current-password",
+            placeholder: "Password kamu",
+            hint: <AuthLink href="/lupa-password">Lupa password?</AuthLink>,
+          },
         ]}
         footer={
           <>
-            <p>
-              <AuthLink href="/lupa-password">Lupa password?</AuthLink>
-            </p>
-            <p>
-              Belum punya akun? <AuthLink href="/daftar">Daftar</AuthLink>
-            </p>
+            Belum punya akun? <AuthLink href="/daftar">Daftar</AuthLink>
           </>
         }
       />
-    </>
+    </div>
   );
 }

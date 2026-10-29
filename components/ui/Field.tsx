@@ -1,29 +1,52 @@
-import type { ComponentProps, ReactNode } from "react";
+"use client";
 
-export const inputClass =
-  "w-full min-h-11 rounded-[10px] bg-surface-dim px-3.5 text-[17px] text-on-surface outline-none placeholder:text-on-surface-variant focus:ring-2 focus:ring-primary disabled:opacity-50";
+import { useState, type ComponentProps, type ReactNode } from "react";
+import { IconButton } from "./Button";
+import { Icon } from "./Icon";
 
-export function Field({ label, children }: { label: string; children: ReactNode }) {
+/**
+ * The one field look shared by every input-like control (Input, AmountInput, Picker, DateField,
+ * PasswordField, SearchField): 48px tall pill-rounded fill, blue ring on focus.
+ */
+export const fieldClass =
+  "w-full h-12 rounded-[14px] bg-surface-dim px-4 text-[17px] text-on-surface outline-none placeholder:text-on-surface-variant focus:ring-2 focus:ring-primary focus-within:ring-2 focus-within:ring-primary disabled:opacity-50";
+/** @deprecated name kept for existing imports */
+export const inputClass = fieldClass;
+
+export function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
   return (
     <label className="block space-y-1.5">
-      <span className="px-1 text-[13px] text-on-surface-variant">{label}</span>
+      <span className="flex items-baseline justify-between px-1 text-[13px] font-medium text-on-surface-variant">
+        {label}
+        {hint && <span className="font-normal">{hint}</span>}
+      </span>
       {children}
     </label>
   );
 }
 
 export function Input(props: ComponentProps<"input">) {
-  return <input {...props} className={`${inputClass} ${props.className ?? ""}`} />;
+  return <input {...props} className={`${fieldClass} ${props.className ?? ""}`} />;
 }
 
-export function Select(props: ComponentProps<"select">) {
-  return <select {...props} className={`${inputClass} appearance-none ${props.className ?? ""}`} />;
+/** Password with a show/hide toggle inside the field. */
+export function PasswordField(props: Omit<ComponentProps<"input">, "type">) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className={`${fieldClass} flex items-center gap-2 pr-1.5`}>
+      <input {...props} type={show ? "text" : "password"} className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-on-surface-variant" />
+      <IconButton onClick={() => setShow((s) => !s)} aria-label={show ? "Sembunyikan password" : "Tampilkan password"} aria-pressed={show}>
+        <Icon name={show ? "visibility_off" : "visibility"} className="text-[20px]" />
+      </IconButton>
+    </div>
+  );
 }
 
 export function FormError({ message }: { message?: string }) {
   if (!message) return null;
   return (
-    <p role="alert" className="flex items-center gap-2 rounded-[10px] bg-negative-container px-3.5 py-2.5 text-[15px] text-negative">
+    <p role="alert" className="flex items-center gap-2 rounded-[12px] bg-negative-container px-4 py-3 text-[15px] text-negative">
+      <Icon name="error" className="text-[18px]" filled />
       {message}
     </p>
   );

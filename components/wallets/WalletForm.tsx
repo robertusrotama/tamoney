@@ -5,12 +5,13 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import { AmountInput } from "@/components/ui/AmountInput";
 import { Button, IconButton } from "@/components/ui/Button";
 import { Dialog, useDialog } from "@/components/ui/Dialog";
-import { Field, FormError, Input, Select } from "@/components/ui/Field";
+import { Field, FormError, Input } from "@/components/ui/Field";
+import { Picker } from "@/components/ui/Picker";
 import { useFormDone } from "@/components/ui/useFormDone";
 import { saveWallet } from "@/lib/actions/wallets";
 import { Icon } from "@/components/ui/Icon";
 import { WALLET_TYPE_LABEL, type Wallet, type WalletType } from "@/lib/types";
-import { CARD_COLORS, CARD_PATTERNS, cardStyle, type CardColor, type CardPattern } from "./style";
+import { CARD_COLORS, CARD_PATTERNS, WALLET_ICON, cardStyle, type CardColor, type CardPattern } from "./style";
 import { WalletFace } from "./WalletFace";
 
 function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void }) {
@@ -35,13 +36,13 @@ function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void })
       </Field>
       <div className="grid grid-cols-2 gap-3">
         <Field label="Jenis">
-          <Select name="type" value={type} onChange={(e) => setType(e.target.value as WalletType)}>
-            {Object.entries(WALLET_TYPE_LABEL).map(([v, l]) => (
-              <option key={v} value={v}>
-                {l}
-              </option>
-            ))}
-          </Select>
+          <Picker
+            name="type"
+            label="Jenis"
+            value={type}
+            onChange={(v) => setType(v as WalletType)}
+            options={(Object.keys(WALLET_TYPE_LABEL) as WalletType[]).map((v) => ({ value: v, label: WALLET_TYPE_LABEL[v], icon: WALLET_ICON[v] }))}
+          />
         </Field>
         <Field label="Saldo awal">
           <AmountInput name="initial_balance" defaultValue={wallet?.initial_balance} required={false} />
@@ -129,7 +130,7 @@ export function WalletDialog({
   return (
     <>
       {variant === "icon" ? (
-        <IconButton onClick={d.show} aria-label={label} className="text-current hover:bg-white/15">
+        <IconButton onClick={d.show} aria-label={label} tone="inherit">
           {children}
         </IconButton>
       ) : (

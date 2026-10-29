@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { fieldClass } from "./Field";
 import { Icon } from "./Icon";
 
 /**
@@ -13,12 +14,18 @@ export function Popover({
   active,
   align = "left",
   width = 288,
+  variant = "pill",
+  ariaLabel,
   children,
 }: {
   label: ReactNode;
   active?: boolean;
   align?: "left" | "right";
-  width?: number;
+  /** panel width in px, or "trigger" to match the trigger (field variant) */
+  width?: number | "trigger";
+  /** pill = filter chip; field = looks exactly like an Input (forms) */
+  variant?: "pill" | "field";
+  ariaLabel?: string;
   children: ReactNode | ((close: () => void) => ReactNode);
 }) {
   const [open, setOpen] = useState(false);
@@ -54,12 +61,18 @@ export function Popover({
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-controls={id}
-        whileTap={{ scale: 0.96 }}
-        className={`flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[14px] font-medium ${
-          active ? "bg-primary-container text-on-primary-container" : "bg-card text-on-surface hover:bg-surface-dim"
-        }`}
+        aria-haspopup="dialog"
+        aria-label={ariaLabel}
+        whileTap={{ scale: variant === "field" ? 0.99 : 0.96 }}
+        className={
+          variant === "field"
+            ? `${fieldClass} flex items-center justify-between gap-2 text-left ${open ? "ring-2 ring-primary" : ""}`
+            : `flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[14px] font-medium focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
+                active ? "bg-primary-container text-on-primary-container" : "bg-card text-on-surface hover:bg-surface-dim"
+              }`
+        }
       >
-        {label}
+        <span className="flex min-w-0 items-center gap-1.5 truncate">{label}</span>
         <motion.span animate={{ rotate: open ? 180 : 0 }} className="flex">
           <Icon name="expand_more" className="text-[18px] opacity-70" />
         </motion.span>
@@ -72,8 +85,10 @@ export function Popover({
             initial={{ opacity: 0, scale: 0.92, y: -4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: -4 }}
-            style={{ width, originX: align === "left" ? 0 : 1, originY: 0 }}
-            className={`glass glass-thick absolute top-[calc(100%+8px)] z-50 max-w-[calc(100vw-2rem)] rounded-[18px] p-2 ${align === "left" ? "left-0" : "right-0"}`}
+            style={{ width: width === "trigger" ? undefined : width, originX: align === "left" ? 0 : 1, originY: 0 }}
+            className={`glass glass-thick absolute top-[calc(100%+8px)] z-50 max-w-[calc(100vw-2rem)] rounded-[18px] p-2 ${
+              width === "trigger" ? "right-0 left-0 min-w-56" : align === "left" ? "left-0" : "right-0"
+            }`}
           >
             {typeof children === "function" ? children(close) : children}
           </motion.div>

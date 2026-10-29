@@ -1,11 +1,13 @@
 "use client";
 
-import { motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 import { AmountInput, withDots } from "@/components/ui/AmountInput";
 import { Button } from "@/components/ui/Button";
-import { Field, FormError, Input, Select } from "@/components/ui/Field";
+import { DateField } from "@/components/ui/DateField";
+import { Field, FormError, Input } from "@/components/ui/Field";
+import { Picker } from "@/components/ui/Picker";
+import { WALLET_ICON } from "@/components/wallets/style";
 import { Segmented } from "@/components/ui/Segmented";
 import { useFormDone } from "@/components/ui/useFormDone";
 import { TransferForm } from "@/components/wallets/TransferForm";
@@ -88,38 +90,37 @@ export function TxForm({
         <AmountInput name="amount" value={amount} onChange={setAmount} large />
         <div className="flex gap-2">
           {QUICK.map((q) => (
-            <motion.button
+            <Button
               key={q}
               type="button"
-              whileTap={{ scale: 0.92 }}
+              variant="tonal"
+              size="sm"
               onClick={() => setAmount(withDots(String((parseRupiah(amount) ?? 0) + q)))}
-              className="flex-1 rounded-full bg-primary-container py-1.5 text-[13px] font-semibold text-on-primary-container tabular-nums"
+              className="flex-1 tabular-nums"
             >
               +{q / 1000}rb
-            </motion.button>
+            </Button>
           ))}
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <Field label="Dompet">
-          <Select name="wallet_id" defaultValue={initial?.wallet_id ?? wallets[0].id} required>
-            {wallets.map((w) => (
-              <option key={w.id} value={w.id}>
-                {w.name}
-              </option>
-            ))}
-          </Select>
+          <Picker
+            name="wallet_id"
+            label="Dompet"
+            defaultValue={initial?.wallet_id ?? wallets[0].id}
+            options={wallets.map((w) => ({ value: w.id, label: w.name, icon: WALLET_ICON[w.type] }))}
+          />
         </Field>
         <Field label="Kategori">
-          <Select name="category_id" key={kind} defaultValue={initial?.kind === kind ? (initial.category_id ?? "") : ""} required>
-            <option value="">Pilih</option>
-            {options.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </Select>
+          <Picker
+            key={kind}
+            name="category_id"
+            label="Kategori"
+            defaultValue={initial?.kind === kind ? (initial.category_id ?? "") : ""}
+            options={options.map((c) => ({ value: c.id, label: c.name, icon: c.icon }))}
+          />
         </Field>
       </div>
 
@@ -127,7 +128,7 @@ export function TxForm({
         <Input name="note" defaultValue={initial?.note ?? ""} maxLength={200} placeholder="Contoh: Makan siang mie ayam" />
       </Field>
       <Field label="Tanggal">
-        <Input name="occurred_at" type="date" defaultValue={initial ? wibDate(initial.occurred_at) : todayWib()} required />
+        <DateField name="occurred_at" label="Tanggal" today={todayWib()} defaultValue={initial ? wibDate(initial.occurred_at) : todayWib()} />
       </Field>
 
       <FormError message={state.error} />

@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { startTransition, useActionState, useState, useTransition, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
+import { useConfirm } from "@/components/ui/Confirm";
 import { FormError, Input } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
 import { createToken, revokeToken } from "@/lib/actions/tokens";
@@ -12,8 +13,7 @@ export function CopyButton({ text, label = "Salin" }: { text: string; label?: st
   return (
     <Button
       type="button"
-      variant="tonal"
-      className="min-h-8 shrink-0 px-3.5 text-[13px]"
+      variant="tonal" size="sm"
       onClick={async () => {
         await navigator.clipboard.writeText(text);
         setDone(true);
@@ -65,15 +65,27 @@ export function CreateToken() {
 
 export function RevokeButton({ id, name }: { id: string; name: string }) {
   const [pending, start] = useTransition();
+  const [confirm, dialog] = useConfirm();
   return (
-    <Button
-      type="button"
-      variant="danger"
-      disabled={pending}
-      className="min-h-8 px-3.5 text-[13px]"
-      onClick={() => confirm(`Cabut token "${name}"? Shortcut yang memakainya akan berhenti bekerja.`) && start(() => void revokeToken(id))}
-    >
-      Cabut
-    </Button>
+    <>
+      {dialog}
+      <Button
+        type="button"
+        variant="danger"
+        size="sm"
+        disabled={pending}
+        onClick={async () => {
+          const ok = await confirm({
+            title: `Cabut token "${name}"?`,
+            message: "Shortcut yang memakai token ini akan berhenti bekerja. Tindakan ini tidak bisa dibatalkan.",
+            confirmLabel: "Cabut",
+            destructive: true,
+          });
+          if (ok) start(() => void revokeToken(id));
+        }}
+      >
+        Cabut
+      </Button>
+    </>
   );
 }

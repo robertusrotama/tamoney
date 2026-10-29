@@ -24,7 +24,7 @@ export function AmountInput({
   const shown = value ?? own;
   return (
     <div
-      className={`flex items-baseline gap-1.5 rounded-[10px] bg-surface-dim px-3.5 focus-within:ring-2 focus-within:ring-primary ${large ? "py-3" : ""}`}
+      className={`flex items-baseline gap-1.5 rounded-[14px] bg-surface-dim px-4 focus-within:ring-2 focus-within:ring-primary ${large ? "py-3" : ""}`}
     >
       <span aria-hidden className={`font-semibold text-on-surface-variant ${large ? "text-[22px]" : "text-[17px]"}`}>
         Rp
@@ -37,7 +37,7 @@ export function AmountInput({
         required={required}
         value={shown}
         onChange={(e) => (onChange ?? setOwn)(withDots(e.target.value))}
-        className={`min-h-11 w-full bg-transparent tabular-nums outline-none placeholder:text-on-surface-variant/60 ${
+        className={`min-h-12 w-full bg-transparent tabular-nums outline-none placeholder:text-on-surface-variant/60 ${
           large ? "text-[34px] font-bold tracking-[-0.02em]" : "text-[17px]"
         }`}
       />

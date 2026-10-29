@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useState, useTransition, type ReactNode } from "react";
+import { IconButton } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Popover } from "@/components/ui/Popover";
 import { Segmented } from "@/components/ui/Segmented";
@@ -56,7 +57,6 @@ export function PeriodBar({ period, today }: { period: Period; today: string }) 
     else go({ p: k, d: period.start <= today && today <= period.end ? today : period.start });
   };
 
-  const nav = "flex size-9 items-center justify-center rounded-full text-primary hover:bg-surface-dim disabled:opacity-30";
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="w-full sm:w-[400px]">
@@ -64,9 +64,9 @@ export function PeriodBar({ period, today }: { period: Period; today: string }) 
       </div>
       <div className="glass flex items-center rounded-full p-1">
         {period.kind !== "rentang" && (
-          <motion.button type="button" whileTap={{ scale: 0.88 }} onClick={() => go(periodParams(period, -1))} aria-label="Periode sebelumnya" className={nav}>
+          <IconButton onClick={() => go(periodParams(period, -1))} aria-label="Periode sebelumnya" tone="primary">
             <Icon name="chevron_left" />
-          </motion.button>
+          </IconButton>
         )}
         {period.kind === "rentang" ? (
           <Popover align="right" width={316} label={<><Icon name="date_range" className="text-[18px] text-primary" />{period.label}</>}>
@@ -93,16 +93,9 @@ export function PeriodBar({ period, today }: { period: Period; today: string }) 
           </span>
         )}
         {period.kind !== "rentang" && (
-          <motion.button
-            type="button"
-            whileTap={{ scale: 0.88 }}
-            onClick={() => go(periodParams(period, 1))}
-            disabled={!period.canNext}
-            aria-label="Periode berikutnya"
-            className={nav}
-          >
+          <IconButton onClick={() => go(periodParams(period, 1))} disabled={!period.canNext} aria-label="Periode berikutnya" tone="primary">
             <Icon name="chevron_right" />
-          </motion.button>
+          </IconButton>
         )}
       </div>
     </div>

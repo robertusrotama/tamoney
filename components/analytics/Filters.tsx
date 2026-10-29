@@ -1,6 +1,8 @@
 "use client";
 
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { Button, IconButton } from "@/components/ui/Button";
+import { fieldClass } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
 import { Mark, Popover } from "@/components/ui/Popover";
 
@@ -41,13 +43,13 @@ export function MultiSelect({
     >
       <div className="flex items-center justify-between px-2.5 pt-1 pb-2">
         <span className="text-[13px] font-semibold text-on-surface-variant">{label}</span>
-        <div className="flex gap-3 text-[13px] font-medium text-primary">
-          <button type="button" onClick={() => onChange(options.map((o) => o.value))} className="hover:opacity-70">
+        <div className="-mr-2 flex">
+          <Button variant="ghost" size="sm" onClick={() => onChange(options.map((o) => o.value))}>
             Pilih semua
-          </button>
-          <button type="button" onClick={() => onChange([])} disabled={!selected.length} className="hover:opacity-70 disabled:opacity-30">
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => onChange([])} disabled={!selected.length}>
             Hapus
-          </button>
+          </Button>
         </div>
       </div>
       <div role="group" aria-label={label} className="max-h-72 overflow-y-auto">
@@ -112,18 +114,31 @@ export function SingleSelect({
   );
 }
 
+/** Search with our own clear button (the native one differs per browser). */
 export function SearchField({ value, onChange, placeholder = "Cari catatan atau kategori" }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
   return (
-    <label className="relative block">
-      <span className="sr-only">Cari</span>
-      <Icon name="search" className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-[20px] text-on-surface-variant" />
+    <div className={`${fieldClass} flex items-center gap-2 bg-card pr-1.5`}>
+      <Icon name="search" className="text-[20px] text-on-surface-variant" />
       <input
-        type="search"
+        type="text"
+        inputMode="search"
+        enterKeyHint="search"
+        aria-label="Cari"
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => e.key === "Escape" && onChange("")}
         placeholder={placeholder}
-        className="h-11 w-full rounded-full bg-card pr-4 pl-11 text-[17px] outline-none placeholder:text-on-surface-variant focus:ring-2 focus:ring-primary"
+        className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-on-surface-variant"
       />
-    </label>
+      <AnimatePresence>
+        {value && (
+          <motion.span key="clear" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}>
+            <IconButton onClick={() => onChange("")} aria-label="Hapus pencarian" className="size-8">
+              <Icon name="cancel" className="text-[18px]" filled />
+            </IconButton>
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

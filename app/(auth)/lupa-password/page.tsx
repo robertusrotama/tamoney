@@ -4,11 +4,12 @@ import { requestPasswordReset } from "@/lib/actions/auth";
 export default function LupaPasswordPage() {
   return (
     <AuthForm
-      title="Lupa Password"
+      title="Lupa password"
+      subtitle="Kami kirim link untuk mengatur ulang password"
       action={requestPasswordReset}
-      submitLabel="Kirim Link Reset"
+      submitLabel="Kirim link reset"
       successMessage="Jika email terdaftar, link untuk mengatur ulang password sudah dikirim."
-      fields={[{ name: "email", label: "Email", type: "email", autoComplete: "email" }]}
+      fields={[{ name: "email", label: "Email", type: "email", autoComplete: "email", placeholder: "nama@email.com" }]}
       footer={<AuthLink href="/masuk">Kembali ke Masuk</AuthLink>}
     />
   );

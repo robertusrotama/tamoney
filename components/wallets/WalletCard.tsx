@@ -4,6 +4,7 @@ import { LayoutGroup, motion } from "motion/react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { Button, IconButton } from "@/components/ui/Button";
+import { useConfirm } from "@/components/ui/Confirm";
 import { Icon } from "@/components/ui/Icon";
 import { setWalletArchived } from "@/lib/actions/wallets";
 import { FadeIn } from "@/components/ui/FadeIn";
@@ -18,7 +19,7 @@ const STRIP = 66; // visible top strip of a stacked card (icon, name, balance)
 export function RestoreButton({ id }: { id: string }) {
   const [pending, start] = useTransition();
   return (
-    <Button variant="tonal" disabled={pending} onClick={() => start(() => void setWalletArchived(id, false))} className="min-h-8 px-3.5 text-[13px]">
+    <Button variant="tonal" size="sm" disabled={pending} onClick={() => start(() => void setWalletArchived(id, false))}>
       Pulihkan
     </Button>
   );
@@ -26,6 +27,7 @@ export function RestoreButton({ id }: { id: string }) {
 
 function SelectedActions({ wallet }: { wallet: Wallet }) {
   const [pending, start] = useTransition();
+  const [confirm, dialog] = useConfirm();
   return (
     <div className="-mr-1 -mb-1 flex">
       <Link
@@ -39,14 +41,19 @@ function SelectedActions({ wallet }: { wallet: Wallet }) {
       <WalletDialog wallet={wallet} label={`Ubah ${wallet.name}`} variant="icon">
         <Icon name="edit" className="text-[18px]" />
       </WalletDialog>
+      {dialog}
       <IconButton
         disabled={pending}
-        onClick={() =>
-          confirm(`Arsipkan ${wallet.name}? Dompet disembunyikan dari pilihan; riwayatnya tetap tersimpan.`) &&
-          start(() => void setWalletArchived(wallet.id, true))
-        }
+        onClick={async () => {
+          const ok = await confirm({
+            title: `Arsipkan ${wallet.name}?`,
+            message: "Dompet disembunyikan dari pilihan dan total saldo. Riwayat transaksinya tetap tersimpan dan bisa dipulihkan kapan saja.",
+            confirmLabel: "Arsipkan",
+          });
+          if (ok) start(() => void setWalletArchived(wallet.id, true));
+        }}
         aria-label={`Arsipkan ${wallet.name}`}
-        className="text-current hover:bg-white/15"
+        tone="inherit"
       >
         <Icon name="archive" className="text-[18px]" />
       </IconButton>

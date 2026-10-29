@@ -18,7 +18,7 @@ export function QuickAdd({ wallets, categories }: { wallets: Wallet[]; categorie
   return (
     <>
       <span className="hidden md:contents">
-        <Button onClick={d.show} className="min-h-9 px-4 text-[14px]">
+        <Button size="sm" onClick={d.show} className="h-9">
           <Icon name="add" className="text-[18px]" /> Catat
         </Button>
       </span>

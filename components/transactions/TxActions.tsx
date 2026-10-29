@@ -36,7 +36,7 @@ export function TxActions({ tx, allWallets, categories }: { tx: Tx; allWallets: 
           del.show(e);
         }}
         aria-label="Hapus transaksi"
-        className="hover:bg-negative-container hover:text-negative"
+        className="hover:bg-negative-container hover:!text-negative"
       >
         <Icon name="delete" className="text-[18px]" />
       </IconButton>

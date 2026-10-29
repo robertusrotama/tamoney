@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { TxActions } from "@/components/transactions/TxActions";
 import { TxList, TxRow } from "@/components/transactions/TxRow";
+import { Button } from "@/components/ui/Button";
 import { Card, EmptyState, Label } from "@/components/ui/EmptyState";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
@@ -79,17 +80,11 @@ export function FilterBar({
         {show.kind && <SingleSelect label="Jenis" value={f.jenis || "all"} defaultValue="all" onChange={(jenis) => set({ jenis })} options={KIND_OPTIONS} />}
         <AnimatePresence>
           {active && (
-            <motion.button
-              type="button"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              whileTap={{ scale: 0.94 }}
-              onClick={() => set({ q: "", kategori: "", dompet: "", jenis: "" })}
-              className="flex h-9 items-center gap-1 rounded-full px-3 text-[14px] font-medium text-primary hover:bg-primary-container"
-            >
-              <Icon name="close" className="text-[16px]" /> Reset
-            </motion.button>
+            <motion.span key="reset" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>
+              <Button variant="ghost" size="sm" className="h-9" onClick={() => set({ q: "", kategori: "", dompet: "", jenis: "" })}>
+                <Icon name="close" className="text-[16px]" /> Reset
+              </Button>
+            </motion.span>
           )}
         </AnimatePresence>
       </div>
@@ -231,14 +226,11 @@ export function AnalyticsView({
                 </div>
               ))}
               {sorted.length > limit && (
-                <motion.button
-                  type="button"
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setLimit((l) => l + PAGE)}
-                  className="mx-auto flex h-10 items-center rounded-full bg-card px-5 text-[15px] font-medium text-primary hover:bg-primary-container"
-                >
-                  Tampilkan lebih banyak ({sorted.length - limit})
-                </motion.button>
+                <div className="flex justify-center">
+                  <Button variant="tonal" onClick={() => setLimit((l) => l + PAGE)}>
+                    Tampilkan lebih banyak ({sorted.length - limit})
+                  </Button>
+                </div>
               )}
             </div>
           )}

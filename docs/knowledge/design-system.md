@@ -84,6 +84,20 @@ Konstanta di `components/ui/MotionProvider.tsx`:
 - **Masuk list:** `FadeIn` opacity + 8px, stagger 30ms (maks 10 item).
 - Hanya animasi `transform`/`opacity`.
 
-## Komponen inti
+## Komponen inti — wajib dipakai, tanpa kontrol bawaan perangkat
 
-`components/ui/`: `Button`/`IconButton`, `Field`/`Input`/`Select`, `AmountInput` (`large` untuk nominal utama), `Segmented`, `Dialog` + `useDialog`, `Money`, `FadeIn`, `Card`/`Label`/`EmptyState`, `Icon`.
+Tidak ada `<select>`, `<input type="date|month">`, `confirm()`/`alert()` atau tombol/field ad-hoc di halaman. Semua lewat `components/ui/`:
+
+| Kebutuhan | Komponen | Catatan |
+|---|---|---|
+| Tombol | `Button` | variant `primary · tonal · ghost · outline · danger · destructive`; size `lg` (52px, CTA halaman/auth) · `md` (44px, form & dialog) · `sm` (32px, aksi baris). Jangan override tinggi lewat className. |
+| Tombol ikon | `IconButton` | warna via `tone` `muted · primary · inherit` (inherit = di atas kartu berwarna). Jangan beri `text-*` lewat className — dua kelas warna saling bertabrakan. |
+| Field teks | `Input`, `PasswordField` (toggle mata), `AmountInput` (Rp + titik ribuan), `SearchField` (tombol hapus sendiri) | semua memakai `fieldClass`: tinggi 48px, `rounded-[14px]`, fill abu, ring biru saat fokus. Label lewat `Field`. |
+| Pilihan satu | `Picker` | pengganti `<select>`: tampil seperti Input, listbox glass, cari otomatis bila > 8 opsi, ↑/↓/Enter/Esc, nilai via input hidden. |
+| Tanggal | `DateField` | pengganti `<input type="date">`: kalender glass (`MonthGrid`), tombol "Hari ini". Rentang: `RangeCalendar` (memakai `MonthGrid` yang sama). |
+| Filter | `MultiSelect`, `SingleSelect` (`components/analytics/Filters.tsx`) di atas `Popover` | checklist / radio dengan tanda `Mark`. |
+| Konfirmasi | `useConfirm()` | dialog sendiri (sheet di mobile); `destructive` untuk tindakan tak bisa dibatalkan. |
+| Lainnya | `Segmented`, `Dialog` + `useDialog`, `Popover`, `Money`, `FadeIn`, `Card`/`Label`/`EmptyState`, `Bone`/`ListBones`, `Icon` | |
+
+## Halaman auth
+Layout terbelah (`app/(auth)/layout.tsx`): panel form kiri (pill logo, judul tengah + subjudul, field berlabel, tombol `lg`), panel visual kanan ≥1024px (`components/auth/AuthVisual.tsx`): kartu UI TaMoney melayang di atas mesh biru — muncul bertahap sekali, tanpa animasi berulang. Tanpa login sosial.

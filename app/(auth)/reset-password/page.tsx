@@ -4,10 +4,11 @@ import { updatePassword } from "@/lib/actions/auth";
 export default function ResetPasswordPage() {
   return (
     <AuthForm
-      title="Atur Password Baru"
+      title="Atur password baru"
+      subtitle="Gunakan minimal 8 karakter"
       action={updatePassword}
-      submitLabel="Simpan Password"
-      fields={[{ name: "password", label: "Password baru (min. 8 karakter)", type: "password", autoComplete: "new-password" }]}
+      submitLabel="Simpan password"
+      fields={[{ name: "password", label: "Password baru", type: "password", autoComplete: "new-password", placeholder: "Minimal 8 karakter" }]}
     />
   );
 }

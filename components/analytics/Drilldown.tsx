@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { IconButton } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Segmented } from "@/components/ui/Segmented";
 import type { Dir, SortBy } from "@/lib/drilldown";
@@ -22,17 +23,16 @@ export function SortControl({ by, dir, onChange }: { by: SortBy; dir: Dir; onCha
           ]}
         />
       </div>
-      <motion.button
-        type="button"
-        whileTap={{ scale: 0.88 }}
+      <IconButton
         onClick={() => onChange(by, dir === "asc" ? "desc" : "asc")}
         aria-label={dir === "asc" ? "Urutan naik — ubah ke turun" : "Urutan turun — ubah ke naik"}
-        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-dim text-primary hover:bg-primary-container"
+        tone="primary"
+        className="bg-surface-dim"
       >
         <motion.span animate={{ rotate: dir === "asc" ? 180 : 0 }} className="flex">
           <Icon name="arrow_downward" className="text-[18px]" />
         </motion.span>
-      </motion.button>
+      </IconButton>
     </div>
   );
 }
