@@ -34,6 +34,7 @@ Satu catatan per keputusan atau fakta proyek. Keputusan baru → catatan baru di
 - [[timezone-wib]]
 - [[mobile-fab-bottom-nav]]
 - [[ponytail-coding-style]]
+- [[pintasan-iphone]]
 
 ## Riwayat desain
 - Spec: `docs/superpowers/specs/2026-10-29-tamoney-fase1-2-design.md`

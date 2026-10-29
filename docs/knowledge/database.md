@@ -23,6 +23,11 @@ Aturan `transactions`:
 - FK wallet `on delete restrict` — lihat [[wallet-archive-not-delete]].
 - Index `(user_id, occurred_at desc)`.
 
+## Pintasan iPhone (API token)
+
+- `api_tokens`: `name`, `token_hash` (sha256 hex, unik), `last_used_at`. Token asli (`tm_…`, 32 byte acak) hanya ditampilkan sekali; RLS milik sendiri.
+- `pintasan_add(p_token, p_kind, p_categories[], p_wallets[], p_amount, p_note)` — SECURITY DEFINER, **hanya anon** (Shortcut tidak punya sesi; token adalah kredensialnya). Advisor 0028 sengaja diterima. Semua baris yang disentuh dibatasi ke pemilik token. Lihat [[pintasan-iphone]].
+
 ## View `wallet_balances`
 
 `security_invoker = true`. Saldo = `initial_balance + Σincome − Σexpense − Σtransfer keluar + Σtransfer masuk`. Lihat [[balance-from-view]].
