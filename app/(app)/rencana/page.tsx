@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { BillList } from "@/components/bills/BillList";
 import { PlanTabs } from "@/components/plan/PlanTabs";
-import { Card, EmptyState } from "@/components/ui/EmptyState";
+import { GoalList } from "@/components/goals/GoalList";
 import { getPlanningState } from "@/lib/planning";
 import { getCategories, getWallets } from "@/lib/queries";
 import { requireUser } from "@/lib/supabase/server";
@@ -20,11 +20,7 @@ export default async function RencanaPage({ searchParams }: PageProps<"/rencana"
       <PlanTabs
         initial={sp.tab === "tagihan" ? "tagihan" : "goals"}
         bills={<BillList bills={s.bills} wallets={wallets} allWallets={allWallets} categories={expense} today={s.today} />}
-        goals={
-          <Card>
-            <EmptyState icon="flag" title="Goals segera hadir" />
-          </Card>
-        }
+        goals={<GoalList goals={s.goals} wallets={wallets} allWallets={allWallets} payday={s.payday} periodStart={s.periodStart} today={s.today} />}
       />
     </div>
   );

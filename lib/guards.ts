@@ -6,3 +6,8 @@ export function walletError(requested: string[], activeOwned: string[], keep: st
   const ok = requested.every((id) => activeOwned.includes(id) || keep.includes(id));
   return ok ? null : "Dompet tidak ditemukan atau sudah diarsipkan";
 }
+
+/** A goal deposit/withdrawal must move money into or out of the goal's own wallet. */
+export function goalTransferError(goalWalletId: string, from: string, to: string): string | null {
+  return from === goalWalletId || to === goalWalletId ? null : "Goal tidak valid";
+}

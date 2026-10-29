@@ -115,7 +115,7 @@ export function BillList({ bills, wallets, allWallets, categories, today }: { bi
       {archived.length > 0 && (
         <details className="group">
           <summary className="flex cursor-pointer list-none items-center gap-1 px-1 text-[15px] font-semibold text-on-surface-variant">
-            <Icon name="chevron_right" className="text-[20px] transition-transform group-open:rotate-90" /> Diarsipkan ({archived.length})
+            <Icon name="chevron_right" className="text-[20px] group-open:rotate-90" /> Diarsipkan ({archived.length})
           </summary>
           <div className="mt-2 divide-y divide-outline overflow-hidden rounded-[14px] bg-card">
             {archived.map((b) => (

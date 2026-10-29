@@ -25,8 +25,10 @@ export function paydaysUntil(today: string, due: string, payday: number): number
     const d = new Date(Date.UTC(y, m - 1, payday)).toISOString().slice(0, 10);
     if (d > due) break;
     if (d > today) n++;
-    m++;
-    if (m > 12) (m = 1), y++;
+    if (++m > 12) {
+      m = 1;
+      y++;
+    }
   }
   return Math.max(1, n);
 }

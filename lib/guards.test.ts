@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { walletError } from "./guards";
+import { goalTransferError, walletError } from "./guards";
 
 describe("walletError", () => {
   it("passes when every wallet is the user's and active", () => {
@@ -13,5 +13,13 @@ describe("walletError", () => {
   it("lets an edit keep the archived wallet it already had", () => {
     expect(walletError(["old"], [], ["old"])).toBeNull();
     expect(walletError(["other"], [], ["old"])).not.toBeNull();
+  });
+});
+
+describe("goalTransferError", () => {
+  it("one side must be the goal's wallet", () => {
+    expect(goalTransferError("jago", "bca", "jago")).toBeNull();
+    expect(goalTransferError("jago", "jago", "bca")).toBeNull();
+    expect(goalTransferError("jago", "bca", "gopay")).toBe("Goal tidak valid");
   });
 });

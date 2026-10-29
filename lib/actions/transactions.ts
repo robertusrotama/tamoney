@@ -1,11 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { walletError } from "@/lib/guards";
+import { goalTransferError, walletError } from "@/lib/guards";
 import { getActiveWalletIds } from "@/lib/queries";
 import { toOccurredAt } from "@/lib/reports";
 import { requireUser } from "@/lib/supabase/server";
 import { firstError, transferSchema, txSchema } from "@/lib/validation";
+import { markAchieved } from "@/lib/goal-progress";
 import type { ActionState } from "./state";
 
 type Supabase = Awaited<ReturnType<typeof requireUser>>["supabase"];
@@ -62,14 +63,26 @@ export async function saveTransfer(_: ActionState, fd: FormData): Promise<Action
   const err = walletError([t.wallet_id, t.to_wallet_id], await getActiveWalletIds(supabase), prev ? [prev.wallet_id, prev.to_wallet_id] : []);
   if (err) return { error: err };
 
-  return write(supabase, fd.get("id"), {
+  // Setor/Tarik on a goal: the transfer must touch the goal's own wallet.
+  const goalId = fd.get("goal_id") ? String(fd.get("goal_id")) : null;
+  if (goalId) {
+    const { data: goal } = await supabase.from("goals").select("wallet_id,archived_at").eq("id", goalId).maybeSingle();
+    if (!goal || goal.archived_at) return { error: "Goal tidak valid" };
+    const goalErr = goalTransferError(goal.wallet_id, t.wallet_id, t.to_wallet_id);
+    if (goalErr) return { error: goalErr };
+  }
+
+  const res = await write(supabase, fd.get("id"), {
     kind: "transfer",
     amount: t.amount,
     wallet_id: t.wallet_id,
     to_wallet_id: t.to_wallet_id,
     note: t.note,
     occurred_at: toOccurredAt(t.occurred_at, prev?.occurred_at),
+    ...(goalId && { goal_id: goalId }),
   });
+  if (res.ok && goalId) await markAchieved(supabase, goalId);
+  return res;
 }
 
 export async function deleteTransaction(id: string): Promise<ActionState> {

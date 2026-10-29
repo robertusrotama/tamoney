@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { billSchema, budgetSettingsSchema, payBillSchema, salarySchema, transferSchema, txSchema, walletSchema } from "./validation";
+import { billSchema, budgetSettingsSchema, goalSchema, payBillSchema, salarySchema, transferSchema, txSchema, walletSchema } from "./validation";
 
 const A = "6f1c2b9e-3a4d-4c5e-8f70-1a2b3c4d5e6f";
 const B = "7a2d3c0f-4b5e-4d6f-9081-2b3c4d5e6f70";
@@ -81,4 +81,15 @@ describe("billSchema / payBillSchema", () => {
   it("reminds 0–14 days ahead", () => expect(billSchema.safeParse({ ...netflix, remind_days: "15" }).success).toBe(false));
   it("pay amount must be positive", () =>
     expect(payBillSchema.safeParse({ bill_id: A, due: "2026-11-05", amount: "0", wallet_id: B, occurred_at: "2026-10-29" }).success).toBe(false));
+});
+
+describe("goalSchema", () => {
+  const ok = { name: "Dana Darurat", icon: "savings", target: "24.000.000", initial_amount: "", due_date: "2027-04-30", monthly_amount: "", wallet_id: A, source_wallet_id: B };
+  it("accepts a goal with a due date", () => expect(goalSchema.safeParse(ok).data).toMatchObject({ target: 24_000_000, initial_amount: 0, monthly_amount: null }));
+  it("needs a due date or a monthly amount", () =>
+    expect(goalSchema.safeParse({ ...ok, due_date: "" }).error?.issues[0].message).toBe("Isi due date atau setoran bulanan"));
+  it("rejects a zero target", () => expect(goalSchema.safeParse({ ...ok, target: "0" }).success).toBe(false));
+  it("allows already having more than the target", () => expect(goalSchema.safeParse({ ...ok, initial_amount: "30.000.000" }).success).toBe(true));
+  it("source and destination differ", () =>
+    expect(goalSchema.safeParse({ ...ok, source_wallet_id: A }).error?.issues[0].message).toBe("Dompet sumber dan tujuan harus berbeda"));
 });

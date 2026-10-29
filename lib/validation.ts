@@ -82,6 +82,22 @@ export const billSchema = z.object({
 
 export const payBillSchema = z.object({ bill_id: id, due: date, amount: rupiah(1), wallet_id: id, occurred_at: date });
 
+const optional = <T extends z.ZodType>(schema: T) => z.union([z.literal("").transform(() => null), schema]).optional().transform((v) => v ?? null);
+
+export const goalSchema = z
+  .object({
+    name: name(50, "goal"),
+    icon: z.string().min(1).max(40),
+    target: rupiah(1),
+    initial_amount: z.union([z.literal("").transform(() => 0), rupiah(0)]).default(0),
+    due_date: optional(date),
+    monthly_amount: optional(rupiah(1)),
+    wallet_id: id,
+    source_wallet_id: optional(id),
+  })
+  .refine((g) => g.due_date || g.monthly_amount, { error: "Isi due date atau setoran bulanan", path: ["monthly_amount"] })
+  .refine((g) => g.wallet_id !== g.source_wallet_id, { error: "Dompet sumber dan tujuan harus berbeda", path: ["source_wallet_id"] });
+
 const pos = z.object({
   id: id.nullable(),
   name: z.string().trim().min(1, { error: "Nama pos wajib diisi" }).max(40, { error: "Nama pos maksimal 40 karakter" }),

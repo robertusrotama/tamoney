@@ -10,8 +10,26 @@ const nice = (d: string) =>
   new Intl.DateTimeFormat("id-ID", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
 
 /** Replaces <input type="date">: field-looking trigger + calendar popover. Posts YYYY-MM-DD via a hidden input. */
-export function DateField({ name, defaultValue, today, label, max }: { name: string; defaultValue: string; today: string; label?: string; max?: string | null }) {
-  const [value, setValue] = useState(defaultValue);
+export function DateField({
+  name,
+  defaultValue,
+  today,
+  label,
+  max,
+  onChange,
+}: {
+  name: string;
+  defaultValue: string;
+  today: string;
+  label?: string;
+  max?: string | null;
+  onChange?: (d: string) => void;
+}) {
+  const [value, setOwn] = useState(defaultValue);
+  const setValue = (d: string) => {
+    setOwn(d);
+    onChange?.(d);
+  };
   const [view, setView] = useState(defaultValue.slice(0, 7));
   return (
     <>
