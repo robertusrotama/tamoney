@@ -10,6 +10,7 @@ import { SIDEBAR_COOKIE } from "./prefs";
 const ITEMS = [
   { href: "/", label: "Ringkasan", icon: "space_dashboard" },
   { href: "/budget", label: "Budget", icon: "pie_chart" },
+  { href: "/rencana", label: "Rencana", icon: "flag" },
   { href: "/analitik", label: "Analitik", icon: "bar_chart" },
   { href: "/dompet", label: "Dompet", icon: "account_balance_wallet" },
 ];

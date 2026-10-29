@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { budgetSettingsSchema, salarySchema, transferSchema, txSchema, walletSchema } from "./validation";
+import { billSchema, budgetSettingsSchema, payBillSchema, salarySchema, transferSchema, txSchema, walletSchema } from "./validation";
 
 const A = "6f1c2b9e-3a4d-4c5e-8f70-1a2b3c4d5e6f";
 const B = "7a2d3c0f-4b5e-4d6f-9081-2b3c4d5e6f70";
@@ -73,4 +73,12 @@ describe("budgetSettingsSchema", () => {
   it("a category sits in one pos only", () =>
     expect(msg({ ...ok, groups: [pos("Tabungan", 3333, true, [A]), pos("Makan", 6667, false, [A])] })).toBe("Satu kategori hanya boleh di satu pos"));
   it("payday is 1–28", () => expect(budgetSettingsSchema.safeParse({ ...ok, payday: 29 }).success).toBe(false));
+});
+
+describe("billSchema / payBillSchema", () => {
+  const netflix = { name: "Netflix", icon: "subscriptions", amount: "186.000", category_id: A, wallet_id: B, cadence: "monthly", next_due: "2026-11-05", remind_days: "3" };
+  it("accepts a monthly bill", () => expect(billSchema.safeParse(netflix).data).toMatchObject({ amount: 186_000, remind_days: 3 }));
+  it("reminds 0–14 days ahead", () => expect(billSchema.safeParse({ ...netflix, remind_days: "15" }).success).toBe(false));
+  it("pay amount must be positive", () =>
+    expect(payBillSchema.safeParse({ bill_id: A, due: "2026-11-05", amount: "0", wallet_id: B, occurred_at: "2026-10-29" }).success).toBe(false));
 });

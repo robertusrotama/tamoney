@@ -52,13 +52,14 @@ export async function loadPeriodView(sb: Supabase, s: Pick<PlanningState, "group
 /** Everything Budget, Rencana, Ringkasan and the notification bell read — once per request. */
 export const getPlanningState = cache(async (sb: Supabase): Promise<PlanningState> => {
   const today = todayWib();
-  const [profile, groups, periodRows] = await Promise.all([
+  const [profile, groups, periodRows, billRows] = await Promise.all([
     sb.from("profiles").select("payday_day").maybeSingle(),
     sb.from("budget_groups").select("id,name,icon,pct_bp,is_savings,sort").order("sort"),
     sb
       .from("budget_periods")
       .select("id,month,start_date,salary,income_tx_id,budget_allocations(group_id,amount),transactions(wallet_id)")
       .order("start_date"),
+    sb.from("bills").select("id,name,icon,amount,category_id,wallet_id,cadence,due_day,next_due,remind_days,archived_at").order("next_due"),
   ]);
   const rows = must(periodRows) as unknown as PeriodRow[];
   const periods: BudgetPeriod[] = rows.map((p) => ({
@@ -75,7 +76,7 @@ export const getPlanningState = cache(async (sb: Supabase): Promise<PlanningStat
     groups: must(groups) as BudgetGroup[],
     periods,
     salaryWallet: rows.at(-1)?.transactions?.wallet_id ?? null,
-    bills: [] as Bill[],
+    bills: (must(billRows) as Bill[]).map((b) => ({ ...b, amount: Number(b.amount) })),
     goals: [] as GoalWithProgress[],
   };
   const last = periods.findLastIndex((p) => p.start_date <= today);

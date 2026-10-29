@@ -66,6 +66,22 @@ export const salarySchema = z
     path: ["alloc"],
   });
 
+const name = (max: number, what: string) =>
+  z.string().trim().min(1, { error: `Nama ${what} wajib diisi` }).max(max, { error: `Nama maksimal ${max} karakter` });
+
+export const billSchema = z.object({
+  name: name(50, "tagihan"),
+  icon: z.string().min(1).max(40),
+  amount: rupiah(1),
+  category_id: id,
+  wallet_id: id,
+  cadence: z.enum(["weekly", "monthly", "yearly"]),
+  next_due: date,
+  remind_days: z.coerce.number().int().min(0, { error: "Pengingat 0–14 hari" }).max(14, { error: "Pengingat 0–14 hari" }).default(3),
+});
+
+export const payBillSchema = z.object({ bill_id: id, due: date, amount: rupiah(1), wallet_id: id, occurred_at: date });
+
 const pos = z.object({
   id: id.nullable(),
   name: z.string().trim().min(1, { error: "Nama pos wajib diisi" }).max(40, { error: "Nama pos maksimal 40 karakter" }),
