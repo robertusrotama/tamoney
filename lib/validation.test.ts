@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { salarySchema, transferSchema, txSchema, walletSchema } from "./validation";
+import { budgetSettingsSchema, salarySchema, transferSchema, txSchema, walletSchema } from "./validation";
 
 const A = "6f1c2b9e-3a4d-4c5e-8f70-1a2b3c4d5e6f";
 const B = "7a2d3c0f-4b5e-4d6f-9081-2b3c4d5e6f70";
@@ -53,4 +53,24 @@ describe("salarySchema", () => {
     const r = salarySchema.safeParse({ ...ok, alloc: { [B]: "11.000.000" } });
     expect(r.error?.issues[0].message).toBe("Total alokasi harus sama dengan gaji");
   });
+});
+
+describe("budgetSettingsSchema", () => {
+  const pos = (name: string, pct_bp: number, is_savings = false, category_ids: string[] = []) => ({ id: null, name, icon: "savings", pct_bp, is_savings, category_ids });
+  const ok = { payday: 25, groups: [pos("Tabungan", 3333, true), pos("Makan", 6667, false, [A]), pos("Lain", 0, false, [B])] };
+  const msg = (v: unknown) => budgetSettingsSchema.safeParse(v).error?.issues[0].message;
+
+  it("accepts a valid setup", () => expect(budgetSettingsSchema.safeParse(ok).success).toBe(true));
+  it("total must be exactly 100%", () =>
+    expect(msg({ ...ok, groups: [pos("Tabungan", 3323, true), ok.groups[1], ok.groups[2]] })).toBe("Total persentase harus 100%"));
+  it("rejects percentages outside 0–100", () => {
+    expect(budgetSettingsSchema.safeParse({ ...ok, groups: [pos("Tabungan", 10001, true), pos("Makan", -1)] }).success).toBe(false);
+  });
+  it("needs exactly one savings pos", () => {
+    expect(msg({ ...ok, groups: [pos("A", 5000), pos("B", 5000)] })).toBe("Harus ada tepat satu pos Tabungan");
+    expect(msg({ ...ok, groups: [pos("A", 5000, true), pos("B", 5000, true)] })).toBe("Harus ada tepat satu pos Tabungan");
+  });
+  it("a category sits in one pos only", () =>
+    expect(msg({ ...ok, groups: [pos("Tabungan", 3333, true, [A]), pos("Makan", 6667, false, [A])] })).toBe("Satu kategori hanya boleh di satu pos"));
+  it("payday is 1–28", () => expect(budgetSettingsSchema.safeParse({ ...ok, payday: 29 }).success).toBe(false));
 });

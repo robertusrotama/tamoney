@@ -18,6 +18,9 @@ export function UserMenu({ name, email }: { name: string; email: string }) {
           <p className="truncate text-[13px] text-on-surface-variant">{email}</p>
         </div>
         <div className="my-1 h-px bg-outline" />
+        <Link href="/pengaturan" className="flex w-full items-center gap-2 rounded-[10px] px-3 py-2 text-[15px] hover:bg-surface-dim">
+          <Icon name="settings" className="text-[18px] text-primary" /> Pengaturan
+        </Link>
         <Link href="/pintasan" className="flex w-full items-center gap-2 rounded-[10px] px-3 py-2 text-[15px] hover:bg-surface-dim">
           <Icon name="bolt" className="text-[18px] text-primary" /> Pintasan iPhone
         </Link>

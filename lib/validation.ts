@@ -66,6 +66,25 @@ export const salarySchema = z
     path: ["alloc"],
   });
 
+const pos = z.object({
+  id: id.nullable(),
+  name: z.string().trim().min(1, { error: "Nama pos wajib diisi" }).max(40, { error: "Nama pos maksimal 40 karakter" }),
+  icon: z.string().min(1).max(40),
+  pct_bp: z.number().int().min(0, { error: "Persentase tidak valid" }).max(10_000, { error: "Persentase tidak valid" }),
+  is_savings: z.boolean(),
+  category_ids: z.array(id),
+});
+
+export const budgetSettingsSchema = z
+  .object({ payday: z.number().int().min(1).max(28, { error: "Tanggal gajian 1–28" }), groups: z.array(pos).min(1) })
+  .refine((s) => s.groups.filter((g) => g.is_savings).length === 1, { error: "Harus ada tepat satu pos Tabungan" })
+  .refine((s) => s.groups.reduce((a, g) => a + g.pct_bp, 0) === 10_000, { error: "Total persentase harus 100%" })
+  .refine((s) => new Set(s.groups.map((g) => g.name.toLowerCase())).size === s.groups.length, { error: "Nama pos tidak boleh sama" })
+  .refine((s) => {
+    const all = s.groups.flatMap((g) => g.category_ids);
+    return new Set(all).size === all.length;
+  }, { error: "Satu kategori hanya boleh di satu pos" });
+
 /** First validation message, for showing in a form. */
 export function firstError(error: z.ZodError): string {
   return error.issues[0]?.message ?? "Data tidak valid";
