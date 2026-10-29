@@ -18,7 +18,7 @@ export const metadata: Metadata = { title: "Pos budget · TaMoney" };
 export default async function PosPage({ params, searchParams }: PageProps<"/budget/[pos]">) {
   const { supabase } = await requireUser();
   const [{ pos: posId }, sp, s, categories, wallets] = await Promise.all([params, searchParams, getPlanningState(supabase), getCategories(supabase), getWallets(supabase, true)]);
-  const group = s.groups.find((g) => g.id === posId);
+  const group = s.allGroups.find((g) => g.id === posId);
   if (!group || !s.current) notFound();
 
   const wanted = typeof sp.periode === "string" ? s.periods.findIndex((p) => p.month.startsWith(sp.periode as string)) : -1;

@@ -37,7 +37,7 @@ export function paydaysUntil(today: string, due: string, payday: number): number
 export function monthlyNeed(goal: Goal, savedNow: number, today: string, payday: number): number {
   const left = goal.target - savedNow;
   if (left <= 0) return 0;
-  if (!goal.due_date) return goal.monthly_amount ?? 0;
+  if (!goal.due_date) return Math.min(left, goal.monthly_amount ?? 0);
   return Math.ceil(left / paydaysUntil(today, goal.due_date, payday) / 1000) * 1000;
 }
 
@@ -46,4 +46,14 @@ export function goalStatus(a: { target: number; saved: number; need: number; dep
   if (a.due && a.due < a.today) return "tertinggal";
   if (a.depositedThisPeriod < a.need && days(a.today, a.periodEnd) <= 7) return "tertinggal";
   return "sesuai";
+}
+
+/**
+ * Need for the salary period labelled `periodMonth` ("YYYY-MM-01"): this period counts once, anchored on its
+ * nominal payday, so a salary that arrived a day late doesn't drop the current period from the count.
+ */
+export function periodNeed(goal: Goal, savedBefore: number, periodMonth: string, payday: number): number {
+  const anchor = `${periodMonth.slice(0, 8)}${String(payday).padStart(2, "0")}`;
+  const dayBefore = new Date(new Date(`${anchor}T00:00:00Z`).getTime() - 86_400_000).toISOString().slice(0, 10);
+  return monthlyNeed(goal, savedBefore, dayBefore, payday);
 }

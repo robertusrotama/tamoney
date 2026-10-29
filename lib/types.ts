@@ -33,7 +33,7 @@ export type Tx = {
   bill_id?: string | null;
 };
 
-export type BudgetGroup = { id: string; name: string; icon: string; pct_bp: number; is_savings: boolean; sort: number };
+export type BudgetGroup = { id: string; name: string; icon: string; pct_bp: number; is_savings: boolean; sort: number; archived_at?: string | null };
 /** allocations: group id → rupiah */
 export type BudgetPeriod = { id: string; month: string; start_date: string; salary: number; income_tx_id: string | null; allocations: Record<string, number> };
 export type Cadence = "weekly" | "monthly" | "yearly";

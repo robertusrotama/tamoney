@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
-import { nominalEnd, periodRange, usage } from "./budget";
-import { deposited, goalStatus, monthlyNeed, saved, type GoalTx, type GoalWithProgress } from "./goals";
+import { groupsFor, nominalEnd, periodRange, usage } from "./budget";
+import { deposited, goalStatus, periodNeed, saved, type GoalTx, type GoalWithProgress } from "./goals";
 import { addDays, isoRange } from "./period";
 import { getCategories, getTransactionsBetween } from "./queries";
 import { todayWib, wibDate } from "./reports";
@@ -26,7 +26,12 @@ export type PlanningState = {
   payday: number;
   /** Start of the salary period goals are measured in (actual or nominal). */
   periodStart: string;
+  /** Month label ("YYYY-MM-01") of that period; goal needs anchor on its nominal payday. */
+  periodMonth: string;
+  /** Active pos (Pengaturan, new salaries). */
   groups: BudgetGroup[];
+  /** Incl. archived pos — past periods may still hold an allocation for them. */
+  allGroups: BudgetGroup[];
   periods: BudgetPeriod[]; // oldest first
   /** Wallet of the latest salary, to preselect next time. */
   salaryWallet: string | null;
@@ -47,14 +52,14 @@ type PeriodRow = Omit<BudgetPeriod, "allocations" | "salary"> & {
 };
 
 /** Usage of one period: its transactions from start to its end (or today while it is still running). */
-export async function loadPeriodView(sb: Supabase, s: Pick<PlanningState, "groups" | "periods" | "today" | "goals">, index: number): Promise<PeriodView> {
+export async function loadPeriodView(sb: Supabase, s: Pick<PlanningState, "allGroups" | "periods" | "today" | "goals">, index: number): Promise<PeriodView> {
   const period = s.periods[index];
   const range = periodRange(s.periods, index);
   const { start, end } = isoRange(range.start, range.end ?? s.today);
   const [rows, categories] = await Promise.all([getTransactionsBetween(sb, start, end), getCategories(sb)]);
   const catGroup = Object.fromEntries(categories.map((c) => [c.id, c.budget_group_id]));
   const goalWallets = Object.fromEntries(s.goals.map((g) => [g.id, g.wallet_id]));
-  return { index, period, range, usage: usage(s.groups, period, rows.map((r) => ({ ...r, goal_id: r.goal_id ?? null })), catGroup, goalWallets) };
+  return { index, period, range, usage: usage(groupsFor(s.allGroups, period), period, rows.map((r) => ({ ...r, goal_id: r.goal_id ?? null })), catGroup, goalWallets) };
 }
 
 /** Everything Budget, Rencana, Ringkasan and the notification bell read — once per request. */
@@ -62,7 +67,7 @@ export const getPlanningState = cache(async (sb: Supabase): Promise<PlanningStat
   const today = todayWib();
   const [profile, groups, periodRows, billRows, goalRows, goalTxRows] = await Promise.all([
     sb.from("profiles").select("payday_day").maybeSingle(),
-    sb.from("budget_groups").select("id,name,icon,pct_bp,is_savings,sort").order("sort"),
+    sb.from("budget_groups").select("id,name,icon,pct_bp,is_savings,sort,archived_at").order("sort"),
     sb
       .from("budget_periods")
       .select("id,month,start_date,salary,income_tx_id,budget_allocations(group_id,amount),transactions(wallet_id)")
@@ -88,6 +93,7 @@ export const getPlanningState = cache(async (sb: Supabase): Promise<PlanningStat
   // The goal "month" is the salary period; before any salary is recorded, the nominal one around today.
   const periodStart =
     last >= 0 ? periods[last].start_date : Number(today.slice(8)) >= payday ? `${today.slice(0, 8)}${String(payday).padStart(2, "0")}` : nominalStart(today, payday);
+  const periodMonth = last >= 0 ? periods[last].month : `${periodStart.slice(0, 8)}01`;
   const periodEnd = periods[last + 1] && last >= 0 ? addDays(periods[last + 1].start_date, -1) : nominalEnd(periodStart, payday);
   const goalTxs = (must(goalTxRows) as GoalTx[]).map((t) => ({ ...t, amount: Number(t.amount) }));
   const goals = (must(goalRows) as Goal[]).map((raw): GoalWithProgress => {
@@ -95,14 +101,16 @@ export const getPlanningState = cache(async (sb: Supabase): Promise<PlanningStat
     const total = saved(g, goalTxs);
     const depositedThisPeriod = deposited(g, goalTxs.filter((t) => wibDate(t.occurred_at) >= periodStart));
     // Need is fixed for the whole period: counted from before this period's deposits, this period included.
-    const need = monthlyNeed(g, total - depositedThisPeriod, addDays(periodStart, -1), payday);
+    const need = periodNeed(g, total - depositedThisPeriod, periodMonth, payday);
     return { ...g, saved: total, need, depositedThisPeriod, status: goalStatus({ target: g.target, saved: total, need, depositedThisPeriod, due: g.due_date, today, periodEnd }) };
   });
   const base = {
     today,
     payday,
     periodStart,
-    groups: must(groups) as BudgetGroup[],
+    periodMonth,
+    groups: (must(groups) as BudgetGroup[]).filter((g) => !g.archived_at),
+    allGroups: must(groups) as BudgetGroup[],
     periods,
     salaryWallet: rows.at(-1)?.transactions?.wallet_id ?? null,
     bills: (must(billRows) as Bill[]).map((b) => ({ ...b, amount: Number(b.amount) })),

@@ -58,6 +58,11 @@ export function allocate(salary: number, groups: Pick<BudgetGroup, "id" | "pct_b
   return out;
 }
 
+/** Pos shown for a period: active ones, plus archived ones that period still allocated (past months never change). */
+export function groupsFor<G extends BudgetGroup>(groups: G[], period: BudgetPeriod): G[] {
+  return groups.filter((g) => !g.archived_at || g.id in period.allocations);
+}
+
 /** Day before the payday of the month after `start` ("25 Okt – 24 Nov"). */
 export function nominalEnd(start: string, payday: number): string {
   const [y, m] = start.split("-").map(Number);

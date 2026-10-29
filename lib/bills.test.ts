@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dueLabel, dueStatus, monthTotal, nextDue } from "./bills";
+import { dueDayFor, dueLabel, dueStatus, monthTotal, nextDue } from "./bills";
 import type { Bill } from "./types";
 
 describe("nextDue", () => {
@@ -38,4 +38,14 @@ describe("monthTotal", () => {
     expect(monthTotal([bill({ amount: 350_000 }), bill({ cadence: "yearly", next_due: "2027-03-02" })], "2026-11")).toBe(350_000);
   });
   it("ignores archived bills", () => expect(monthTotal([bill({ archived_at: "2026-10-01" })], "2026-11")).toBe(0));
+});
+
+describe("dueDayFor", () => {
+  it("keeps the original day when an edit leaves the due date alone", () =>
+    expect(dueDayFor("monthly", "2027-02-28", { next_due: "2027-02-28", due_day: 31 })).toBe(31));
+  it("takes the new day when the due date changes", () => expect(dueDayFor("monthly", "2027-03-05", { next_due: "2027-02-28", due_day: 31 })).toBe(5));
+  it("new bills take their day; weekly has none", () => {
+    expect(dueDayFor("monthly", "2026-11-30", null)).toBe(30);
+    expect(dueDayFor("weekly", "2026-11-30", null)).toBeNull();
+  });
 });

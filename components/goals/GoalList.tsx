@@ -51,7 +51,7 @@ export function Ring({ value, size = 64, children }: { value: number; size?: num
   );
 }
 
-function GoalCard({ goal, wallets, allWallets, payday, periodStart, today }: { goal: GoalWithProgress; wallets: Wallet[]; allWallets: Wallet[]; payday: number; periodStart: string; today: string }) {
+function GoalCard({ goal, wallets, allWallets, payday, periodMonth, today }: { goal: GoalWithProgress; wallets: Wallet[]; allWallets: Wallet[]; payday: number; periodMonth: string; today: string }) {
   const [confirm, dialog] = useConfirm();
   const [pending, start] = useTransition();
   const wallet = allWallets.find((w) => w.id === goal.wallet_id)?.name;
@@ -104,7 +104,7 @@ function GoalCard({ goal, wallets, allWallets, payday, periodStart, today }: { g
         {goal.status !== "tercapai" && <GoalMoneyButton goal={goal} wallets={wallets} mode="setor" />}
         <GoalMoneyButton goal={goal} wallets={wallets} mode="tarik" />
         <div className="-mr-2 ml-auto flex">
-          <GoalDialog goal={goal} wallets={wallets} payday={payday} periodStart={periodStart} variant="icon">
+          <GoalDialog goal={goal} wallets={wallets} payday={payday} periodMonth={periodMonth} variant="icon">
             <Icon name="edit" className="text-[18px]" />
           </GoalDialog>
           <IconButton aria-label={`Arsipkan ${goal.name}`} onClick={archive} disabled={pending}>
@@ -117,7 +117,7 @@ function GoalCard({ goal, wallets, allWallets, payday, periodStart, today }: { g
   );
 }
 
-export function GoalList({ goals, wallets, allWallets, payday, periodStart, today }: { goals: GoalWithProgress[]; wallets: Wallet[]; allWallets: Wallet[]; payday: number; periodStart: string; today: string }) {
+export function GoalList({ goals, wallets, allWallets, payday, periodMonth, today }: { goals: GoalWithProgress[]; wallets: Wallet[]; allWallets: Wallet[]; payday: number; periodMonth: string; today: string }) {
   const [pending, start] = useTransition();
   const active = goals.filter((g) => !g.archived_at);
   const archived = goals.filter((g) => g.archived_at);
@@ -140,7 +140,7 @@ export function GoalList({ goals, wallets, allWallets, payday, periodStart, toda
             )}
           </p>
         </div>
-        <GoalDialog wallets={wallets} payday={payday} periodStart={periodStart}>
+        <GoalDialog wallets={wallets} payday={payday} periodMonth={periodMonth}>
           <Icon name="add" className="text-[18px]" /> Buat goal
         </GoalDialog>
       </div>
@@ -154,7 +154,7 @@ export function GoalList({ goals, wallets, allWallets, payday, periodStart, toda
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {active.map((g) => (
-            <GoalCard key={g.id} goal={g} wallets={wallets} allWallets={allWallets} payday={payday} periodStart={periodStart} today={today} />
+            <GoalCard key={g.id} goal={g} wallets={wallets} allWallets={allWallets} payday={payday} periodMonth={periodMonth} today={today} />
           ))}
         </div>
       )}

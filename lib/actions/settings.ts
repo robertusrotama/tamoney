@@ -9,6 +9,10 @@ import type { ActionState } from "./state";
 type Supabase = Awaited<ReturnType<typeof requireUser>>["supabase"];
 const FAILED = { error: "Gagal menyimpan, coba lagi" };
 
+/** Archive pos instead of deleting them; returns true on error. */
+const archive = async (sb: Supabase, ids: string[]) =>
+  !!(await sb.from("budget_groups").update({ archived_at: new Date().toISOString() }).in("id", ids)).error;
+
 /** Point every listed category at its pos; every other expense category gets none. */
 async function mapCategories(sb: Supabase, byGroup: Record<string, string[]>): Promise<boolean> {
   const listed = Object.values(byGroup).flat();
@@ -31,16 +35,16 @@ export async function saveBudgetSettings(input: unknown): Promise<ActionState> {
   const { payday, groups } = parsed.data;
   const { supabase, user } = await requireUser();
 
-  const { data: existing, error } = await supabase.from("budget_groups").select("id,is_savings");
+  const { data: existing, error } = await supabase.from("budget_groups").select("id,is_savings").is("archived_at", null);
   if (error) return FAILED;
   const savingsId = existing.find((g) => g.is_savings)?.id;
   const known = new Set(existing.map((g) => g.id));
   if (groups.some((g) => g.id && !known.has(g.id)) || groups.find((g) => g.is_savings)?.id !== savingsId) return { error: "Pos tidak ditemukan, muat ulang halaman" };
 
-  // Removed pos first, so a new pos may reuse a removed name.
+  // Removed pos are archived (past periods keep their allocations), first so a new pos may reuse the name.
   const keep = groups.map((g) => g.id).filter(Boolean) as string[];
   const gone = existing.filter((g) => !g.is_savings && !keep.includes(g.id)).map((g) => g.id);
-  if (gone.length && (await supabase.from("budget_groups").delete().in("id", gone)).error) return FAILED;
+  if (gone.length && (await archive(supabase, gone))) return FAILED;
 
   const byGroup: Record<string, string[]> = {};
   for (const [sort, g] of groups.entries()) {
@@ -62,14 +66,14 @@ export async function saveBudgetSettings(input: unknown): Promise<ActionState> {
 export async function resetBudgetDefaults(): Promise<ActionState> {
   const { supabase } = await requireUser();
   const [groupsRes, catsRes] = await Promise.all([
-    supabase.from("budget_groups").select("id,name,is_savings"),
+    supabase.from("budget_groups").select("id,name,is_savings").is("archived_at", null),
     supabase.from("categories").select("id,name").eq("kind", "expense"),
   ]);
   if (groupsRes.error || catsRes.error) return FAILED;
 
   const defaults = new Set(DEFAULT_POS.map((p) => p.name));
   const gone = groupsRes.data.filter((g) => !g.is_savings && !defaults.has(g.name)).map((g) => g.id);
-  if (gone.length && (await supabase.from("budget_groups").delete().in("id", gone)).error) return FAILED;
+  if (gone.length && (await archive(supabase, gone))) return FAILED;
 
   const idByName: Record<string, string> = {};
   for (const [sort, p] of DEFAULT_POS.entries()) {

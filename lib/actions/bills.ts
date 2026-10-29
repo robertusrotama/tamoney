@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { dueDayFor } from "@/lib/bills";
 import { walletError } from "@/lib/guards";
 import { getActiveWalletIds } from "@/lib/queries";
 import { toOccurredAt } from "@/lib/reports";
@@ -20,7 +21,7 @@ export async function saveBill(_: ActionState, fd: FormData): Promise<ActionStat
   const id = fd.get("id");
 
   const [prev, category] = await Promise.all([
-    id ? supabase.from("bills").select("wallet_id").eq("id", String(id)).maybeSingle() : null,
+    id ? supabase.from("bills").select("wallet_id,next_due,due_day").eq("id", String(id)).maybeSingle() : null,
     supabase.from("categories").select("kind").eq("id", b.category_id).maybeSingle(),
   ]);
   if (id && !prev?.data) return { error: "Tagihan tidak ditemukan" };
@@ -28,8 +29,7 @@ export async function saveBill(_: ActionState, fd: FormData): Promise<ActionStat
   const err = walletError([b.wallet_id], await getActiveWalletIds(supabase), prev?.data ? [prev.data.wallet_id] : []);
   if (err) return { error: err };
 
-  // due_day remembers the original day so a bill on the 31st returns to the 31st after short months.
-  const row = { ...b, due_day: b.cadence === "weekly" ? null : Number(b.next_due.slice(8)) };
+  const row = { ...b, due_day: dueDayFor(b.cadence, b.next_due, prev?.data ?? null) };
   const { error } = id ? await supabase.from("bills").update(row).eq("id", String(id)) : await supabase.from("bills").insert(row);
   if (error) return FAILED;
   revalidatePath("/", "layout");

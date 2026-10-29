@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { BudgetGroup, BudgetPeriod } from "./types";
-import { allocate, DEFAULT_POS, nominalEnd, periodRange, safePerDay, usage, type UsageRow } from "./budget";
+import { allocate, DEFAULT_POS, groupsFor, nominalEnd, periodRange, safePerDay, usage, type UsageRow } from "./budget";
 
 const groups: BudgetGroup[] = DEFAULT_POS.map((p, i) => ({ ...p, id: p.name, sort: i }));
 
@@ -98,5 +98,15 @@ describe("safePerDay", () => {
       { group: groups[0], limit: 4_000_000, used: 0, left: 4_000_000, pct: 0, level: "ok" as const },
     ];
     expect(safePerDay(pos, "2026-11-19", "2026-11-24")).toBe(100_000);
+  });
+});
+
+describe("groupsFor", () => {
+  it("keeps an archived pos in periods that allocated it, hides it elsewhere", () => {
+    const gs = [{ ...groups[1] }, { ...groups[7], archived_at: "2026-11-01T00:00:00Z" }];
+    const oct = { id: "p", month: "2026-10-01", start_date: "2026-10-25", salary: 1, income_tx_id: null, allocations: { [groups[7].id]: 400_000 } };
+    const nov = { ...oct, allocations: {} };
+    expect(groupsFor(gs, oct).map((g) => g.id)).toEqual([groups[1].id, groups[7].id]);
+    expect(groupsFor(gs, nov).map((g) => g.id)).toEqual([groups[1].id]);
   });
 });

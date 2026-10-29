@@ -11,16 +11,15 @@ import { Picker } from "@/components/ui/Picker";
 import { useFormDone } from "@/components/ui/useFormDone";
 import { WALLET_ICON } from "@/components/wallets/style";
 import { saveGoal } from "@/lib/actions/goals";
-import { monthlyNeed } from "@/lib/goals";
+import { periodNeed } from "@/lib/goals";
 import { parseRupiah } from "@/lib/money";
-import { addDays } from "@/lib/period";
 import { todayWib } from "@/lib/reports";
 import type { Goal, Wallet } from "@/lib/types";
 
 const nextYear = (d: string) => `${Number(d.slice(0, 4)) + 1}${d.slice(4)}`;
 const ICONS = ["savings", "health_and_safety", "flight", "home", "directions_car", "school", "trending_up", "laptop_mac", "favorite", "celebration", "child_care", "phone_iphone"];
 
-function GoalForm({ goal, wallets, payday, periodStart, onDone }: { goal?: Goal; wallets: Wallet[]; payday: number; periodStart: string; onDone: () => void }) {
+function GoalForm({ goal, wallets, payday, periodMonth, onDone }: { goal?: Goal; wallets: Wallet[]; payday: number; periodMonth: string; onDone: () => void }) {
   const { state, pending, onSubmit } = useFormDone(saveGoal, onDone);
   const today = todayWib();
   const [icon, setIcon] = useState(goal?.icon ?? "savings");
@@ -32,7 +31,7 @@ function GoalForm({ goal, wallets, payday, periodStart, onDone }: { goal?: Goal;
 
   const suggest =
     hasDue && due && parseRupiah(target)
-      ? monthlyNeed({ ...(goal as Goal), target: parseRupiah(target) ?? 0, due_date: due, monthly_amount: null }, parseRupiah(initial) ?? 0, addDays(periodStart, -1), payday)
+      ? periodNeed({ ...(goal as Goal), target: parseRupiah(target) ?? 0, due_date: due, monthly_amount: null }, parseRupiah(initial) ?? 0, periodMonth, payday)
       : 0;
 
   return (
@@ -94,14 +93,14 @@ export function GoalDialog({
   goal,
   wallets,
   payday,
-  periodStart,
+  periodMonth,
   variant = "tonal",
   children,
 }: {
   goal?: Goal;
   wallets: Wallet[];
   payday: number;
-  periodStart: string;
+  periodMonth: string;
   variant?: ButtonVariant | "icon";
   children: ReactNode;
 }) {
@@ -118,7 +117,7 @@ export function GoalDialog({
         </Button>
       )}
       <Dialog open={d.open} origin={d.origin} onClose={d.close} title={goal ? "Ubah goal" : "Buat goal"}>
-        <GoalForm goal={goal} wallets={wallets} payday={payday} periodStart={periodStart} onDone={d.close} />
+        <GoalForm goal={goal} wallets={wallets} payday={payday} periodMonth={periodMonth} onDone={d.close} />
       </Dialog>
     </>
   );

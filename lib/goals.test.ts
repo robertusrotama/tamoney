@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { goalStatus, monthlyNeed, paydaysUntil, saved, type GoalTx } from "./goals";
+import { goalStatus, monthlyNeed, paydaysUntil, periodNeed, saved, type GoalTx } from "./goals";
 import type { Goal } from "./types";
 
 const goal = (p: Partial<Goal> = {}): Goal => ({
@@ -34,4 +34,11 @@ describe("goalStatus", () => {
   it("behind when the period ends soon without the deposit", () => expect(goalStatus(base)).toBe("tertinggal"));
   it("on track early in the period", () => expect(goalStatus({ ...base, today: "2026-11-04" })).toBe("sesuai"));
   it("on track once this period's deposit is in", () => expect(goalStatus({ ...base, depositedThisPeriod: 3 })).toBe("sesuai"));
+});
+
+describe("periodNeed", () => {
+  it("counts the current period once even when the salary came after payday", () =>
+    expect(periodNeed(goal({ target: 3_000_000, due_date: "2026-12-25" }), 0, "2026-10-01", 25)).toBe(1_000_000));
+  it("fixed monthly amount never asks for more than is left", () =>
+    expect(monthlyNeed(goal({ target: 1_000_000, monthly_amount: 1_000_000 }), 800_000, "2026-10-29", 25)).toBe(200_000));
 });

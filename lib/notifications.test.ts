@@ -15,7 +15,7 @@ const goal = (p: Partial<GoalWithProgress>): GoalWithProgress => ({
   id: "g", name: "Dana Darurat", icon: "savings", target: 24_000_000, initial_amount: 0, due_date: null, monthly_amount: 1_000_000, wallet_id: "jago",
   source_wallet_id: "bca", achieved_at: null, archived_at: null, created_at: "", saved: 0, need: 1_000_000, depositedThisPeriod: 0, status: "tertinggal", ...p,
 });
-const empty: PlanningState = { today, payday: 25, periodStart: "2026-10-25", groups: [], periods: [], salaryWallet: null, current: null, bills: [], goals: [] };
+const empty: PlanningState = { today, payday: 25, periodStart: "2026-10-25", periodMonth: "2026-10-01", groups: [], allGroups: [], periods: [], salaryWallet: null, current: null, bills: [], goals: [] };
 
 describe("buildNotifications", () => {
   const state: PlanningState = {

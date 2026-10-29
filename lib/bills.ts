@@ -46,3 +46,13 @@ export function monthTotal(bills: Bill[], month: string): number {
   }
   return total;
 }
+
+/**
+ * due_day to store on save: the original day survives an edit that leaves next_due alone (a bill on the 31st
+ * sitting at 28 Feb stays a 31st bill); a new or moved due date takes its own day. Weekly bills have none.
+ */
+export function dueDayFor(cadence: Bill["cadence"], nextDueDate: string, prev: Pick<Bill, "next_due" | "due_day"> | null): number | null {
+  if (cadence === "weekly") return null;
+  if (prev && prev.next_due === nextDueDate && prev.due_day) return prev.due_day;
+  return Number(nextDueDate.slice(8));
+}

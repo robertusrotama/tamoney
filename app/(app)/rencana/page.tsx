@@ -20,7 +20,7 @@ export default async function RencanaPage({ searchParams }: PageProps<"/rencana"
       <PlanTabs
         initial={sp.tab === "tagihan" ? "tagihan" : "goals"}
         bills={<BillList bills={s.bills} wallets={wallets} allWallets={allWallets} categories={expense} today={s.today} />}
-        goals={<GoalList goals={s.goals} wallets={wallets} allWallets={allWallets} payday={s.payday} periodStart={s.periodStart} today={s.today} />}
+        goals={<GoalList goals={s.goals} wallets={wallets} allWallets={allWallets} payday={s.payday} periodMonth={s.periodMonth} today={s.today} />}
       />
     </div>
   );
