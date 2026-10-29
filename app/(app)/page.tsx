@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PlanCards } from "@/components/dashboard/PlanCards";
 import { TxForm } from "@/components/transactions/TxForm";
 import { TxList, TxRow } from "@/components/transactions/TxRow";
 import { Card, EmptyState, Label } from "@/components/ui/EmptyState";
@@ -7,6 +8,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
 import { WALLET_ICON, cardInk, cardStyle } from "@/components/wallets/style";
 import { WalletDialog } from "@/components/wallets/WalletForm";
+import { getPlanningState } from "@/lib/planning";
 import { getCategories, getTransactionsBetween, getWallets } from "@/lib/queries";
 import { monthKey, monthRange, monthTotals, todayWib, wibDate, wibGreeting } from "@/lib/reports";
 import { requireUser } from "@/lib/supabase/server";
@@ -31,10 +33,11 @@ export default async function DashboardPage() {
   const { supabase, user } = await requireUser();
   const today = todayWib();
   const { start, end } = monthRange(monthKey(new Date().toISOString()));
-  const [wallets, categories, monthTxs] = await Promise.all([
+  const [wallets, categories, monthTxs, plan] = await Promise.all([
     getWallets(supabase),
     getCategories(supabase),
     getTransactionsBetween(supabase, start, end),
+    getPlanningState(supabase),
   ]);
 
   const total = wallets.reduce((s, w) => s + w.balance, 0);
@@ -94,6 +97,8 @@ export default async function DashboardPage() {
                 <div className="h-full rounded-full bg-negative" style={{ width: `${spentShare * 100}%` }} />
               </div>
             </Card>
+
+            <PlanCards s={plan} wallets={wallets} />
 
             <section>
               <SectionHeader title="Dompet" href="/dompet" linkLabel="Kelola" />
