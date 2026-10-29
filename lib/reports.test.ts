@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   categoryBreakdown,
-  filterHistory,
   monthKey,
-  parseMonth,
-  monthlyTrend,
   monthRange,
   monthTotals,
   pctChange,
@@ -66,47 +63,9 @@ describe("wibGreeting", () => {
   });
 });
 
-describe("parseMonth", () => {
-  it("accepts YYYY-MM and falls back otherwise", () => {
-    expect(parseMonth("2026-02", "2026-10")).toBe("2026-02");
-    for (const bad of [undefined, "", "2026-13", "2026-1", "x"]) expect(parseMonth(bad, "2026-10")).toBe("2026-10");
-  });
-});
-
-describe("filterHistory", () => {
-  const rows = [
-    { ...exp(10, "A"), note: "Mie Ayam", wallet_id: "w1", to_wallet_id: null },
-    { ...inc(20), note: null, wallet_id: "w2", to_wallet_id: null },
-    { ...transfer(30), note: null, wallet_id: "w1", to_wallet_id: "w2" },
-  ];
-
-  it("searches note and category name, case-insensitive", () => {
-    expect(filterHistory(rows, { q: "mie" })).toHaveLength(1);
-    expect(filterHistory(rows, { q: "gaji" })).toHaveLength(1);
-  });
-
-  it("filters by kind, category and wallet (either side of a transfer)", () => {
-    expect(filterHistory(rows, { kind: "transfer" })).toHaveLength(1);
-    expect(filterHistory(rows, { category: "A" })).toHaveLength(1);
-    expect(filterHistory(rows, { wallet: "w2" })).toHaveLength(2);
-    expect(filterHistory(rows, {})).toHaveLength(3);
-  });
-});
-
 describe("monthTotals", () => {
   it("ignores transfers", () => {
     expect(monthTotals([inc(100), exp(40), transfer(500)])).toEqual({ income: 100, expense: 40, net: 60 });
-  });
-});
-
-describe("monthlyTrend", () => {
-  it("returns n ascending months with empty months as zero", () => {
-    const trend = monthlyTrend([exp(10, "A", "2026-10-05T03:00:00Z"), inc(70, "2026-08-02T03:00:00Z")], "2026-10", 3);
-    expect(trend).toEqual([
-      { month: "2026-08", income: 70, expense: 0 },
-      { month: "2026-09", income: 0, expense: 0 },
-      { month: "2026-10", income: 0, expense: 10 },
-    ]);
   });
 });
 

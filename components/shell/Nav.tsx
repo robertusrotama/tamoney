@@ -78,7 +78,6 @@ function Sidebar({ collapsed, width, onToggle }: { collapsed: boolean; width: nu
         <motion.button
           type="button"
           onClick={onToggle}
-          whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.9 }}
           aria-label={collapsed ? "Lebarkan sidebar" : "Ciutkan sidebar"}
           aria-expanded={!collapsed}
@@ -128,25 +127,25 @@ function NavItem({
         // Fixed left inset centers the 21px icon in the 44px collapsed rail, so it never moves.
         className={`relative flex h-11 items-center gap-3 overflow-hidden rounded-full pl-[11.5px] text-[15px] font-medium ${active ? "text-primary" : "text-on-surface"}`}
       >
-        {/* One hover layer that slides between items (shared layoutId), not a per-item fade */}
-        {hovered && !active && (
-          <motion.span layoutId="sidebar-hover" className="absolute inset-0 rounded-full bg-surface-dim" transition={{ type: "spring", bounce: 0, duration: 0.28 }} />
-        )}
-        {active && <motion.span layoutId="sidebar-lens" className="glass-lens absolute inset-0 rounded-full" />}
+        {/* Hover: each item's own fill fades in and out — quiet, no travel */}
         <motion.span
-          className="relative flex shrink-0"
-          animate={{ scale: hovered ? 1.1 : 1, rotate: hovered && !active ? -6 : 0 }}
-          transition={{ type: "spring", bounce: 0.3, duration: 0.35 }}
-        >
+          aria-hidden
+          className="absolute inset-0 rounded-full bg-surface-dim"
+          initial={false}
+          animate={{ opacity: hovered && !active ? 1 : 0 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+        />
+        {active && <motion.span layoutId="sidebar-lens" className="glass-lens absolute inset-0 rounded-full" />}
+        <span className="relative flex shrink-0">
           <Icon name={item.icon} filled={active} className={`text-[21px] ${active ? "" : "text-on-surface-variant"}`} />
-        </motion.span>
+        </span>
         <AnimatePresence initial={false}>
           {!collapsed && (
             <motion.span
               key="label"
               className="relative whitespace-nowrap"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1, x: hovered ? 2 : 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
               {item.label}

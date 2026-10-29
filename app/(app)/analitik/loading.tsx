@@ -1,33 +1,31 @@
-import { Bone, ListBones, LoadingLabel, TitleBones } from "@/components/ui/Skeleton";
+import { Bone, ListBones, LoadingLabel } from "@/components/ui/Skeleton";
 
+/** Mirrors Analitik: period tabs, search + filter pills, summary, history (left) + category donut (right). */
 export default function Loading() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <LoadingLabel />
-      <TitleBones action />
-      <div className="grid gap-4 rounded-[14px] bg-card p-4 sm:grid-cols-3">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="space-y-2">
-            <Bone className="h-3 w-20" />
-            <Bone className="h-7 w-36" />
-            <Bone className="h-3 w-28" />
-          </div>
-        ))}
+      <Bone className="ml-1 h-8 w-40" />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Bone className="h-8 w-full rounded-[9px] sm:w-[400px]" />
+        <Bone className="h-11 w-56 rounded-full" />
       </div>
-      <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
-        <div className="space-y-2">
-          <Bone className="h-5 w-32" />
-          <Bone className="h-[260px] rounded-[14px]" />
-        </div>
-        <div className="space-y-2">
+      <Bone className="h-11 rounded-full" />
+      <div className="flex gap-2">
+        <Bone className="h-9 w-28 rounded-full" />
+        <Bone className="h-9 w-28 rounded-full" />
+        <Bone className="h-9 w-32 rounded-full" />
+      </div>
+      <Bone className="h-[104px] rounded-[14px]" />
+      <div className="grid items-start gap-8 lg:grid-cols-[1fr_340px]">
+        <div className="space-y-2 lg:order-2">
           <Bone className="h-5 w-24" />
-          <Bone className="h-[260px] rounded-[14px]" />
+          <Bone className="h-[360px] rounded-[14px]" />
         </div>
-      </div>
-      <div className="space-y-2">
-        <Bone className="h-5 w-20" />
-        <Bone className="h-11 rounded-[10px]" />
-        <ListBones rows={6} />
+        <div className="space-y-2 lg:order-1">
+          <Bone className="h-5 w-28" />
+          <ListBones rows={8} />
+        </div>
       </div>
     </div>
   );

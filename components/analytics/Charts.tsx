@@ -1,12 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { formatRupiah } from "@/lib/money";
 
-// CSS variables so charts follow light/dark like the rest of the UI.
-const POSITIVE = "var(--c-positive)";
-const NEGATIVE = "var(--c-negative)";
 /** Apple system palette: blue, orange, purple, teal, pink, yellow, gray. */
 export const CATEGORY_COLORS = ["#0a84ff", "#ff9f0a", "#bf5af2", "#40c8e0", "#ff375f", "#ffd60a", "#8e8e93"];
 
@@ -22,19 +19,6 @@ const tooltip = {
   },
   labelStyle: { color: "var(--c-label-2)" },
 };
-
-export function TrendChart({ data }: { data: { label: string; income: number; expense: number }[] }) {
-  return (
-    <ResponsiveContainer width="100%" height={220}>
-      <BarChart data={data} barGap={3}>
-        <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "var(--c-label-2)" }} />
-        <Tooltip {...tooltip} cursor={{ fill: "var(--c-fill)", radius: 8 }} />
-        <Bar dataKey="income" name="Masuk" fill={POSITIVE} radius={[5, 5, 5, 5]} maxBarSize={18} animationDuration={500} />
-        <Bar dataKey="expense" name="Keluar" fill={NEGATIVE} radius={[5, 5, 5, 5]} maxBarSize={18} animationDuration={500} />
-      </BarChart>
-    </ResponsiveContainer>
-  );
-}
 
 /** links[i] opens slice i's category deep dive. */
 export function CategoryDonut({ data, links }: { data: { name: string; amount: number }[]; links?: string[] }) {

@@ -19,21 +19,25 @@ export function Segmented<T extends string>({
       {options.map((o) => {
         const active = o.value === value;
         return (
-          <button
+          <motion.button
             key={o.value}
             type="button"
             role="radio"
             aria-checked={active}
             onClick={() => onChange(o.value)}
-            className={`relative flex-1 rounded-[7px] py-1.5 text-[13px] font-semibold ${active ? (o.tone ?? "text-on-surface") : "text-on-surface-variant"}`}
+            whileTap={{ scale: 0.96 }}
+            // inactive options answer the pointer: label darkens on hover, a faint fill under the press
+            className={`group relative flex-1 rounded-[7px] py-1.5 text-[13px] font-semibold ${active ? (o.tone ?? "text-on-surface") : "text-on-surface-variant hover:text-on-surface"}`}
           >
+            {!active && <span className="absolute inset-0 rounded-[7px] bg-on-surface/0 group-active:bg-on-surface/5" />}
             {active && (
               <motion.span
                 layoutId={`seg-${id}`}
-                className="absolute inset-0 rounded-[7px] bg-card shadow-[0_3px_8px_rgb(0_0_0/0.12),0_3px_1px_rgb(0_0_0/0.04)] dark:bg-[#636366] dark:shadow-none"              />
+                className="absolute inset-0 rounded-[7px] bg-card shadow-[0_3px_8px_rgb(0_0_0/0.12),0_3px_1px_rgb(0_0_0/0.04)] dark:bg-[#636366] dark:shadow-none"
+              />
             )}
             <span className="relative">{o.label}</span>
-          </button>
+          </motion.button>
         );
       })}
     </div>

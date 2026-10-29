@@ -18,19 +18,14 @@ Semua layar memakai [[design-system]]. Shell: sidebar Liquid Glass mengambang & 
 - Komponen: `app/(app)/page.tsx`, `TxRow`/`TxList`, `TxForm`.
 
 ## Analitik → `/analitik`
-- Large title + `MonthPicker` (‹ bulan › + popover grid bulan; tanpa `<input type="month">` yang tidak didukung Safari/Firefox desktop).
-- Satu kartu grouped: Pemasukan · Pengeluaran · Surplus/Defisit (+% vs bulan lalu).
-- **Tren 6 Bulan** (bar, warna sistem) dan **Kategori** (donut + peringkat).
-- **Riwayat**: cari + filter (GET form), list dengan edit/hapus, paginasi 20.
-- Baris peringkat & irisan donut kategori → **deep dive kategori**.
-- Komponen: `app/(app)/analitik/page.tsx`, `components/analytics/*`, `TxActions`.
+- Tab periode **Mingguan · Bulanan · Tahunan · Rentang** + ‹ label › (Rentang: kalender rentang kustom dengan preset 7/30/90 hari). Minggu = Senin–Minggu WIB. Perbandingan selalu vs periode sebelumnya yang sama panjang. Logika di `lib/period.ts` (dites).
+- Search bar; filter **Kategori** & **Dompet** (checklist, bisa lebih dari 1) dan **Jenis** (pilih satu) — komponen sendiri (`components/ui/Popover.tsx`, `components/analytics/Filters.tsx`), bukan kontrol bawaan perangkat.
+- Ringkasan Pemasukan · Pengeluaran · Selisih; **Riwayat** (kiri, dikelompokkan per hari saat urut Tanggal, urut Tanggal/Nominal/Nama) dan **Kategori** donut + peringkat (kanan, sticky) → deep dive.
+- **Kinerja:** server hanya mengambil data periode (+ periode sebelumnya). Search, filter, urut, total, donut dihitung di klien (instan, tanpa request); state disinkron ke URL lewat `history.replaceState`. Ganti periode = navigasi dalam transition → tab langsung pindah + skeleton.
 
 ## Deep dive kategori → `/analitik/kategori/[id]`
-- Kembali ke Analitik, ikon + nama kategori, `MonthPicker`.
-- Ringkasan: total bulan, porsi dari semua pengeluaran/pemasukan, Δ vs bulan lalu, jumlah transaksi + rata-rata, transaksi terbesar (lompat ke barisnya).
-- Grafik **Per Hari** / **Per Minggu** (minggu = blok tanggal 1–7, 8–14, …, WIB); klik batang → gulir ke grupnya.
-- Pengelompokan **Harian · Mingguan · Semua** dengan subtotal per grup; filter cari catatan + dompet; urut **Tanggal · Nominal · Nama** naik/turun. Semua state di URL (`kelompok`, `urut`, `arah`, `q`, `dompet`, `bulan`).
-- Logika di `lib/drilldown.ts` (dites).
+- Mengikuti periode Analitik (tab yang sama). Ringkasan total, porsi, Δ vs periode sebelumnya, jumlah + rata-rata, transaksi terbesar.
+- Grafik per **Hari / Minggu / Bulan**; pengelompokan **Harian · Mingguan · Bulanan · Semua** (default menyesuaikan panjang periode); filter cari + dompet; urut Tanggal/Nominal/Nama. Semua instan di klien.
 
 ## Dompet → `/dompet`
 - Large title + ringkasan total, tombol Tambah.

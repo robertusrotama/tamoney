@@ -1,38 +1,20 @@
 "use client";
 
 import { motion } from "motion/react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { Icon } from "@/components/ui/Icon";
 import { Segmented } from "@/components/ui/Segmented";
+import type { Dir, SortBy } from "@/lib/drilldown";
 import { formatRupiah } from "@/lib/money";
 
-/** Writes one search param and keeps the rest (filters, month); the server page re-renders from the URL. */
-function useSetParam() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const params = useSearchParams();
-  return (entries: Record<string, string>) => {
-    const next = new URLSearchParams(params);
-    for (const [k, v] of Object.entries(entries)) next.set(k, v);
-    router.replace(`${pathname}?${next}`, { scroll: false });
-  };
-}
-
-export function UrlSegmented<T extends string>({ param, value, options }: { param: string; value: T; options: { value: T; label: string }[] }) {
-  const set = useSetParam();
-  return <Segmented value={value} onChange={(v) => set({ [param]: v })} options={options} />;
-}
-
-/** Sort field + a direction toggle whose arrow flips with a spring. */
-export function SortControl({ by, dir }: { by: "tanggal" | "nominal" | "nama"; dir: "asc" | "desc" }) {
-  const set = useSetParam();
+/** Sort field + a direction toggle whose arrow flips with a spring. Pure client state: instant. */
+export function SortControl({ by, dir, onChange }: { by: SortBy; dir: Dir; onChange: (by: SortBy, dir: Dir) => void }) {
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-1">
+      <div className="min-w-0 flex-1">
         <Segmented
           value={by}
-          onChange={(v) => set({ urut: v, arah: v === "nama" ? "asc" : "desc" })} // sensible default direction per field
+          onChange={(v) => onChange(v, v === "nama" ? "asc" : "desc")} // sensible default direction per field
           options={[
             { value: "tanggal", label: "Tanggal" },
             { value: "nominal", label: "Nominal" },
@@ -42,10 +24,10 @@ export function SortControl({ by, dir }: { by: "tanggal" | "nominal" | "nama"; d
       </div>
       <motion.button
         type="button"
-        whileTap={{ scale: 0.9 }}
-        onClick={() => set({ arah: dir === "asc" ? "desc" : "asc" })}
+        whileTap={{ scale: 0.88 }}
+        onClick={() => onChange(by, dir === "asc" ? "desc" : "asc")}
         aria-label={dir === "asc" ? "Urutan naik — ubah ke turun" : "Urutan turun — ubah ke naik"}
-        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-dim text-primary"
+        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-dim text-primary hover:bg-primary-container"
       >
         <motion.span animate={{ rotate: dir === "asc" ? 180 : 0 }} className="flex">
           <Icon name="arrow_downward" className="text-[18px]" />
@@ -55,7 +37,7 @@ export function SortControl({ by, dir }: { by: "tanggal" | "nominal" | "nama"; d
   );
 }
 
-/** Daily or weekly bars; tapping a bar scrolls to that day's / week's group in the list. */
+/** Bars per bucket; tapping a bar scrolls to that bucket's group in the list. */
 export function DrillChart({ data, color }: { data: { key: string; label: string; total: number }[]; color: string }) {
   const max = Math.max(...data.map((d) => d.total));
   return (
@@ -73,7 +55,7 @@ export function DrillChart({ data, color }: { data: { key: string; label: string
           name="Total"
           radius={[4, 4, 4, 4]}
           maxBarSize={28}
-          animationDuration={500}
+          animationDuration={400}
           cursor="pointer"
           onClick={(d) =>
             document.getElementById(`g-${(d as { key?: string }).key}`)?.scrollIntoView({

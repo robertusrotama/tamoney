@@ -78,7 +78,8 @@ Konstanta di `components/ui/MotionProvider.tsx`:
 - **Tekan:** `whileTap` scale 0.97 (tombol), 0.9 (ikon) — umpan balik saat pointer-down.
 - **Sheet mobile** (`Dialog` < 768px): drag Y 1:1, elastic atas 0.05 (rubber-band), tutup bila `offset + project(velocity) > tinggi/2` dengan fungsi proyeksi Apple (`d = 0.998`).
 - **Dialog desktop:** muncul dari posisi tombol pemicu (`useDialog().show(e)` → `origin`) dan kembali ke sana saat ditutup (jalur simetris).
-- **Navigasi:** highlight sidebar / thumb segmented pindah dengan `layoutId`.
+- **Navigasi:** lensa item aktif sidebar & thumb segmented pindah dengan `layoutId`; hover item sidebar = **fade** latar (0.18s), tanpa geser.
+- **Kontrol:** segmented & pill filter punya state hover, tekan (scale), fokus; popover tumbuh dari pemicunya, Esc/klik luar menutup.
 - **Angka:** `Money` menganimasikan dari nilai di layar ke nilai baru (spring 0.6s).
 - **Masuk list:** `FadeIn` opacity + 8px, stagger 30ms (maks 10 item).
 - Hanya animasi `transform`/`opacity`.
