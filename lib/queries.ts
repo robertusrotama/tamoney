@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { fetchAllPages } from "./paging";
 import type { Supabase } from "./supabase/server";
+import type { Profile } from "@/components/ui/Avatar";
 import type { Category, Tx, Wallet } from "./types";
 
 export type TxWithCategory = Tx & { category_name: string | null; category_icon: string | null };
@@ -23,6 +24,12 @@ export const getWallets = cache(async (sb: Supabase, includeArchived = false): P
 export async function getActiveWalletIds(sb: Supabase): Promise<string[]> {
   return must(await sb.from("wallets").select("id").is("archived_at", null)).map((w) => w.id as string);
 }
+
+/** Display name + avatar; falls back to the e-mail's local part when no name was given at sign-up. */
+export const getProfile = cache(async (sb: Supabase, email: string): Promise<Profile> => {
+  const { data } = await sb.from("profiles").select("display_name,avatar,avatar_color").maybeSingle();
+  return { display_name: data?.display_name || email.split("@")[0], avatar: data?.avatar ?? null, avatar_color: data?.avatar_color ?? null };
+});
 
 export const getCategories = cache(async (sb: Supabase): Promise<Category[]> =>
   must(await sb.from("categories").select("id,kind,name,icon,budget_group_id").order("created_at")),

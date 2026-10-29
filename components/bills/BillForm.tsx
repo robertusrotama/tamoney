@@ -30,7 +30,7 @@ function BillForm({ bill, wallets, categories, onDone }: { bill?: Bill; wallets:
   const icon = bill?.icon ?? categories.find((c) => c.id === category)?.icon ?? "receipt_long";
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form method="post" onSubmit={onSubmit} className="space-y-4">
       {bill && <input type="hidden" name="id" value={bill.id} />}
       <input type="hidden" name="icon" value={icon} />
       <input type="hidden" name="cadence" value={cadence} />

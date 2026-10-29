@@ -81,7 +81,7 @@ export function TxForm({
 
   const options = categories.filter((c) => c.kind === kind);
   return (
-    <form onSubmit={onSubmit} key={version} className="space-y-4">
+    <form method="post" onSubmit={onSubmit} key={version} className="space-y-4">
       {initial && <input type="hidden" name="id" value={initial.id} />}
       <input type="hidden" name="kind" value={kind} />
       {switcher}

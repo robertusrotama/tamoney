@@ -6,14 +6,19 @@ import { QuickAdd } from "@/components/shell/QuickAdd";
 import { UserMenu } from "@/components/shell/UserMenu";
 import { buildNotifications } from "@/lib/notifications";
 import { getPlanningState } from "@/lib/planning";
-import { getCategories, getWallets } from "@/lib/queries";
+import { getCategories, getProfile, getWallets } from "@/lib/queries";
 import { requireUser } from "@/lib/supabase/server";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { supabase, user } = await requireUser();
-  const [wallets, categories, plan, cookieStore] = await Promise.all([getWallets(supabase), getCategories(supabase), getPlanningState(supabase), cookies()]);
+  const [wallets, categories, plan, profile, cookieStore] = await Promise.all([
+    getWallets(supabase),
+    getCategories(supabase),
+    getPlanningState(supabase),
+    getProfile(supabase, user.email),
+    cookies(),
+  ]);
   const notices = buildNotifications(plan, plan.today, Object.fromEntries(wallets.map((w) => [w.id, w.name])));
-  const name = (user.user_metadata.display_name as string | undefined) || user.email!.split("@")[0];
 
   return (
     <AppShell
@@ -24,7 +29,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <div className="glass flex items-center gap-1.5 rounded-full p-1">
             <QuickAdd wallets={wallets} categories={categories} />
             <Notifications notices={notices} bills={plan.bills} goals={plan.goals} wallets={wallets} />
-            <UserMenu name={name} email={user.email!} />
+            <UserMenu profile={profile} email={user.email} />
           </div>
         </header>
       }

@@ -36,7 +36,7 @@ export function CreateToken() {
 
   return (
     <div className="space-y-3">
-      <form onSubmit={onSubmit} className="flex gap-2">
+      <form method="post" onSubmit={onSubmit} className="flex gap-2">
         <Input name="name" placeholder="Nama perangkat, mis. iPhone Tama" maxLength={50} className="flex-1" />
         <Button type="submit" disabled={pending}>
           {pending ? "Membuat…" : "Buat Token"}

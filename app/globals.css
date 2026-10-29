@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+/* dark: utilities follow the same rule as the tokens (system, or a forced theme). */
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+  &:where([data-theme="dark"] *) {
+    @slot;
+  }
+}
+
 /*
  * Apple system colors (docs/knowledge/design-system.md). Token names are semantic so pages
  * don't care about the palette; light/dark values live in the variables below.
@@ -36,8 +48,13 @@
   --c-glass-thick: rgb(250 250 252 / 0.86);
 }
 
+/* Theme: follows the system unless Pengaturan forces one (<html data-theme>, from the "theme" cookie). */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --c-primary: #0a84ff;
     --c-primary-container: rgb(10 132 255 / 0.2);
     --c-on-primary-container: #64aaff;
@@ -66,6 +83,37 @@
     --c-glass-lens: rgb(255 255 255 / 0.12);
     --c-glass-thick: rgb(36 36 38 / 0.86);
   }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --c-primary: #0a84ff;
+  --c-primary-container: rgb(10 132 255 / 0.2);
+  --c-on-primary-container: #64aaff;
+  --c-positive: #30d158;
+  --c-positive-container: rgb(48 209 88 / 0.18);
+  --c-negative: #ff453a;
+  --c-negative-container: rgb(255 69 58 / 0.18);
+  --c-warning: #ff9f0a;
+  --c-warning-container: rgb(255 159 10 / 0.18);
+  --c-tertiary: #5e5ce6;
+  --c-tertiary-container: rgb(94 92 230 / 0.22);
+
+  --c-surface: #000000;
+  --c-card: #1c1c1e;
+  --c-fill: rgb(118 118 128 / 0.24);
+  --c-separator: rgb(84 84 88 / 0.6);
+  --c-label: #ffffff;
+  --c-label-2: rgb(235 235 245 / 0.6);
+  --c-material: rgb(30 30 30 / 0.72);
+  --c-scrim: rgb(0 0 0 / 0.5);
+
+  --c-glass-hi: rgb(60 60 64 / 0.55);
+  --c-glass-lo: rgb(30 30 32 / 0.5);
+  --c-glass-rim: rgb(255 255 255 / 0.16);
+  --c-glass-edge: rgb(255 255 255 / 0.08);
+  --c-glass-lens: rgb(255 255 255 / 0.12);
+  --c-glass-thick: rgb(36 36 38 / 0.86);
 }
 
 @theme inline {

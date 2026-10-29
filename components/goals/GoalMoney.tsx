@@ -27,7 +27,7 @@ function GoalMoneyForm({ goal, wallets, mode, onDone }: { goal: GoalWithProgress
   const otherSide = mode === "setor" ? "wallet_id" : "to_wallet_id";
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form method="post" onSubmit={onSubmit} className="space-y-4">
       <input type="hidden" name="goal_id" value={goal.id} />
       <input type="hidden" name={mode === "setor" ? "to_wallet_id" : "wallet_id"} value={goal.wallet_id} />
       <input type="hidden" name="note" value={`${mode === "setor" ? "Setor" : "Tarik"} ${goal.name}`} />

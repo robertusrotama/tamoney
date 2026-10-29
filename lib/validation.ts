@@ -98,6 +98,23 @@ export const goalSchema = z
   .refine((g) => g.due_date || g.monthly_amount, { error: "Isi due date atau setoran bulanan", path: ["monthly_amount"] })
   .refine((g) => g.wallet_id !== g.source_wallet_id, { error: "Dompet sumber dan tujuan harus berbeda", path: ["source_wallet_id"] });
 
+export const AVATAR_COLORS = ["blue", "indigo", "purple", "pink", "red", "orange", "yellow", "green", "teal", "graphite"] as const;
+
+export const profileSchema = z.object({
+  display_name: name(50, "tampilan"),
+  avatar: z.string().max(16).optional().transform((v) => v || null),
+  avatar_color: z.union([z.literal(""), z.enum(AVATAR_COLORS)]).optional().transform((v) => v || null),
+});
+
+export const passwordSchema = z
+  .object({
+    current: z.string().min(1, { error: "Isi password saat ini" }),
+    password: z.string().min(8, { error: "Password minimal 8 karakter" }),
+    confirm: z.string(),
+  })
+  .refine((p) => p.password === p.confirm, { error: "Konfirmasi password tidak sama", path: ["confirm"] })
+  .refine((p) => p.password !== p.current, { error: "Password baru harus berbeda", path: ["password"] });
+
 const pos = z.object({
   id: id.nullable(),
   name: z.string().trim().min(1, { error: "Nama pos wajib diisi" }).max(40, { error: "Nama pos maksimal 40 karakter" }),

@@ -15,6 +15,8 @@ const ITEMS = [
   { href: "/dompet", label: "Dompet", icon: "account_balance_wallet" },
 ];
 
+const SETTINGS = { href: "/pengaturan", label: "Pengaturan", icon: "settings" };
+
 const WIDE = 232;
 const NARROW = 64;
 const GAP = 12; // sidebar floats this far from the window edge
@@ -100,6 +102,15 @@ function Sidebar({ collapsed, width, onToggle }: { collapsed: boolean; width: nu
             onHover={(on) => setHovered(on ? i.href : null)}
           />
         ))}
+      </nav>
+      <nav className="mt-auto" aria-label="Pengaturan" onPointerLeave={() => setHovered(null)}>
+        <NavItem
+          item={SETTINGS}
+          active={isActive(path, SETTINGS.href)}
+          collapsed={collapsed}
+          hovered={hovered === SETTINGS.href}
+          onHover={(on) => setHovered(on ? SETTINGS.href : null)}
+        />
       </nav>
     </motion.aside>
   );

@@ -75,7 +75,7 @@ function SalaryForm({ groups, periods, wallets, today, payday, salaryWallet, mon
   const months = [...new Set([-2, -1, 0, 1].map((n) => shiftYm(today.slice(0, 7), n)).concat(periods.map((p) => p.month.slice(0, 7))))].sort().reverse();
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4" key={month}>
+    <form method="post" onSubmit={onSubmit} className="space-y-4" key={month}>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Gaji bulan">
           <Picker

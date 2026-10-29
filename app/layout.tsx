@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
+import { THEME_COOKIE } from "@/components/shell/prefs";
 import { MotionProvider } from "@/components/ui/MotionProvider";
 import "./globals.css";
 
@@ -20,9 +22,10 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const theme = (await cookies()).get(THEME_COOKIE)?.value;
   return (
-    <html lang="id" className="h-full antialiased">
+    <html lang="id" className="h-full antialiased" data-theme={theme === "light" || theme === "dark" ? theme : undefined}>
       <head>
         {/* eslint-disable-next-line @next/next/no-page-custom-font, @next/next/google-font-display -- icon font; "block" hides raw ligature names while loading */}
         <link

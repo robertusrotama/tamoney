@@ -19,7 +19,7 @@ function PayBillForm({ bill, wallets, onDone }: { bill: Bill; wallets: Wallet[];
   const { state, pending, onSubmit } = useFormDone(payBill, onDone);
   const today = todayWib();
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form method="post" onSubmit={onSubmit} className="space-y-4">
       <input type="hidden" name="bill_id" value={bill.id} />
       <input type="hidden" name="due" value={bill.next_due} />
       <div className="flex items-center gap-3 rounded-[14px] bg-surface-dim/60 px-3 py-2.5">

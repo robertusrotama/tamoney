@@ -24,7 +24,7 @@ function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void })
   const look = { type, color: color || null, pattern: pattern || null };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form method="post" onSubmit={onSubmit} className="space-y-4">
       {wallet && <input type="hidden" name="id" value={wallet.id} />}
       <input type="hidden" name="color" value={color} />
       <input type="hidden" name="pattern" value={pattern} />

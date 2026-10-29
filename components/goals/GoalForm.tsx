@@ -36,7 +36,7 @@ function GoalForm({ goal, wallets, payday, periodStart, onDone }: { goal?: Goal;
       : 0;
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form method="post" onSubmit={onSubmit} className="space-y-4">
       {goal && <input type="hidden" name="id" value={goal.id} />}
       <input type="hidden" name="icon" value={icon} />
       <div className="flex gap-1.5 overflow-x-auto pb-1">

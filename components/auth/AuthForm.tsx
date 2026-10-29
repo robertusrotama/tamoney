@@ -42,7 +42,7 @@ export function AuthForm({
           {successMessage}
         </p>
       ) : (
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form method="post" onSubmit={onSubmit} className="space-y-4">
           {fields.map((f) => (
             <div key={f.name} className="space-y-1">
               <Field label={f.label}>

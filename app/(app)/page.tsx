@@ -9,7 +9,7 @@ import { Money } from "@/components/ui/Money";
 import { WALLET_ICON, cardInk, cardStyle } from "@/components/wallets/style";
 import { WalletDialog } from "@/components/wallets/WalletForm";
 import { getPlanningState } from "@/lib/planning";
-import { getCategories, getTransactionsBetween, getWallets } from "@/lib/queries";
+import { getCategories, getProfile, getTransactionsBetween, getWallets } from "@/lib/queries";
 import { monthKey, monthRange, monthTotals, todayWib, wibDate, wibGreeting } from "@/lib/reports";
 import { requireUser } from "@/lib/supabase/server";
 
@@ -33,11 +33,12 @@ export default async function DashboardPage() {
   const { supabase, user } = await requireUser();
   const today = todayWib();
   const { start, end } = monthRange(monthKey(new Date().toISOString()));
-  const [wallets, categories, monthTxs, plan] = await Promise.all([
+  const [wallets, categories, monthTxs, plan, profile] = await Promise.all([
     getWallets(supabase),
     getCategories(supabase),
     getTransactionsBetween(supabase, start, end),
     getPlanningState(supabase),
+    getProfile(supabase, user.email),
   ]);
 
   const total = wallets.reduce((s, w) => s + w.balance, 0);
@@ -45,7 +46,7 @@ export default async function DashboardPage() {
   const todayTxs = monthTxs.filter((t) => wibDate(t.occurred_at) === today);
   const names = new Map(wallets.map((w) => [w.id, w.name]));
   const walletName = (id: string) => names.get(id) ?? "Diarsipkan";
-  const firstName = ((user.user_metadata.display_name as string | undefined) || user.email!.split("@")[0]).split(" ")[0];
+  const firstName = profile.display_name.split(" ")[0];
   const spentShare = income > 0 ? Math.min(expense / income, 1) : expense > 0 ? 1 : 0;
 
   return (

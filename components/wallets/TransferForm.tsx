@@ -17,7 +17,7 @@ export function TransferForm({ wallets, initial, onDone }: { wallets: Wallet[]; 
   const options = wallets.map((w) => ({ value: w.id, label: w.name, icon: WALLET_ICON[w.type] }));
 
   return (
-    <form onSubmit={onSubmit} key={version} className="space-y-4">
+    <form method="post" onSubmit={onSubmit} key={version} className="space-y-4">
       {initial && <input type="hidden" name="id" value={initial.id} />}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Dari dompet">

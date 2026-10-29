@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { billSchema, budgetSettingsSchema, goalSchema, payBillSchema, salarySchema, transferSchema, txSchema, walletSchema } from "./validation";
+import { billSchema, budgetSettingsSchema, goalSchema, passwordSchema, profileSchema, payBillSchema, salarySchema, transferSchema, txSchema, walletSchema } from "./validation";
 
 const A = "6f1c2b9e-3a4d-4c5e-8f70-1a2b3c4d5e6f";
 const B = "7a2d3c0f-4b5e-4d6f-9081-2b3c4d5e6f70";
@@ -92,4 +92,17 @@ describe("goalSchema", () => {
   it("allows already having more than the target", () => expect(goalSchema.safeParse({ ...ok, initial_amount: "30.000.000" }).success).toBe(true));
   it("source and destination differ", () =>
     expect(goalSchema.safeParse({ ...ok, source_wallet_id: A }).error?.issues[0].message).toBe("Dompet sumber dan tujuan harus berbeda"));
+});
+
+describe("profileSchema / passwordSchema", () => {
+  it("accepts a name with an emoji avatar", () =>
+    expect(profileSchema.safeParse({ display_name: " Tama ", avatar: "🦊", avatar_color: "orange" }).data).toEqual({ display_name: "Tama", avatar: "🦊", avatar_color: "orange" }));
+  it("no avatar falls back to the initial", () => expect(profileSchema.safeParse({ display_name: "Tama", avatar: "", avatar_color: "" }).data?.avatar).toBeNull());
+  it("rejects an unknown color", () => expect(profileSchema.safeParse({ display_name: "Tama", avatar: "🦊", avatar_color: "neon" }).success).toBe(false));
+  const pw = { current: "lama-123456", password: "baru-123456", confirm: "baru-123456" };
+  it("accepts a new password", () => expect(passwordSchema.safeParse(pw).success).toBe(true));
+  it("needs 8+ characters", () => expect(passwordSchema.safeParse({ ...pw, password: "pendek", confirm: "pendek" }).error?.issues[0].message).toBe("Password minimal 8 karakter"));
+  it("confirmation must match", () => expect(passwordSchema.safeParse({ ...pw, confirm: "lain-123456" }).error?.issues[0].message).toBe("Konfirmasi password tidak sama"));
+  it("must differ from the current one", () =>
+    expect(passwordSchema.safeParse({ current: pw.password, password: pw.password, confirm: pw.password }).error?.issues[0].message).toBe("Password baru harus berbeda"));
 });
