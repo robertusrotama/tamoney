@@ -22,7 +22,15 @@ Semua layar memakai [[design-system]]. Shell: sidebar Liquid Glass mengambang & 
 - Satu kartu grouped: Pemasukan · Pengeluaran · Surplus/Defisit (+% vs bulan lalu).
 - **Tren 6 Bulan** (bar, warna sistem) dan **Kategori** (donut + peringkat).
 - **Riwayat**: cari + filter (GET form), list dengan edit/hapus, paginasi 20.
+- Baris peringkat & irisan donut kategori → **deep dive kategori**.
 - Komponen: `app/(app)/analitik/page.tsx`, `components/analytics/*`, `TxActions`.
+
+## Deep dive kategori → `/analitik/kategori/[id]`
+- Kembali ke Analitik, ikon + nama kategori, `MonthPicker`.
+- Ringkasan: total bulan, porsi dari semua pengeluaran/pemasukan, Δ vs bulan lalu, jumlah transaksi + rata-rata, transaksi terbesar (lompat ke barisnya).
+- Grafik **Per Hari** / **Per Minggu** (minggu = blok tanggal 1–7, 8–14, …, WIB); klik batang → gulir ke grupnya.
+- Pengelompokan **Harian · Mingguan · Semua** dengan subtotal per grup; filter cari catatan + dompet; urut **Tanggal · Nominal · Nama** naik/turun. Semua state di URL (`kelompok`, `urut`, `arah`, `q`, `dompet`, `bulan`).
+- Logika di `lib/drilldown.ts` (dites).
 
 ## Dompet → `/dompet`
 - Large title + ringkasan total, tombol Tambah.

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { formatRupiah } from "@/lib/money";
 
@@ -35,11 +36,25 @@ export function TrendChart({ data }: { data: { label: string; income: number; ex
   );
 }
 
-export function CategoryDonut({ data }: { data: { name: string; amount: number }[] }) {
+/** links[i] opens slice i's category deep dive. */
+export function CategoryDonut({ data, links }: { data: { name: string; amount: number }[]; links?: string[] }) {
+  const router = useRouter();
   return (
     <ResponsiveContainer width="100%" height={190}>
       <PieChart>
-        <Pie data={data} dataKey="amount" nameKey="name" innerRadius={58} outerRadius={86} paddingAngle={1.5} cornerRadius={4} stroke="none" animationDuration={600}>
+        <Pie
+          data={data}
+          dataKey="amount"
+          nameKey="name"
+          innerRadius={58}
+          outerRadius={86}
+          paddingAngle={1.5}
+          cornerRadius={4}
+          stroke="none"
+          animationDuration={600}
+          cursor={links ? "pointer" : undefined}
+          onClick={(_, i) => links?.[i] && router.push(links[i])}
+        >
           {data.map((_, i) => (
             <Cell key={i} fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} />
           ))}

@@ -115,10 +115,14 @@ export default async function AnalitikPage({ searchParams }: PageProps<"/analiti
               <EmptyState icon="donut_large" title="Belum ada pengeluaran" />
             ) : (
               <>
-                <CategoryDonut data={breakdown} />
+                <CategoryDonut data={breakdown} links={breakdown.map((c) => `/analitik/kategori/${c.categoryId}?bulan=${month}`)} />
                 <ol>
                   {breakdown.map((c, i) => (
-                    <li key={c.categoryId} className="flex items-center gap-3 border-b border-outline py-2 last:border-0">
+                    <li key={c.categoryId} className="border-b border-outline last:border-0">
+                      <Link
+                        href={`/analitik/kategori/${c.categoryId}?bulan=${month}`}
+                        className="-mx-2 flex items-center gap-3 rounded-[10px] px-2 py-2 hover:bg-surface-dim"
+                      >
                       <span className="size-2.5 shrink-0 rounded-full" style={{ background: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }} />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[15px]">{c.name}</p>
@@ -127,6 +131,8 @@ export default async function AnalitikPage({ searchParams }: PageProps<"/analiti
                         </p>
                       </div>
                       <Delta value={c.deltaVsPrev} invert />
+                      <Icon name="chevron_right" className="text-[20px] text-on-surface-variant/60" />
+                      </Link>
                     </li>
                   ))}
                 </ol>
