@@ -2,7 +2,8 @@ import { ImageResponse } from "next/og";
 
 // App icons rendered once at build time: a white wallet on Apple's systemBlue gradient
 // (same mark as the login screen). Full-bleed square — iOS and Android apply their own mask.
-const ICONS: Record<string, { size: number; glyph: number }> = {
+const ICONS: Record<string, { size: number; glyph: number; round?: boolean }> = {
+  "32.png": { size: 32, glyph: 0.66, round: true }, // browser tab: no OS mask, so round it ourselves
   "192.png": { size: 192, glyph: 0.56 },
   "512.png": { size: 512, glyph: 0.56 },
   "maskable-512.png": { size: 512, glyph: 0.44 }, // stays inside the 80% maskable safe zone
@@ -27,6 +28,7 @@ export async function GET(_: Request, ctx: RouteContext<"/icons/[file]">) {
           alignItems: "center",
           justifyContent: "center",
           background: "linear-gradient(145deg, #0a84ff 0%, #0040dd 100%)",
+          borderRadius: icon.round ? "22%" : 0,
         }}
       >
         <svg width={g} height={g} viewBox="0 0 24 24" fill="none">

@@ -24,7 +24,9 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  const { data } = await supabase.auth.getUser();
+  // getClaims refreshes an expiring session (writing cookies via setAll) and verifies the JWT locally.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims ?? null;
   const path = request.nextUrl.pathname;
   const redirectTo = (to: string) => {
     const r = NextResponse.redirect(new URL(to, request.url));
@@ -32,8 +34,8 @@ export async function proxy(request: NextRequest) {
     return r;
   };
 
-  if (!data.user && !PUBLIC.some((p) => path.startsWith(p))) return redirectTo("/masuk");
-  if (data.user && AUTH_PAGES.includes(path)) return redirectTo("/");
+  if (!user && !PUBLIC.some((p) => path.startsWith(p))) return redirectTo("/masuk");
+  if (user && AUTH_PAGES.includes(path)) return redirectTo("/");
   return response;
 }
 

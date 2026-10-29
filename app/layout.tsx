@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   applicationName: "TaMoney",
   // Home Screen app on iOS: full screen, content runs under a translucent status bar (safe areas handled)
   appleWebApp: { capable: true, title: "TaMoney", statusBarStyle: "black-translucent" },
-  icons: { apple: "/icons/apple-180.png" },
+  icons: { icon: [{ url: "/icons/32.png", sizes: "32x32", type: "image/png" }], apple: "/icons/apple-180.png" },
   formatDetection: { telephone: false },
 };
 

@@ -50,6 +50,7 @@ export function AppShell({ initialCollapsed, header, children }: { initialCollap
 
 function Sidebar({ collapsed, width, onToggle }: { collapsed: boolean; width: number; onToggle: () => void }) {
   const path = usePathname();
+  const [hovered, setHovered] = useState<string | null>(null);
   return (
     <motion.aside
       initial={false}
@@ -58,15 +59,17 @@ function Sidebar({ collapsed, width, onToggle }: { collapsed: boolean; width: nu
       className="glass fixed z-40 hidden flex-col rounded-[26px] p-2.5 md:flex"
       aria-label="Navigasi utama"
     >
-      <div className={`mb-4 flex h-11 items-center ${collapsed ? "justify-center" : "justify-between pl-2.5"}`}>
+      {/* Brand is out of flow and the button is pinned right, so both simply ride the width spring:
+          nothing waits for the brand's exit animation before moving. */}
+      <div className="relative mb-4 flex h-11 items-center justify-end pr-1">
         <AnimatePresence initial={false}>
           {!collapsed && (
             <motion.span
               key="brand"
               initial={{ opacity: 0, x: -6 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -6 }}
-              className="text-[19px] font-bold tracking-[-0.02em] whitespace-nowrap"
+              exit={{ opacity: 0, x: -6, transition: { duration: 0.12 } }}
+              className="pointer-events-none absolute left-2.5 text-[19px] font-bold tracking-[-0.02em] whitespace-nowrap"
             >
               TaMoney
             </motion.span>
@@ -75,6 +78,7 @@ function Sidebar({ collapsed, width, onToggle }: { collapsed: boolean; width: nu
         <motion.button
           type="button"
           onClick={onToggle}
+          whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.9 }}
           aria-label={collapsed ? "Lebarkan sidebar" : "Ciutkan sidebar"}
           aria-expanded={!collapsed}
@@ -84,38 +88,76 @@ function Sidebar({ collapsed, width, onToggle }: { collapsed: boolean; width: nu
         </motion.button>
       </div>
 
-      <nav className="space-y-1">
+      <nav className="space-y-1" onPointerLeave={() => setHovered(null)}>
         {ITEMS.map((i) => (
-          <NavItem key={i.href} item={i} active={isActive(path, i.href)} collapsed={collapsed} />
+          <NavItem
+            key={i.href}
+            item={i}
+            active={isActive(path, i.href)}
+            collapsed={collapsed}
+            hovered={hovered === i.href}
+            onHover={(on) => setHovered(on ? i.href : null)}
+          />
         ))}
       </nav>
     </motion.aside>
   );
 }
 
-function NavItem({ item, active, collapsed }: { item: (typeof ITEMS)[number]; active: boolean; collapsed: boolean }) {
-  const [hover, setHover] = useState(false);
-  const showTip = collapsed && hover;
+function NavItem({
+  item,
+  active,
+  collapsed,
+  hovered,
+  onHover,
+}: {
+  item: (typeof ITEMS)[number];
+  active: boolean;
+  collapsed: boolean;
+  hovered: boolean;
+  onHover: (on: boolean) => void;
+}) {
   return (
-    <div className="relative" onPointerEnter={() => setHover(true)} onPointerLeave={() => setHover(false)}>
+    <div className="relative" onPointerEnter={() => onHover(true)}>
       <Link
         href={item.href}
         aria-current={active ? "page" : undefined}
         aria-label={collapsed ? item.label : undefined}
-        onFocus={() => setHover(true)}
-        onBlur={() => setHover(false)}
-        className={`relative flex h-11 items-center gap-3 rounded-full text-[15px] font-medium ${collapsed ? "justify-center" : "px-3.5"} ${
-          active ? "text-primary" : "text-on-surface hover:bg-surface-dim"
-        }`}
+        onFocus={() => onHover(true)}
+        onBlur={() => onHover(false)}
+        // Fixed left inset centers the 21px icon in the 44px collapsed rail, so it never moves.
+        className={`relative flex h-11 items-center gap-3 overflow-hidden rounded-full pl-[11.5px] text-[15px] font-medium ${active ? "text-primary" : "text-on-surface"}`}
       >
+        {/* One hover layer that slides between items (shared layoutId), not a per-item fade */}
+        {hovered && !active && (
+          <motion.span layoutId="sidebar-hover" className="absolute inset-0 rounded-full bg-surface-dim" transition={{ type: "spring", bounce: 0, duration: 0.28 }} />
+        )}
         {active && <motion.span layoutId="sidebar-lens" className="glass-lens absolute inset-0 rounded-full" />}
-        <Icon name={item.icon} filled={active} className={`relative text-[21px] ${active ? "" : "text-on-surface-variant"}`} />
-        {!collapsed && <span className="relative whitespace-nowrap">{item.label}</span>}
+        <motion.span
+          className="relative flex shrink-0"
+          animate={{ scale: hovered ? 1.1 : 1, rotate: hovered && !active ? -6 : 0 }}
+          transition={{ type: "spring", bounce: 0.3, duration: 0.35 }}
+        >
+          <Icon name={item.icon} filled={active} className={`text-[21px] ${active ? "" : "text-on-surface-variant"}`} />
+        </motion.span>
+        <AnimatePresence initial={false}>
+          {!collapsed && (
+            <motion.span
+              key="label"
+              className="relative whitespace-nowrap"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, x: hovered ? 2 : 0 }}
+              exit={{ opacity: 0, transition: { duration: 0.1 } }}
+            >
+              {item.label}
+            </motion.span>
+          )}
+        </AnimatePresence>
       </Link>
 
       {/* Collapsed: the label grows out of the icon toward the content, on hover or keyboard focus */}
       <AnimatePresence>
-        {showTip && (
+        {collapsed && hovered && (
           <motion.span
             role="tooltip"
             initial={{ opacity: 0, scale: 0.85, x: -6 }}

@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -20,10 +21,15 @@ export async function createClient() {
 
 export type Supabase = Awaited<ReturnType<typeof createClient>>;
 
-/** Verified user (getUser hits the Auth server), or redirect to login. */
-export async function requireUser() {
+/**
+ * Verified user, or redirect to login. getClaims verifies the JWT signature locally (ES256 keys, JWKS
+ * cached) instead of a round trip to the Auth server; cache() shares one result between layout and page.
+ */
+export const requireUser = cache(async () => {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) redirect("/masuk");
-  return { supabase, user: data.user };
-}
+  const { data } = await supabase.auth.getClaims();
+  if (!data?.claims) redirect("/masuk");
+  const c = data.claims;
+  const user = { id: c.sub, email: c.email ?? "", user_metadata: (c.user_metadata ?? {}) as Record<string, unknown> };
+  return { supabase, user };
+});

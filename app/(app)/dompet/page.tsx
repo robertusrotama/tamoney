@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Dompet · TaMoney" };
 
 export default async function DompetPage() {
   const { supabase } = await requireUser();
-  const [all, transfers] = await Promise.all([getWallets(supabase, { includeArchived: true }), getRecentTransfers(supabase)]);
+  const [all, transfers] = await Promise.all([getWallets(supabase, true), getRecentTransfers(supabase)]);
   const active = all.filter((w) => !w.archived_at);
   const archived = all.filter((w) => w.archived_at);
   const total = active.reduce((s, w) => s + w.balance, 0);

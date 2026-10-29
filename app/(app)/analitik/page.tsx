@@ -50,7 +50,7 @@ export default async function AnalitikPage({ searchParams }: PageProps<"/analiti
 
   const { supabase } = await requireUser();
   const [wallets, categories, txs] = await Promise.all([
-    getWallets(supabase, { includeArchived: true }),
+    getWallets(supabase, true),
     getCategories(supabase),
     getTransactionsBetween(supabase, monthRange(shiftMonth(month, -5)).start, monthRange(month).end),
   ]);

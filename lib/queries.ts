@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { fetchAllPages } from "./paging";
 import type { Supabase } from "./supabase/server";
 import type { Category, Tx, Wallet } from "./types";
@@ -10,21 +11,22 @@ function must<T>({ data, error }: { data: T | null; error: { message: string } |
   return data as T;
 }
 
-export async function getWallets(sb: Supabase, { includeArchived = false } = {}): Promise<Wallet[]> {
+// cache(): layout and page ask for the same data in one request; arguments must be primitives/same refs.
+export const getWallets = cache(async (sb: Supabase, includeArchived = false): Promise<Wallet[]> => {
   let q = sb.from("wallets").select("id,name,type,initial_balance,archived_at").order("created_at");
   if (!includeArchived) q = q.is("archived_at", null);
   const [wallets, balances] = await Promise.all([q, sb.from("wallet_balances").select("wallet_id,balance")]);
   const byId = new Map(must(balances).map((b) => [b.wallet_id as string, Number(b.balance)]));
   return must(wallets).map((w) => ({ ...w, initial_balance: Number(w.initial_balance), balance: byId.get(w.id) ?? 0 }));
-}
+});
 
 export async function getActiveWalletIds(sb: Supabase): Promise<string[]> {
   return must(await sb.from("wallets").select("id").is("archived_at", null)).map((w) => w.id as string);
 }
 
-export async function getCategories(sb: Supabase): Promise<Category[]> {
-  return must(await sb.from("categories").select("id,kind,name,icon").order("created_at"));
-}
+export const getCategories = cache(async (sb: Supabase): Promise<Category[]> =>
+  must(await sb.from("categories").select("id,kind,name,icon").order("created_at")),
+);
 
 const TX_COLUMNS = "id,kind,amount,wallet_id,to_wallet_id,category_id,note,occurred_at,category:categories(name,icon)";
 
