@@ -3,7 +3,8 @@ import Link from "next/link";
 import { AutoSubmitForm } from "@/components/analytics/AutoSubmitForm";
 import { CATEGORY_COLORS, CategoryDonut, TrendChart } from "@/components/analytics/Charts";
 import { TxActions } from "@/components/transactions/TxActions";
-import { TxRow } from "@/components/transactions/TxRow";
+import { TxList, TxRow } from "@/components/transactions/TxRow";
+import { FadeIn } from "@/components/ui/FadeIn";
 import { Card, EmptyState, Label } from "@/components/ui/EmptyState";
 import { Input, Select } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
@@ -22,7 +23,7 @@ import {
 } from "@/lib/reports";
 import { requireUser } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Analitik & Riwayat · TaMoney" };
+export const metadata: Metadata = { title: "Analitik · TaMoney" };
 
 const PAGE_SIZE = 20;
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
@@ -33,8 +34,8 @@ function Delta({ value, invert }: { value: number | null; invert?: boolean }) {
   if (value === null) return <span className="text-on-surface-variant">—</span>;
   const good = invert ? value <= 0 : value >= 0;
   return (
-    <span className={`font-mono text-xs ${good ? "text-positive" : "text-negative"}`}>
-      {value >= 0 ? "▲" : "▼"} {Math.abs(Math.round(value * 100))}%
+    <span className={`text-[13px] font-medium tabular-nums ${good ? "text-positive" : "text-negative"}`}>
+      {value >= 0 ? "↑" : "↓"} {Math.abs(Math.round(value * 100))}%
     </span>
   );
 }
@@ -66,68 +67,62 @@ export default async function AnalitikPage({ searchParams }: PageProps<"/analiti
   const walletName = (id: string) => names.get(id) ?? "—";
   const pageHref = (p: number) => `?${new URLSearchParams({ ...Object.fromEntries(Object.entries({ bulan: month, q: filter.q, dompet: filter.wallet, kategori: filter.category, jenis: filter.kind }).filter(([, v]) => v)), hal: String(p) })}`;
 
+  const h2 = "mb-2 px-1 text-[20px] font-bold tracking-[-0.01em]";
+
   return (
     <div className="space-y-8">
       <AutoSubmitForm id="filter" />
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-primary">Analitik & Riwayat</h1>
-            <p className="text-sm text-on-surface-variant">Ringkasan arus kas, porsi kategori, dan semua transaksi {monthLabel(month, "long")}.</p>
-          </div>
-          <label className="flex items-center gap-2 rounded-full border border-outline bg-card px-4 py-2 text-sm">
-            <Icon name="calendar_month" className="text-lg text-on-surface-variant" />
-            <span className="sr-only">Pilih bulan</span>
-            <input form="filter" type="month" name="bulan" defaultValue={month} className="bg-transparent font-semibold outline-none" />
-          </label>
-        </div>
+      <div className="flex flex-wrap items-end justify-between gap-3 px-1">
+        <h1 className="large-title">Analitik</h1>
+        <label className="flex min-h-9 items-center gap-1.5 rounded-full bg-card px-3.5 text-[15px] font-semibold text-primary">
+          <Icon name="calendar_month" className="text-[18px]" />
+          <span className="sr-only">Pilih bulan</span>
+          <input form="filter" type="month" name="bulan" defaultValue={month} className="bg-transparent outline-none" />
+        </label>
+      </div>
 
-        <section className="grid gap-4 sm:grid-cols-3">
+      {/* Inset-grouped summary: one card, three rows */}
+      <section className="grid overflow-hidden rounded-[14px] bg-card sm:grid-cols-3">
+        {[
+          { label: "Pemasukan", value: now.income, delta: <Delta value={pctChange(now.income, prev.income)} /> },
+          { label: "Pengeluaran", value: now.expense, delta: <Delta value={pctChange(now.expense, prev.expense)} invert /> },
+          { label: now.net >= 0 ? "Surplus" : "Defisit", value: now.net, delta: null, signed: true },
+        ].map((c) => (
+          <div key={c.label} className="border-b border-outline p-4 last:border-0 sm:border-r sm:border-b-0 sm:last:border-r-0">
+            <Label>{c.label}</Label>
+            <Money value={c.value} sign={c.signed ? "auto" : "none"} className="block text-[24px] font-bold tracking-[-0.02em]" />
+            {c.delta && <p className="text-[13px] text-on-surface-variant">{c.delta} vs bulan lalu</p>}
+          </div>
+        ))}
+      </section>
+
+      <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+        <section className="min-w-0">
+          <h2 className={h2}>Tren 6 Bulan</h2>
           <Card>
-            <Label>Total pemasukan</Label>
-            <Money value={now.income} className="mt-2 block text-2xl font-bold" />
-            <p className="mt-1 text-xs text-on-surface-variant">
-              <Delta value={pctChange(now.income, prev.income)} /> vs bulan lalu
+            <p className="mb-1 flex gap-4 text-[13px] text-on-surface-variant">
+              <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-positive" />Masuk</span>
+              <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-negative" />Keluar</span>
             </p>
-          </Card>
-          <Card>
-            <Label>Total pengeluaran</Label>
-            <Money value={now.expense} className="mt-2 block text-2xl font-bold" />
-            <p className="mt-1 text-xs text-on-surface-variant">
-              <Delta value={pctChange(now.expense, prev.expense)} invert /> vs bulan lalu
-            </p>
-          </Card>
-          <Card>
-            <Label>Selisih ({now.net >= 0 ? "surplus" : "defisit"})</Label>
-            <Money value={now.net} sign="auto" className="mt-2 block text-2xl font-bold" />
+            <TrendChart data={trend} />
           </Card>
         </section>
 
-        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+        <section className="min-w-0">
+          <h2 className={h2}>Kategori</h2>
           <Card>
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-lg font-bold">Tren Arus Kas</h2>
-              <p className="flex gap-3 font-mono text-[11px] text-on-surface-variant">
-                <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-positive" />Pemasukan</span>
-                <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-negative" />Pengeluaran</span>
-              </p>
-            </div>
-            <TrendChart data={trend} />
-          </Card>
-
-          <Card>
-            <h2 className="text-lg font-bold">Porsi Kategori Pengeluaran</h2>
             {breakdown.length === 0 ? (
-              <EmptyState icon="donut_large" title="Belum ada pengeluaran bulan ini" />
+              <EmptyState icon="donut_large" title="Belum ada pengeluaran" />
             ) : (
               <>
                 <CategoryDonut data={breakdown} />
-                <ol className="space-y-2">
+                <ol>
                   {breakdown.map((c, i) => (
-                    <li key={c.categoryId} className="flex items-center gap-3 text-sm">
+                    <li key={c.categoryId} className="flex items-center gap-3 border-b border-outline py-2 last:border-0">
                       <span className="size-2.5 shrink-0 rounded-full" style={{ background: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }} />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-semibold">{c.name}</p>
-                        <p className="font-mono text-[11px] text-on-surface-variant">
+                        <p className="truncate text-[15px]">{c.name}</p>
+                        <p className="text-[13px] text-on-surface-variant tabular-nums">
                           {Math.round(c.share * 100)}% · <Money value={c.amount} />
                         </p>
                       </div>
@@ -138,53 +133,61 @@ export default async function AnalitikPage({ searchParams }: PageProps<"/analiti
               </>
             )}
           </Card>
+        </section>
+      </div>
+
+      <section>
+        <h2 className={h2}>Riwayat</h2>
+        <div className="mb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
+          <div className="relative">
+            <Icon name="search" className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[18px] text-on-surface-variant" />
+            <Input form="filter" name="q" type="search" defaultValue={filter.q} placeholder="Cari" className="bg-card pl-9" />
+          </div>
+          <Select form="filter" name="dompet" defaultValue={filter.wallet ?? ""} aria-label="Dompet" className="bg-card">
+            <option value="">Semua dompet</option>
+            {wallets.map((w) => (
+              <option key={w.id} value={w.id}>{w.name}</option>
+            ))}
+          </Select>
+          <Select form="filter" name="kategori" defaultValue={filter.category ?? ""} aria-label="Kategori" className="bg-card">
+            <option value="">Semua kategori</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>{c.name} ({c.kind === "income" ? "masuk" : "keluar"})</option>
+            ))}
+          </Select>
+          <Select form="filter" name="jenis" defaultValue={filter.kind ?? "all"} aria-label="Jenis" className="bg-card">
+            <option value="all">Semua jenis</option>
+            <option value="income">Masuk</option>
+            <option value="expense">Keluar</option>
+            <option value="transfer">Transfer</option>
+          </Select>
         </div>
 
-        <Card>
-          <h2 className="mb-4 text-lg font-bold">Riwayat Transaksi</h2>
-          <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
-            <Input form="filter" name="q" type="search" defaultValue={filter.q} placeholder="Cari catatan atau kategori…" />
-            <Select form="filter" name="dompet" defaultValue={filter.wallet ?? ""} aria-label="Dompet">
-              <option value="">Semua dompet</option>
-              {wallets.map((w) => (
-                <option key={w.id} value={w.id}>{w.name}</option>
-              ))}
-            </Select>
-            <Select form="filter" name="kategori" defaultValue={filter.category ?? ""} aria-label="Kategori">
-              <option value="">Semua kategori</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name} ({c.kind === "income" ? "masuk" : "keluar"})</option>
-              ))}
-            </Select>
-            <Select form="filter" name="jenis" defaultValue={filter.kind ?? "all"} aria-label="Jenis">
-              <option value="all">Semua jenis</option>
-              <option value="income">Masuk</option>
-              <option value="expense">Keluar</option>
-              <option value="transfer">Transfer</option>
-            </Select>
-          </div>
-
-          {shown.length === 0 ? (
+        {shown.length === 0 ? (
+          <Card>
             <EmptyState icon="receipt_long" title="Tidak ada transaksi" />
-          ) : (
-            <div className="space-y-2">
-              {shown.map((t) => (
-                <TxRow key={t.id} tx={t} walletName={walletName} showDate actions={<TxActions tx={t} allWallets={wallets} categories={categories} />} />
-              ))}
-            </div>
-          )}
+          </Card>
+        ) : (
+          <TxList>
+            {shown.map((t, i) => (
+              <FadeIn key={t.id} index={i}>
+                <TxRow tx={t} walletName={walletName} showDate actions={<TxActions tx={t} allWallets={wallets} categories={categories} />} />
+              </FadeIn>
+            ))}
+          </TxList>
+        )}
 
-          <div className="mt-4 flex items-center justify-between text-sm text-on-surface-variant">
-            <p>{history.length} transaksi</p>
-            {pages > 1 && (
-              <nav className="flex items-center gap-1" aria-label="Halaman">
-                {page > 1 && <Link href={pageHref(page - 1)} className="rounded-full px-3 py-1 hover:bg-surface-dim">‹</Link>}
-                <span className="font-mono">{page} / {pages}</span>
-                {page < pages && <Link href={pageHref(page + 1)} className="rounded-full px-3 py-1 hover:bg-surface-dim">›</Link>}
-              </nav>
-            )}
-          </div>
-        </Card>
+        <div className="mt-3 flex items-center justify-between px-1 text-[13px] text-on-surface-variant">
+          <p>{history.length} transaksi</p>
+          {pages > 1 && (
+            <nav className="flex items-center gap-1" aria-label="Halaman">
+              {page > 1 && <Link href={pageHref(page - 1)} aria-label="Sebelumnya" className="flex size-8 items-center justify-center rounded-full bg-card text-primary"><Icon name="chevron_left" /></Link>}
+              <span className="px-2 tabular-nums">{page} / {pages}</span>
+              {page < pages && <Link href={pageHref(page + 1)} aria-label="Berikutnya" className="flex size-8 items-center justify-center rounded-full bg-card text-primary"><Icon name="chevron_right" /></Link>}
+            </nav>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

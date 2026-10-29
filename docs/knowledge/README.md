@@ -10,7 +10,7 @@ Vault Obsidian untuk TaMoney — web app pencatatan keuangan pribadi. Buka folde
 
 ## Produk
 - [[prd]] — PRD Fase 1–4 dan status tiap fitur
-- [[screens]] — layar Stitch → route & komponen
+- [[screens]] — tiap layar → route & komponen
 
 ## Desain
 - [[design-system]] — token warna, tipografi, bentuk, komponen
@@ -25,7 +25,7 @@ Satu catatan per keputusan atau fakta proyek. Keputusan baru → catatan baru di
 
 - [[scope-fase-1-2]]
 - [[brand-tamoney]]
-- [[stitch-project-source]]
+- [[apple-design-direction]]
 - [[no-bank-sync-no-ai-yet]]
 - [[money-bigint-rupiah]]
 - [[balance-from-view]]

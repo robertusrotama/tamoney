@@ -4,13 +4,16 @@ import { Money } from "@/components/ui/Money";
 import type { TxWithCategory } from "@/lib/queries";
 import { wibDate, wibTime } from "@/lib/reports";
 
-const TONE = {
-  income: "bg-positive-container text-positive",
-  expense: "bg-negative-container text-negative",
-  transfer: "bg-tertiary-container text-tertiary",
+const TILE = {
+  income: "bg-positive text-white",
+  expense: "bg-negative text-white",
+  transfer: "bg-tertiary text-white",
 };
 
-/** One transaction line. walletName resolves ids; actions = optional edit/delete buttons. */
+const shortDate = (iso: string) =>
+  new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(wibDate(iso)));
+
+/** One inset-grouped list row. Put rows inside <TxList> for the hairline separators. */
 export function TxRow({
   tx,
   walletName,
@@ -23,26 +26,36 @@ export function TxRow({
   actions?: ReactNode;
 }) {
   const transfer = tx.kind === "transfer";
-  const title = transfer ? "Transfer antar dompet" : tx.note || tx.category_name || "Transaksi";
+  const title = transfer ? "Transfer" : tx.note || tx.category_name || "Transaksi";
+  const subtitle = transfer
+    ? `${walletName(tx.wallet_id)} → ${walletName(tx.to_wallet_id!)}`
+    : [tx.note ? tx.category_name : null, walletName(tx.wallet_id)].filter(Boolean).join(" · ");
   const signed = tx.kind === "expense" ? -tx.amount : tx.amount;
 
   return (
-    <div className="flex items-center gap-3 rounded-xl bg-surface px-3 py-3">
-      <span className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${TONE[tx.kind]}`}>
-        <Icon name={transfer ? "swap_horiz" : (tx.category_icon ?? "receipt")} />
+    <div className="flex items-center gap-3 py-2.5 pl-4">
+      <span className={`flex size-8 shrink-0 items-center justify-center rounded-[8px] ${TILE[tx.kind]}`}>
+        <Icon name={transfer ? "swap_horiz" : (tx.category_icon ?? "receipt")} className="text-[19px]" filled />
       </span>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold">{title}</p>
-        <p className="truncate text-xs text-on-surface-variant">
-          <span className="rounded bg-surface-dim px-1.5 py-0.5 font-mono text-[10px]">
-            {transfer ? `${walletName(tx.wallet_id)} → ${walletName(tx.to_wallet_id!)}` : walletName(tx.wallet_id)}
-          </span>{" "}
-          {showDate ? `${wibDate(tx.occurred_at)} ` : ""}
-          {wibTime(tx.occurred_at)} WIB{!transfer && tx.note && tx.category_name ? ` · ${tx.category_name}` : ""}
-        </p>
+      <div data-sep className="-mb-2.5 flex min-w-0 flex-1 items-center gap-3 border-b border-outline pr-4 pb-2.5">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[17px] leading-tight">{title}</p>
+          <p className="truncate text-[13px] text-on-surface-variant">{subtitle}</p>
+        </div>
+        <div className="shrink-0 text-right">
+          <Money value={signed} sign={transfer ? "none" : "auto"} className="text-[17px] font-medium" />
+          <p className="text-[13px] text-on-surface-variant tabular-nums">
+            {showDate ? `${shortDate(tx.occurred_at)}, ` : ""}
+            {wibTime(tx.occurred_at)}
+          </p>
+        </div>
+        {actions}
       </div>
-      <Money value={signed} sign={transfer ? "none" : "auto"} className="shrink-0 text-sm font-bold" />
-      {actions}
     </div>
   );
+}
+
+/** Grouped list container: rows separated by hairlines inset past the icon. */
+export function TxList({ children }: { children: ReactNode }) {
+  return <div className="overflow-hidden rounded-[14px] bg-card [&>*:last-child_[data-sep]]:border-0">{children}</div>;
 }

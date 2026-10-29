@@ -1,11 +1,12 @@
 "use client";
 
+import { motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 import { AmountInput, withDots } from "@/components/ui/AmountInput";
 import { Button } from "@/components/ui/Button";
 import { Field, FormError, Input, Select } from "@/components/ui/Field";
-import { Icon } from "@/components/ui/Icon";
+import { Segmented } from "@/components/ui/Segmented";
 import { useFormDone } from "@/components/ui/useFormDone";
 import { saveTransaction } from "@/lib/actions/transactions";
 import { parseRupiah } from "@/lib/money";
@@ -48,42 +49,34 @@ export function TxForm({
   }
 
   const options = categories.filter((c) => c.kind === kind);
-  const tab = (k: Kind, label: string, icon: string) => (
-    <button
-      type="button"
-      onClick={() => setKind(k)}
-      aria-pressed={kind === k}
-      className={`flex flex-1 items-center justify-center gap-1 rounded-full py-2 text-sm font-semibold transition ${
-        kind === k ? (k === "expense" ? "bg-card text-negative shadow-sm" : "bg-card text-positive shadow-sm") : "text-on-surface-variant"
-      }`}
-    >
-      <Icon name={icon} className="text-lg" /> {label}
-    </button>
-  );
-
   return (
     <form onSubmit={onSubmit} key={version} className="space-y-4">
       {initial && <input type="hidden" name="id" value={initial.id} />}
       <input type="hidden" name="kind" value={kind} />
-      <div className="flex rounded-full bg-surface-dim p-1">
-        {tab("expense", "Pengeluaran", "arrow_upward")}
-        {tab("income", "Pemasukan", "arrow_downward")}
-      </div>
+      <Segmented
+        value={kind}
+        onChange={setKind}
+        options={[
+          { value: "expense", label: "Pengeluaran", tone: "text-negative" },
+          { value: "income", label: "Pemasukan", tone: "text-positive" },
+        ]}
+      />
 
-      <Field label="Nominal (IDR)">
-        <AmountInput name="amount" value={amount} onChange={setAmount} />
-      </Field>
-      <div className="flex flex-wrap gap-2">
-        {QUICK.map((q) => (
-          <button
-            key={q}
-            type="button"
-            onClick={() => setAmount(withDots(String((parseRupiah(amount) ?? 0) + q)))}
-            className="rounded-full bg-surface-dim px-3 py-1 font-mono text-xs font-medium text-on-surface-variant hover:bg-primary-container hover:text-primary"
-          >
-            +{q / 1000}rb
-          </button>
-        ))}
+      <div className="space-y-2">
+        <AmountInput name="amount" value={amount} onChange={setAmount} large />
+        <div className="flex gap-2">
+          {QUICK.map((q) => (
+            <motion.button
+              key={q}
+              type="button"
+              whileTap={{ scale: 0.92 }}
+              onClick={() => setAmount(withDots(String((parseRupiah(amount) ?? 0) + q)))}
+              className="flex-1 rounded-full bg-primary-container py-1.5 text-[13px] font-semibold text-on-primary-container tabular-nums"
+            >
+              +{q / 1000}rb
+            </motion.button>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -117,7 +110,7 @@ export function TxForm({
 
       <FormError message={state.error} />
       <Button type="submit" disabled={pending} className="w-full">
-        <Icon name="check" className="text-lg" /> {pending ? "Menyimpan…" : "Simpan Transaksi"}
+        {pending ? "Menyimpan…" : "Simpan"}
       </Button>
     </form>
   );

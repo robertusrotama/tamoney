@@ -1,31 +1,33 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { motion } from "motion/react";
 import { TxForm } from "@/components/transactions/TxForm";
 import { Button } from "@/components/ui/Button";
-import { Dialog } from "@/components/ui/Dialog";
+import { Dialog, useDialog } from "@/components/ui/Dialog";
 import { Icon } from "@/components/ui/Icon";
 import type { Category, Wallet } from "@/lib/types";
 
-/** "Catat Transaksi" in the top bar (desktop) and a floating + (mobile), both opening the same form. */
+/** "Catat" in the toolbar (desktop) and a floating + (mobile); the form grows out of whichever was tapped. */
 export function QuickAdd({ wallets, categories }: { wallets: Wallet[]; categories: Category[] }) {
-  const [open, setOpen] = useState(false);
-  const close = useCallback(() => setOpen(false), []);
+  const d = useDialog();
   return (
     <>
-      <Button onClick={() => setOpen(true)} className="hidden md:inline-flex">
-        <Icon name="add" className="text-lg" /> Catat Transaksi
-      </Button>
-      <button
+      <span className="hidden md:contents">
+        <Button onClick={d.show} className="min-h-9 px-4 text-[14px]">
+          <Icon name="add" className="text-[18px]" /> Catat
+        </Button>
+      </span>
+      <motion.button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={d.show}
         aria-label="Catat transaksi"
-        className="fixed bottom-20 right-4 z-40 flex size-14 items-center justify-center rounded-full bg-primary text-on-primary shadow-xl active:scale-95 md:hidden"
+        whileTap={{ scale: 0.9 }}
+        className="fixed right-4 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-40 flex size-14 items-center justify-center rounded-full bg-primary text-on-primary shadow-[0_8px_24px_-6px_rgb(0_122_255/0.6)] md:hidden"
       >
-        <Icon name="add" className="text-3xl" />
-      </button>
-      <Dialog open={open} onClose={close} title="Catat Transaksi">
-        <TxForm wallets={wallets} categories={categories} onDone={close} />
+        <Icon name="add" className="text-[30px]" />
+      </motion.button>
+      <Dialog open={d.open} origin={d.origin} onClose={d.close} title="Catat Transaksi">
+        <TxForm wallets={wallets} categories={categories} onDone={d.close} />
       </Dialog>
     </>
   );

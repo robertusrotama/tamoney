@@ -1,16 +1,31 @@
 import Link from "next/link";
 import { TxForm } from "@/components/transactions/TxForm";
-import { TxRow } from "@/components/transactions/TxRow";
+import { TxList, TxRow } from "@/components/transactions/TxRow";
 import { Card, EmptyState, Label } from "@/components/ui/EmptyState";
+import { FadeIn } from "@/components/ui/FadeIn";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
+import { WALLET_GRADIENT, WALLET_ICON } from "@/components/wallets/style";
 import { WalletDialog } from "@/components/wallets/WalletForm";
 import { getCategories, getTransactionsBetween, getWallets } from "@/lib/queries";
 import { monthKey, monthRange, monthTotals, todayWib, wibDate, wibGreeting } from "@/lib/reports";
 import { requireUser } from "@/lib/supabase/server";
 
 const longDate = (d: string) =>
-  new Intl.DateTimeFormat("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(d));
+  new Intl.DateTimeFormat("id-ID", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(d));
+
+function SectionHeader({ title, href, linkLabel }: { title: string; href?: string; linkLabel?: string }) {
+  return (
+    <div className="mb-2 flex items-baseline justify-between px-1">
+      <h2 className="text-[20px] font-bold tracking-[-0.01em]">{title}</h2>
+      {href && (
+        <Link href={href} className="text-[15px] text-primary">
+          {linkLabel}
+        </Link>
+      )}
+    </div>
+  );
+}
 
 export default async function DashboardPage() {
   const { supabase, user } = await requireUser();
@@ -28,106 +43,107 @@ export default async function DashboardPage() {
   const names = new Map(wallets.map((w) => [w.id, w.name]));
   const walletName = (id: string) => names.get(id) ?? "Diarsipkan";
   const firstName = ((user.user_metadata.display_name as string | undefined) || user.email!.split("@")[0]).split(" ")[0];
+  const spentShare = income > 0 ? Math.min(expense / income, 1) : expense > 0 ? 1 : 0;
 
   return (
     <div className="space-y-8">
-      <div>
-        <p className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider text-on-surface-variant">
-          <Icon name="calendar_today" className="text-sm" /> {longDate(today)}
-        </p>
-        <h1 className="text-3xl font-bold tracking-tight text-primary md:text-4xl">
-          {wibGreeting()}, {firstName}!
+      <div className="px-1">
+        <p className="text-[13px] font-semibold text-on-surface-variant uppercase">{longDate(today)}</p>
+        <h1 className="large-title">
+          {wibGreeting()}, {firstName}
         </h1>
       </div>
 
       {wallets.length === 0 ? (
         <Card>
           <EmptyState icon="account_balance_wallet" title="Buat dompet pertama">
-            <p className="max-w-sm text-sm">Tambahkan dompet (tunai, rekening bank, atau e-wallet) untuk mulai mencatat transaksi.</p>
-            <div className="mt-2">
+            <p className="max-w-xs text-[15px]">Tambahkan tunai, rekening bank, atau e-wallet untuk mulai mencatat.</p>
+            <div className="mt-3">
               <WalletDialog>
-                <Icon name="add_circle" className="text-lg" /> Tambah Dompet
+                <Icon name="add" className="text-[18px]" /> Tambah Dompet
               </WalletDialog>
             </div>
           </EmptyState>
         </Card>
       ) : (
-        <>
-          <section className="grid gap-4 sm:grid-cols-3">
-            <Card>
+        <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+          <div className="min-w-0 space-y-8">
+            {/* Hero: the one number that matters most, then this month's flow */}
+            <Card className="p-5">
               <Label>Saldo total</Label>
-              <Money value={total} className="mt-2 block text-3xl font-bold" />
-            </Card>
-            <Card>
-              <Label className="flex items-center justify-between">
-                Pemasukan bulan ini <Icon name="arrow_downward" className="rounded-full bg-positive-container p-1 text-base text-positive" />
-              </Label>
-              <Money value={income} className="mt-2 block text-3xl font-bold text-positive" />
-            </Card>
-            <Card>
-              <Label className="flex items-center justify-between">
-                Pengeluaran bulan ini <Icon name="arrow_upward" className="rounded-full bg-negative-container p-1 text-base text-negative" />
-              </Label>
-              <Money value={expense} className="mt-2 block text-3xl font-bold text-negative" />
-            </Card>
-          </section>
-
-          <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
-            <div className="min-w-0 space-y-6">
-              <section>
-                <div className="mb-3 flex items-center justify-between">
-                  <h2 className="flex items-center gap-2 text-lg font-bold">
-                    <Icon name="account_balance_wallet" /> Dompet
-                  </h2>
-                  <Link href="/dompet" className="font-mono text-xs font-semibold text-primary hover:underline">
-                    Kelola Semua ›
-                  </Link>
+              <Money value={total} className="mt-0.5 block text-[clamp(2.25rem,1.6rem+3vw,3rem)] leading-none font-bold tracking-[-0.03em]" />
+              <div className="mt-5 grid grid-cols-2 gap-4">
+                <div>
+                  <p className="flex items-center gap-1 text-[13px] text-on-surface-variant">
+                    <Icon name="south_west" className="text-[15px] text-positive" /> Masuk bulan ini
+                  </p>
+                  <Money value={income} className="text-[20px] font-semibold tracking-[-0.01em]" />
                 </div>
-                <div className="flex snap-x gap-3 overflow-x-auto pb-2">
-                  {wallets.map((w, i) => (
-                    <div
-                      key={w.id}
-                      className={`min-w-44 snap-start rounded-2xl border p-4 ${i === 0 ? "border-primary bg-primary text-on-primary" : "border-outline-variant bg-card"}`}
+                <div>
+                  <p className="flex items-center gap-1 text-[13px] text-on-surface-variant">
+                    <Icon name="north_east" className="text-[15px] text-negative" /> Keluar bulan ini
+                  </p>
+                  <Money value={expense} className="text-[20px] font-semibold tracking-[-0.01em]" />
+                </div>
+              </div>
+              <div
+                className="mt-4 h-1.5 overflow-hidden rounded-full bg-positive/25"
+                role="img"
+                aria-label={`Pengeluaran ${Math.round(spentShare * 100)}% dari pemasukan`}
+              >
+                <div className="h-full rounded-full bg-negative" style={{ width: `${spentShare * 100}%` }} />
+              </div>
+            </Card>
+
+            <section>
+              <SectionHeader title="Dompet" href="/dompet" linkLabel="Kelola" />
+              <div className="-mx-4 flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 pb-1 md:-mx-1 md:px-1 [scrollbar-width:none]">
+                {wallets.map((w, i) => (
+                  <FadeIn key={w.id} index={i} className="snap-start">
+                    <Link
+                      href="/dompet"
+                      className={`flex w-40 flex-col gap-6 rounded-[14px] bg-gradient-to-br p-3.5 text-white ${WALLET_GRADIENT[w.type]}`}
                     >
-                      <p className="truncate text-sm font-semibold">{w.name}</p>
-                      <Money value={w.balance} className="mt-3 block text-lg font-bold" />
-                    </div>
-                  ))}
-                </div>
-              </section>
+                      <span className="flex items-center gap-1.5 text-[13px] font-semibold">
+                        <Icon name={WALLET_ICON[w.type]} className="text-[17px]" filled />
+                        <span className="truncate">{w.name}</span>
+                      </span>
+                      <Money value={w.balance} className="text-[17px] font-bold tracking-[-0.01em]" />
+                    </Link>
+                  </FadeIn>
+                ))}
+              </div>
+            </section>
 
-              <Card>
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="flex items-center gap-2 text-lg font-bold">
-                    <Icon name="history" /> Aktivitas Hari Ini
-                    <span className="rounded-full bg-surface-dim px-2 py-0.5 font-mono text-[11px] font-medium text-on-surface-variant">
-                      {todayTxs.length} transaksi
-                    </span>
-                  </h2>
-                  <Link href="/analitik" className="text-sm font-semibold text-primary hover:underline">
-                    Lihat Semua
-                  </Link>
-                </div>
-                {todayTxs.length === 0 ? (
-                  <EmptyState icon="receipt_long" title="Belum ada transaksi hari ini" />
-                ) : (
-                  <div className="space-y-2">
-                    {todayTxs.map((t) => (
-                      <TxRow key={t.id} tx={t} walletName={walletName} />
-                    ))}
-                  </div>
-                )}
+            <section>
+              <SectionHeader title="Hari Ini" href="/analitik" linkLabel="Semua" />
+              {todayTxs.length === 0 ? (
+                <Card>
+                  <EmptyState icon="receipt_long" title="Belum ada transaksi hari ini">
+                    <p className="text-[15px]">Ketuk + untuk mencatat.</p>
+                  </EmptyState>
+                </Card>
+              ) : (
+                <TxList>
+                  {todayTxs.map((t, i) => (
+                    <FadeIn key={t.id} index={i}>
+                      <TxRow tx={t} walletName={walletName} />
+                    </FadeIn>
+                  ))}
+                </TxList>
+              )}
+            </section>
+          </div>
+
+          <aside className="hidden lg:block">
+            <div className="sticky top-20">
+              <SectionHeader title="Catat Cepat" />
+              <Card className="p-5">
+                <TxForm wallets={wallets} categories={categories} />
               </Card>
             </div>
-
-            <Card className="hidden h-fit xl:block">
-              <h2 className="mb-4 flex items-center gap-2 text-lg font-bold">
-                <Icon name="bolt" className="text-primary" /> Catat Singkat
-              </h2>
-              <TxForm wallets={wallets} categories={categories} />
-            </Card>
-          </div>
-        </>
+          </aside>
+        </div>
       )}
     </div>
   );

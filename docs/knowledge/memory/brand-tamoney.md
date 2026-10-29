@@ -5,7 +5,7 @@ type: decision
 updated: 2026-10-29
 ---
 
-Nama produk di UI adalah **TaMoney**. Desain Stitch memakai "FinFlow" — selalu diganti.
+Nama produk di UI adalah **TaMoney** (desain lama dari Stitch memakai "FinFlow"; sudah ditinggalkan).
 
 **Why:** Keputusan user 2026-10-29.
 

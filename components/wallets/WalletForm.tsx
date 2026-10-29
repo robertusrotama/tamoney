@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AmountInput } from "@/components/ui/AmountInput";
-import { Button } from "@/components/ui/Button";
-import { Dialog } from "@/components/ui/Dialog";
+import { Button, IconButton } from "@/components/ui/Button";
+import { Dialog, useDialog } from "@/components/ui/Dialog";
 import { Field, FormError, Input, Select } from "@/components/ui/Field";
 import { useFormDone } from "@/components/ui/useFormDone";
 import { saveWallet } from "@/lib/actions/wallets";
@@ -31,26 +31,38 @@ function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void })
       </Field>
       <FormError message={state.error} />
       <Button type="submit" disabled={pending} className="w-full">
-        {pending ? "Menyimpan…" : "Simpan Dompet"}
+        {pending ? "Menyimpan…" : "Simpan"}
       </Button>
     </form>
   );
 }
 
 /** A button that opens the wallet form in a dialog (add when no wallet, edit otherwise). */
-export function WalletDialog({ wallet, children, label }: { wallet?: Wallet; children: ReactNode; label?: string }) {
-  const [open, setOpen] = useState(false);
+export function WalletDialog({
+  wallet,
+  children,
+  label,
+  variant = "primary",
+}: {
+  wallet?: Wallet;
+  children: ReactNode;
+  label?: string;
+  variant?: "primary" | "tonal" | "icon";
+}) {
+  const d = useDialog();
   return (
     <>
-      {wallet ? (
-        <button type="button" onClick={() => setOpen(true)} aria-label={label} className="rounded-full p-1.5 hover:bg-black/5">
+      {variant === "icon" ? (
+        <IconButton onClick={d.show} aria-label={label} className="text-current hover:bg-white/15">
           {children}
-        </button>
+        </IconButton>
       ) : (
-        <Button onClick={() => setOpen(true)}>{children}</Button>
+        <Button variant={variant} onClick={d.show}>
+          {children}
+        </Button>
       )}
-      <Dialog open={open} onClose={() => setOpen(false)} title={wallet ? "Ubah Dompet" : "Tambah Dompet"}>
-        <WalletForm wallet={wallet} onDone={() => setOpen(false)} />
+      <Dialog open={d.open} origin={d.origin} onClose={d.close} title={wallet ? "Ubah Dompet" : "Tambah Dompet"}>
+        <WalletForm wallet={wallet} onDone={d.close} />
       </Dialog>
     </>
   );

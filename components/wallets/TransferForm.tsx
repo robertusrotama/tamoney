@@ -37,9 +37,7 @@ export function TransferForm({ wallets, initial, onDone }: { wallets: Wallet[]; 
           </Select>
         </Field>
       </div>
-      <Field label="Nominal transfer">
-        <AmountInput name="amount" defaultValue={initial?.amount} />
-      </Field>
+      <AmountInput name="amount" defaultValue={initial?.amount} large />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Catatan">
           <Input name="note" defaultValue={initial?.note ?? ""} maxLength={200} placeholder="Opsional" />
@@ -50,7 +48,7 @@ export function TransferForm({ wallets, initial, onDone }: { wallets: Wallet[]; 
       </div>
       <FormError message={state.error} />
       <Button type="submit" disabled={pending} className="w-full">
-        {pending ? "Menyimpan…" : "Simpan Transfer"}
+        {pending ? "Menyimpan…" : "Transfer"}
       </Button>
     </form>
   );

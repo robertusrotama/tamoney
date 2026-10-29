@@ -1,4 +1,4 @@
-import { BottomNav, Sidebar } from "@/components/shell/Nav";
+import { Sidebar, TabBar } from "@/components/shell/Nav";
 import { QuickAdd } from "@/components/shell/QuickAdd";
 import { UserMenu } from "@/components/shell/UserMenu";
 import { getCategories, getWallets } from "@/lib/queries";
@@ -12,17 +12,17 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="min-h-screen">
       <Sidebar />
-      <div className="md:pl-70">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 bg-surface/85 px-4 backdrop-blur-xl md:justify-end md:px-8">
-          <p className="text-xl font-extrabold tracking-tight text-primary md:hidden">TaMoney</p>
+      <div className="md:pl-64">
+        <header className="material sticky top-0 z-30 flex h-13 items-center justify-between gap-3 px-4 pt-[env(safe-area-inset-top)] md:justify-end md:px-8">
+          <p className="text-[17px] font-semibold md:hidden">TaMoney</p>
           <div className="flex items-center gap-3">
             <QuickAdd wallets={wallets} categories={categories} />
             <UserMenu name={name} email={user.email!} />
           </div>
         </header>
-        <main className="mx-auto max-w-7xl px-4 pb-28 pt-4 md:px-8 md:pb-10">{children}</main>
+        <main className="mx-auto max-w-5xl px-4 pt-3 pb-32 md:px-8 md:pb-12">{children}</main>
       </div>
-      <BottomNav />
+      <TabBar />
     </div>
   );
 }

@@ -28,9 +28,9 @@ export function AuthForm({
 
   return (
     <div className="space-y-5">
-      <h1 className="text-xl font-bold">{title}</h1>
+      <h1 className="text-[22px] font-bold tracking-[-0.01em]">{title}</h1>
       {state.ok && successMessage ? (
-        <p role="status" className="rounded-xl bg-positive-container px-4 py-3 text-sm text-on-positive-container">
+        <p role="status" className="rounded-[10px] bg-positive-container px-3.5 py-3 text-[15px] text-positive">
           {successMessage}
         </p>
       ) : (
@@ -46,14 +46,14 @@ export function AuthForm({
           </Button>
         </form>
       )}
-      {footer && <div className="space-y-1 text-center text-sm text-on-surface-variant">{footer}</div>}
+      {footer && <div className="space-y-1 text-center text-[15px] text-on-surface-variant">{footer}</div>}
     </div>
   );
 }
 
 export function AuthLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <Link href={href} className="font-semibold text-primary hover:underline">
+    <Link href={href} className="text-primary">
       {children}
     </Link>
   );

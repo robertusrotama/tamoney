@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { inputClass } from "./Field";
 
 export const withDots = (raw: string) => raw.replace(/\D/g, "").replace(/^0+(?=\d)/, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
@@ -12,18 +11,24 @@ export function AmountInput({
   value,
   onChange,
   required = true,
+  large,
 }: {
   name: string;
   defaultValue?: number;
   value?: string;
   onChange?: (v: string) => void;
   required?: boolean;
+  large?: boolean;
 }) {
   const [own, setOwn] = useState(defaultValue ? withDots(String(defaultValue)) : "");
   const shown = value ?? own;
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-outline bg-surface pl-4 focus-within:bg-card focus-within:ring-2 focus-within:ring-primary">
-      <span className="font-mono text-sm text-on-surface-variant">Rp</span>
+    <div
+      className={`flex items-baseline gap-1.5 rounded-[10px] bg-surface-dim px-3.5 focus-within:ring-2 focus-within:ring-primary ${large ? "py-3" : ""}`}
+    >
+      <span aria-hidden className={`font-semibold text-on-surface-variant ${large ? "text-[22px]" : "text-[17px]"}`}>
+        Rp
+      </span>
       <input
         name={name}
         inputMode="numeric"
@@ -32,7 +37,9 @@ export function AmountInput({
         required={required}
         value={shown}
         onChange={(e) => (onChange ?? setOwn)(withDots(e.target.value))}
-        className={`${inputClass} border-0 bg-transparent pl-0 font-mono text-lg tabular-nums focus:ring-0`}
+        className={`min-h-11 w-full bg-transparent tabular-nums outline-none placeholder:text-on-surface-variant/60 ${
+          large ? "text-[34px] font-bold tracking-[-0.02em]" : "text-[17px]"
+        }`}
       />
     </div>
   );

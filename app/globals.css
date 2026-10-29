@@ -1,42 +1,125 @@
 @import "tailwindcss";
 
-/* Tokens: docs/knowledge/design-system.md ("Colors" prose palette) */
-@theme {
-  --color-primary: #1e3a8a;
+/*
+ * Apple system colors (docs/knowledge/design-system.md). Token names are semantic so pages
+ * don't care about the palette; light/dark values live in the variables below.
+ */
+:root {
+  color-scheme: light dark;
+
+  --c-primary: #007aff; /* systemBlue */
+  --c-primary-container: rgb(0 122 255 / 0.12);
+  --c-on-primary-container: #0062cc;
+  --c-positive: #248a3d; /* systemGreen, accessible text variant */
+  --c-positive-container: rgb(52 199 89 / 0.14);
+  --c-negative: #d70015; /* systemRed, accessible text variant */
+  --c-negative-container: rgb(255 59 48 / 0.12);
+  --c-tertiary: #5856d6; /* systemIndigo */
+  --c-tertiary-container: rgb(88 86 214 / 0.12);
+
+  --c-surface: #f2f2f7; /* systemGroupedBackground */
+  --c-card: #ffffff; /* secondarySystemGroupedBackground */
+  --c-fill: rgb(118 118 128 / 0.12); /* tertiarySystemFill: fields, segmented control */
+  --c-separator: rgb(60 60 67 / 0.18);
+  --c-label: #000000;
+  --c-label-2: rgb(60 60 67 / 0.6); /* secondaryLabel */
+  --c-material: rgb(249 249 249 / 0.78); /* bar material */
+  --c-scrim: rgb(0 0 0 / 0.32);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-primary: #0a84ff;
+    --c-primary-container: rgb(10 132 255 / 0.2);
+    --c-on-primary-container: #64aaff;
+    --c-positive: #30d158;
+    --c-positive-container: rgb(48 209 88 / 0.18);
+    --c-negative: #ff453a;
+    --c-negative-container: rgb(255 69 58 / 0.18);
+    --c-tertiary: #5e5ce6;
+    --c-tertiary-container: rgb(94 92 230 / 0.22);
+
+    --c-surface: #000000;
+    --c-card: #1c1c1e;
+    --c-fill: rgb(118 118 128 / 0.24);
+    --c-separator: rgb(84 84 88 / 0.6);
+    --c-label: #ffffff;
+    --c-label-2: rgb(235 235 245 / 0.6);
+    --c-material: rgb(30 30 30 / 0.72);
+    --c-scrim: rgb(0 0 0 / 0.5);
+  }
+}
+
+@theme inline {
+  --color-primary: var(--c-primary);
   --color-on-primary: #ffffff;
-  --color-primary-container: #dbeafe;
-  --color-on-primary-container: #1e3a8a;
-  --color-primary-fixed: #0a192f;
+  --color-primary-container: var(--c-primary-container);
+  --color-on-primary-container: var(--c-on-primary-container);
+  --color-positive: var(--c-positive);
+  --color-positive-container: var(--c-positive-container);
+  --color-on-positive-container: var(--c-positive);
+  --color-negative: var(--c-negative);
+  --color-negative-container: var(--c-negative-container);
+  --color-on-negative-container: var(--c-negative);
+  --color-tertiary: var(--c-tertiary);
+  --color-tertiary-container: var(--c-tertiary-container);
+  --color-on-tertiary-container: var(--c-tertiary);
 
-  --color-positive: #059669;
-  --color-positive-container: #d1fae5;
-  --color-on-positive-container: #065f46;
-  --color-negative: #e11d48;
-  --color-negative-container: #ffe4e6;
-  --color-on-negative-container: #9f1239;
+  --color-surface: var(--c-surface);
+  --color-card: var(--c-card);
+  --color-surface-dim: var(--c-fill);
+  --color-outline: var(--c-separator);
+  --color-outline-variant: var(--c-separator);
+  --color-on-surface: var(--c-label);
+  --color-on-surface-variant: var(--c-label-2);
+  --color-scrim: var(--c-scrim);
 
-  --color-tertiary: #6366f1;
-  --color-tertiary-container: #eef2ff;
-  --color-on-tertiary-container: #3730a3;
+  /* System font: SF Pro on Apple devices, with built-in optical sizing */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-sans);
+}
 
-  --color-surface: #f8fafc;
-  --color-surface-dim: #f1f5f9;
-  --color-card: #ffffff;
-  --color-outline: #cbd5e1;
-  --color-outline-variant: #e2e8f0;
-  --color-on-surface: #0f172a;
-  --color-on-surface-variant: #64748b;
-
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+html {
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background: var(--color-surface);
-  color: var(--color-on-surface);
+  background: var(--c-surface);
+  color: var(--c-label);
+  font-optical-sizing: auto;
 }
 
-.material-symbols-outlined {
-  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+/* Bar material: translucent layer that content scrolls under */
+.material {
+  background: var(--c-material);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .material {
+    background: var(--c-card);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .material {
+    background: var(--c-card);
+    border-color: var(--c-label);
+  }
+}
+
+/* Large title: tight leading, negative tracking as size grows */
+.large-title {
+  font-size: clamp(1.75rem, 1.4rem + 1.5vw, 2.125rem);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+}
+
+.material-symbols-rounded {
+  font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
   line-height: 1;
 }
