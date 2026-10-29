@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition, type ReactNode } from "react";
 import { AmountInput, withDots } from "@/components/ui/AmountInput";
 import { Button, type ButtonVariant } from "@/components/ui/Button";
+import { useConfirm } from "@/components/ui/Confirm";
 import { DateField } from "@/components/ui/DateField";
 import { Dialog, useDialog } from "@/components/ui/Dialog";
 import { Field, FormError } from "@/components/ui/Field";
@@ -11,7 +13,7 @@ import { Money } from "@/components/ui/Money";
 import { Picker } from "@/components/ui/Picker";
 import { useFormDone } from "@/components/ui/useFormDone";
 import { WALLET_ICON } from "@/components/wallets/style";
-import { recordSalary } from "@/lib/actions/budget";
+import { deleteSalary, recordSalary } from "@/lib/actions/budget";
 import { allocate, monthLabel, shiftYm } from "@/lib/budget";
 import { parseRupiah } from "@/lib/money";
 import type { BudgetGroup, BudgetPeriod, Wallet } from "@/lib/types";
@@ -144,17 +146,43 @@ function SalaryForm({ groups, periods, wallets, today, payday, salaryWallet, mon
 }
 
 /** Button + dialog. `month` fixed = edit that month; otherwise the next salary month. */
-export function SalaryButton({ month, variant = "primary", children, ...props }: Props & { month?: string; variant?: ButtonVariant; children: ReactNode }) {
+export function SalaryButton({ month, variant = "primary", size, children, ...props }: Props & { month?: string; variant?: ButtonVariant; size?: "sm" | "md"; children: ReactNode }) {
   const d = useDialog();
   const m = month ?? nextSalaryMonth(props.today, props.payday, props.periods);
   return (
     <>
-      <Button variant={variant} onClick={d.show}>
+      <Button variant={variant} size={size} onClick={d.show}>
         {children}
       </Button>
       <Dialog open={d.open} origin={d.origin} onClose={d.close} title={props.periods.some((p) => p.month.startsWith(m)) ? "Ubah alokasi" : "Catat gaji"}>
         <SalaryForm {...props} month={m} onDone={d.close} />
       </Dialog>
+    </>
+  );
+}
+
+/** Deletes the shown month's salary after a confirm; the period and its salary transaction go together. */
+export function DeleteSalaryButton({ periodId, label }: { periodId: string; label: string }) {
+  const [confirm, dialog] = useConfirm();
+  const [pending, start] = useTransition();
+  const [error, setError] = useState<string>();
+  const router = useRouter();
+  const run = async () => {
+    if (!(await confirm({ title: `Hapus gaji ${label}?`, message: "Periode budget dan transaksi gajinya ikut dihapus. Transaksi lain tidak berubah.", confirmLabel: "Hapus", destructive: true })))
+      return;
+    start(async () => {
+      const res = await deleteSalary(periodId);
+      setError(res.error);
+      if (res.ok) router.push("/budget");
+    });
+  };
+  return (
+    <>
+      <Button variant="danger" size="sm" onClick={run} disabled={pending}>
+        <Icon name="delete" className="text-[16px]" /> Hapus gaji
+      </Button>
+      {error && <span className="text-[13px] text-negative">{error}</span>}
+      {dialog}
     </>
   );
 }

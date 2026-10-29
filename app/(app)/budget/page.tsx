@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PeriodPicker, PosRow } from "@/components/budget/PosRow";
-import { SalaryButton } from "@/components/budget/SalaryForm";
+import { DeleteSalaryButton, SalaryButton } from "@/components/budget/SalaryForm";
 import { Card, EmptyState } from "@/components/ui/EmptyState";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
@@ -83,6 +83,12 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
             </div>
           ))}
         </dl>
+        <div className="flex flex-wrap items-center gap-2">
+          <SalaryButton {...salaryProps} month={period.month.slice(0, 7)} variant="tonal" size="sm">
+            <Icon name="edit" className="text-[16px]" /> Ubah gaji
+          </SalaryButton>
+          <DeleteSalaryButton periodId={period.id} label={monthLabel(period.month)} />
+        </div>
         {!running && leftover > 0 && (
           <Link href="/rencana?tab=goals" className="flex items-center gap-2 rounded-[12px] bg-positive-container px-3 py-2.5 text-[15px] font-medium text-positive">
             <Icon name="savings" className="text-[20px]" filled />
@@ -106,6 +112,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
             <PosRow
               key={p.group.id}
               p={p}
+              href={`/budget/${p.group.id}?periode=${period.month.slice(0, 7)}`}
               note={p.group.is_savings && goalNeed > 0 ? `Kebutuhan setoran goal ${formatRupiah(goalNeed)} dari alokasi ${formatRupiah(p.limit)}` : undefined}
             />
           ))}

@@ -35,3 +35,15 @@ export async function recordSalary(_: ActionState, fd: FormData): Promise<Action
   revalidatePath("/", "layout");
   return { ok: true };
 }
+
+/** Removes one month's salary: its budget period (allocations cascade) and the salary income transaction. */
+export async function deleteSalary(periodId: string): Promise<ActionState> {
+  const { supabase } = await requireUser();
+  const { data: period } = await supabase.from("budget_periods").select("income_tx_id").eq("id", periodId).maybeSingle();
+  if (!period) return { error: "Periode tidak ditemukan" };
+  const { error } = await supabase.from("budget_periods").delete().eq("id", periodId);
+  if (error) return { error: "Gagal menghapus, coba lagi" };
+  if (period.income_tx_id) await supabase.from("transactions").delete().eq("id", period.income_tx_id);
+  revalidatePath("/", "layout");
+  return { ok: true };
+}

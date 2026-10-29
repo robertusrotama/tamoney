@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
@@ -11,11 +12,12 @@ const BAR = { ok: "bg-primary", warn: "bg-warning", over: "bg-negative", saved: 
 const TILE = { ok: "bg-primary-container text-primary", warn: "bg-warning-container text-warning", over: "bg-negative-container text-negative", saved: "bg-positive-container text-positive" };
 
 /** One pos: used / limit with a bar that grows from the left (transform only). */
-export function PosRow({ p, note }: { p: PosUsage; note?: string }) {
+export function PosRow({ p, note, href }: { p: PosUsage; note?: string; href?: string }) {
   const fill = p.limit > 0 ? Math.min(1, Math.max(0, p.used) / p.limit) : p.used > 0 ? 1 : 0;
   const savings = p.group.is_savings;
+  const Row = href ? Link : "div";
   return (
-    <div className="flex items-center gap-3 px-4 py-3">
+    <Row href={href as string} className={`flex items-center gap-3 px-4 py-3 ${href ? "hover:bg-surface-dim" : ""}`}>
       <span className={`flex size-9 shrink-0 items-center justify-center rounded-[10px] ${TILE[p.level]}`}>
         <Icon name={p.group.icon} className="text-[20px]" filled />
       </span>
@@ -50,7 +52,8 @@ export function PosRow({ p, note }: { p: PosUsage; note?: string }) {
           {note && <span className="block">{note}</span>}
         </p>
       </div>
-    </div>
+      {href && <Icon name="chevron_right" className="-mr-1 text-[20px] text-on-surface-variant" />}
+    </Row>
   );
 }
 
