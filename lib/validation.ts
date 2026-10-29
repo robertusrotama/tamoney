@@ -53,6 +53,19 @@ export const walletSchema = z.object({
     .transform((v) => v || null),
 });
 
+export const salarySchema = z
+  .object({
+    month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, { error: "Bulan tidak valid" }),
+    amount: rupiah(1),
+    wallet_id: id,
+    occurred_at: date,
+    alloc: z.record(id, rupiah(0)),
+  })
+  .refine((s) => Object.values(s.alloc).reduce((a, b) => a + b, 0) === s.amount, {
+    error: "Total alokasi harus sama dengan gaji",
+    path: ["alloc"],
+  });
+
 /** First validation message, for showing in a form. */
 export function firstError(error: z.ZodError): string {
   return error.issues[0]?.message ?? "Data tidak valid";

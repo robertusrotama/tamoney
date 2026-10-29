@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { transferSchema, txSchema, walletSchema } from "./validation";
+import { salarySchema, transferSchema, txSchema, walletSchema } from "./validation";
 
 const A = "6f1c2b9e-3a4d-4c5e-8f70-1a2b3c4d5e6f";
 const B = "7a2d3c0f-4b5e-4d6f-9081-2b3c4d5e6f70";
@@ -38,5 +38,19 @@ describe("walletSchema", () => {
 
   it("allows an empty starting balance as 0", () => {
     expect(walletSchema.safeParse({ name: "Tunai", type: "cash", initial_balance: "" }).data?.initial_balance).toBe(0);
+  });
+});
+
+describe("salarySchema", () => {
+  const ok = { month: "2026-10", amount: "12.000.000", wallet_id: A, occurred_at: "2026-10-25", alloc: { [B]: "12.000.000" } };
+  it("parses salary and allocations", () => {
+    const d = salarySchema.safeParse(ok).data;
+    expect(d?.amount).toBe(12_000_000);
+    expect(d?.alloc).toEqual({ [B]: 12_000_000 });
+  });
+  it("rejects a bad month", () => expect(salarySchema.safeParse({ ...ok, month: "2026-13" }).success).toBe(false));
+  it("rejects allocations that do not add up", () => {
+    const r = salarySchema.safeParse({ ...ok, alloc: { [B]: "11.000.000" } });
+    expect(r.error?.issues[0].message).toBe("Total alokasi harus sama dengan gaji");
   });
 });

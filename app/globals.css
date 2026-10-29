@@ -14,6 +14,8 @@
   --c-positive-container: rgb(52 199 89 / 0.14);
   --c-negative: #d70015; /* systemRed, accessible text variant */
   --c-negative-container: rgb(255 59 48 / 0.12);
+  --c-warning: #c93400; /* systemOrange, accessible text variant */
+  --c-warning-container: rgb(255 149 0 / 0.14);
   --c-tertiary: #5856d6; /* systemIndigo */
   --c-tertiary-container: rgb(88 86 214 / 0.12);
 
@@ -43,6 +45,8 @@
     --c-positive-container: rgb(48 209 88 / 0.18);
     --c-negative: #ff453a;
     --c-negative-container: rgb(255 69 58 / 0.18);
+    --c-warning: #ff9f0a;
+    --c-warning-container: rgb(255 159 10 / 0.18);
     --c-tertiary: #5e5ce6;
     --c-tertiary-container: rgb(94 92 230 / 0.22);
 
@@ -75,6 +79,8 @@
   --color-negative: var(--c-negative);
   --color-negative-container: var(--c-negative-container);
   --color-on-negative-container: var(--c-negative);
+  --color-warning: var(--c-warning);
+  --color-warning-container: var(--c-warning-container);
   --color-tertiary: var(--c-tertiary);
   --color-tertiary-container: var(--c-tertiary-container);
   --color-on-tertiary-container: var(--c-tertiary);

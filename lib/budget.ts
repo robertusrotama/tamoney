@@ -123,3 +123,15 @@ export function safePerDay(pos: PosUsage[], today: string, end: string): number 
   const left = pos.filter((p) => !p.group.is_savings).reduce((s, p) => s + Math.max(0, p.left), 0);
   return days > 0 ? Math.floor(left / days) : 0;
 }
+
+const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("id-ID", { ...opts, timeZone: "UTC" });
+/** "2026-10-01" or "2026-10" → "Oktober 2026" */
+export const monthLabel = (month: string) => fmt({ month: "long", year: "numeric" }).format(new Date(`${month.slice(0, 7)}-01T00:00:00Z`));
+/** "25 Okt – 24 Nov" */
+export const rangeLabel = (start: string, end: string) =>
+  `${fmt({ day: "numeric", month: "short" }).format(new Date(`${start}T00:00:00Z`))} – ${fmt({ day: "numeric", month: "short" }).format(new Date(`${end}T00:00:00Z`))}`;
+/** "YYYY-MM" n months away */
+export const shiftYm = (ym: string, n: number) => {
+  const [y, m] = ym.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1 + n, 1)).toISOString().slice(0, 7);
+};
