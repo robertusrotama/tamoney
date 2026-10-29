@@ -4,7 +4,6 @@ import { Card, EmptyState, Label } from "@/components/ui/EmptyState";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
-import { TransferForm } from "@/components/wallets/TransferForm";
 import { RestoreButton, WalletCard } from "@/components/wallets/WalletCard";
 import { WalletDialog } from "@/components/wallets/WalletForm";
 import { WALLET_ICON } from "@/components/wallets/style";
@@ -43,7 +42,7 @@ export default async function DompetPage() {
           </EmptyState>
         </Card>
       ) : (
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {active.map((w, i) => (
             <FadeIn key={w.id} index={i}>
               <WalletCard wallet={w} />
@@ -52,35 +51,25 @@ export default async function DompetPage() {
         </section>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-        <section className="min-w-0">
-          <h2 className="mb-2 px-1 text-[20px] font-bold tracking-[-0.01em]">Riwayat Transfer</h2>
-          {transfers.length === 0 ? (
-            <Card>
-              <EmptyState icon="swap_horiz" title="Belum ada transfer" />
-            </Card>
-          ) : (
-            <TxList>
-              {transfers.map((t, i) => (
-                <FadeIn key={t.id} index={i}>
-                  <TxRow tx={t} walletName={walletName} showDate />
-                </FadeIn>
-              ))}
-            </TxList>
-          )}
-        </section>
-
-        <section>
-          <h2 className="mb-2 px-1 text-[20px] font-bold tracking-[-0.01em]">Pindah Saldo</h2>
-          <Card className="p-5">
-            {active.length < 2 ? (
-              <p className="text-[15px] text-on-surface-variant">Butuh minimal 2 dompet aktif untuk transfer.</p>
-            ) : (
-              <TransferForm wallets={active} />
-            )}
+      <section>
+        <div className="mb-2 flex items-baseline justify-between px-1">
+          <h2 className="text-[20px] font-bold tracking-[-0.01em]">Riwayat Transfer</h2>
+          <p className="text-[13px] text-on-surface-variant">Transfer baru lewat + Catat</p>
+        </div>
+        {transfers.length === 0 ? (
+          <Card>
+            <EmptyState icon="swap_horiz" title="Belum ada transfer" />
           </Card>
-        </section>
-      </div>
+        ) : (
+          <TxList>
+            {transfers.map((t, i) => (
+              <FadeIn key={t.id} index={i}>
+                <TxRow tx={t} walletName={walletName} showDate />
+              </FadeIn>
+            ))}
+          </TxList>
+        )}
+      </section>
 
       {archived.length > 0 && (
         <section>

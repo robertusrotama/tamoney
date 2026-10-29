@@ -6,7 +6,7 @@ updated: 2026-10-29
 
 # Screens
 
-Semua layar memakai [[design-system]]. Shell: sidebar translucent 256px (≥ 768px) atau tab bar translucent + tombol `+` melayang (< 768px). Lihat [[mobile-fab-bottom-nav]].
+Semua layar memakai [[design-system]]. Shell: sidebar Liquid Glass mengambang & bisa diciutkan (≥ 768px) atau tab bar kapsul mengambang + tombol `+` (< 768px). Lihat [[mobile-fab-bottom-nav]].
 
 ## Ringkasan → `/`
 - Large title: tanggal + sapaan WIB.
@@ -14,10 +14,11 @@ Semua layar memakai [[design-system]]. Shell: sidebar translucent 256px (≥ 768
 - **Dompet**: kartu mini bergradien, geser horizontal.
 - **Hari Ini**: list inset grouped.
 - ≥ 1024px: kolom kanan sticky **Catat Cepat** (`TxForm`).
+- **+ Catat** (header/FAB) punya 3 tab: Pengeluaran · Pemasukan · Transfer (transfer hanya saat membuat baru).
 - Komponen: `app/(app)/page.tsx`, `TxRow`/`TxList`, `TxForm`.
 
 ## Analitik → `/analitik`
-- Large title + pemilih bulan (pill).
+- Large title + `MonthPicker` (‹ bulan › + popover grid bulan; tanpa `<input type="month">` yang tidak didukung Safari/Firefox desktop).
 - Satu kartu grouped: Pemasukan · Pengeluaran · Surplus/Defisit (+% vs bulan lalu).
 - **Tren 6 Bulan** (bar, warna sistem) dan **Kategori** (donut + peringkat).
 - **Riwayat**: cari + filter (GET form), list dengan edit/hapus, paginasi 20.
@@ -26,7 +27,7 @@ Semua layar memakai [[design-system]]. Shell: sidebar translucent 256px (≥ 768
 ## Dompet → `/dompet`
 - Large title + ringkasan total, tombol Tambah.
 - Kartu dompet gaya Apple Wallet (gradien per jenis), ubah/arsipkan.
-- **Riwayat Transfer** (list) dan **Pindah Saldo** (`TransferForm`).
+- **Riwayat Transfer** (list). Transfer baru dibuat lewat **+ Catat → Transfer**.
 - **Diarsipkan** dengan Pulihkan. Lihat [[wallet-archive-not-delete]].
 
 ## Auth → `/masuk`, `/daftar`, `/lupa-password`, `/reset-password`

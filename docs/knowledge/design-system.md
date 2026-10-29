@@ -42,6 +42,23 @@ Token semantik di `app/globals.css` (variabel `--c-*`, dipetakan ke kelas Tailwi
 - Judul seksi di luar kartu, kiri, dengan aksi teks biru di kanan ("Kelola", "Semua").
 - Field: fill abu `rounded-[10px]`, tinggi min 44px (target sentuh), ring biru saat fokus.
 
+## Liquid Glass
+
+Shell mengambang di atas konten (gaya iOS 26), dibuat dari bagian Materials skill apple-design (tidak ada skill liquid-glass terpisah):
+
+- `.glass`: badan tipis translucent (gradien atas→bawah), `blur(14px) saturate(190%)`, rim spekular terang di atas (inset 1px), tepi halus, bayangan ambient dalam.
+- `.glass.glass-thick`: untuk permukaan besar (popover bulan, menu akun): blur 40px + badan lebih padat agar teks di belakang tidak bersaing.
+- `.glass-lens`: "lensa" yang menandai item aktif di sidebar/tab bar; berpindah dengan `layoutId`.
+- Tooltip/chip kecil di atas konten terang: **solid** (`bg-card`), bukan glass, demi keterbacaan.
+- Reduce transparency → solid.
+
+Dipakai: sidebar mengambang (desktop), tab bar kapsul mengambang (mobile), kapsul header (Catat + akun), pemilih bulan.
+
+### Sidebar
+- Lebar 232px, ciut ke 64px lewat tombol `left_panel_close/open`. Status disimpan di cookie `sb_collapsed` (dibaca server → tidak ada lompatan saat load).
+- Saat ciut, hover/fokus keyboard memunculkan label menu yang tumbuh dari ikon ke arah konten.
+- Konten mengikuti lebar sidebar lewat CSS var `--sb` yang dianimasikan Motion; desktop full width (tanpa max-width).
+
 ## Material
 
 - `.material` = `backdrop-filter: blur(20px) saturate(180%)` + latar semi transparan. Dipakai untuk sidebar, header, tab bar, menu akun. Konten menggulir di bawahnya.

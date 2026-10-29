@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AutoSubmitForm } from "@/components/analytics/AutoSubmitForm";
+import { MonthPicker } from "@/components/analytics/MonthPicker";
 import { CATEGORY_COLORS, CategoryDonut, TrendChart } from "@/components/analytics/Charts";
 import { TxActions } from "@/components/transactions/TxActions";
 import { TxList, TxRow } from "@/components/transactions/TxRow";
@@ -42,7 +43,8 @@ function Delta({ value, invert }: { value: number | null; invert?: boolean }) {
 
 export default async function AnalitikPage({ searchParams }: PageProps<"/analitik">) {
   const sp = await searchParams;
-  const month = parseMonth(one(sp.bulan), monthKey(new Date().toISOString()));
+  const currentMonth = monthKey(new Date().toISOString());
+  const month = parseMonth(one(sp.bulan), currentMonth);
   const filter = { q: one(sp.q), wallet: one(sp.dompet), category: one(sp.kategori), kind: one(sp.jenis) };
   const page = Math.max(1, Number(one(sp.hal)) || 1);
 
@@ -72,13 +74,11 @@ export default async function AnalitikPage({ searchParams }: PageProps<"/analiti
   return (
     <div className="space-y-8">
       <AutoSubmitForm id="filter" />
+      {/* the month lives in the URL; the filter form must carry it so a filter change keeps the month */}
+      <input form="filter" type="hidden" name="bulan" value={month} />
       <div className="flex flex-wrap items-end justify-between gap-3 px-1">
         <h1 className="large-title">Analitik</h1>
-        <label className="flex min-h-9 items-center gap-1.5 rounded-full bg-card px-3.5 text-[15px] font-semibold text-primary">
-          <Icon name="calendar_month" className="text-[18px]" />
-          <span className="sr-only">Pilih bulan</span>
-          <input form="filter" type="month" name="bulan" defaultValue={month} className="bg-transparent outline-none" />
-        </label>
+        <MonthPicker month={month} current={currentMonth} />
       </div>
 
       {/* Inset-grouped summary: one card, three rows */}

@@ -11,7 +11,7 @@ export function UserMenu({ name, email }: { name: string; email: string }) {
       >
         {name.charAt(0).toUpperCase()}
       </summary>
-      <div className="material absolute right-0 z-50 mt-2 w-60 origin-top-right rounded-[14px] border border-outline p-1.5 shadow-[0_20px_40px_-12px_rgb(0_0_0/0.25)]">
+      <div className="glass glass-thick absolute right-0 z-50 mt-2 w-60 origin-top-right rounded-[14px] border border-outline p-1.5 shadow-[0_20px_40px_-12px_rgb(0_0_0/0.25)]">
         <div className="px-3 py-2">
           <p className="text-[15px] font-semibold">{name}</p>
           <p className="truncate text-[13px] text-on-surface-variant">{email}</p>

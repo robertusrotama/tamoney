@@ -22,7 +22,7 @@ export function QuickAdd({ wallets, categories }: { wallets: Wallet[]; categorie
         onClick={d.show}
         aria-label="Catat transaksi"
         whileTap={{ scale: 0.9 }}
-        className="fixed right-4 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-40 flex size-14 items-center justify-center rounded-full bg-primary text-on-primary shadow-[0_8px_24px_-6px_rgb(0_122_255/0.6)] md:hidden"
+        className="fixed right-5 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-40 flex size-14 items-center justify-center rounded-full bg-primary text-on-primary shadow-[0_8px_24px_-6px_rgb(0_122_255/0.6)] md:hidden"
       >
         <Icon name="add" className="text-[30px]" />
       </motion.button>

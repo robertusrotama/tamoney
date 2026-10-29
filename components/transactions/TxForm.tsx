@@ -8,15 +8,19 @@ import { Button } from "@/components/ui/Button";
 import { Field, FormError, Input, Select } from "@/components/ui/Field";
 import { Segmented } from "@/components/ui/Segmented";
 import { useFormDone } from "@/components/ui/useFormDone";
+import { TransferForm } from "@/components/wallets/TransferForm";
 import { saveTransaction } from "@/lib/actions/transactions";
 import { parseRupiah } from "@/lib/money";
 import { todayWib, wibDate } from "@/lib/reports";
 import type { Category, Tx, Wallet } from "@/lib/types";
 
 const QUICK = [20_000, 50_000, 100_000, 500_000];
-type Kind = "expense" | "income";
+type Kind = "expense" | "income" | "transfer";
 
-/** Catat Singkat: income/expense entry and edit. wallets = active wallets (plus the edited row's own). */
+/**
+ * Catat: expense / income / transfer in one place (transfer only when creating; an edit keeps its type).
+ * wallets = active wallets (plus the edited row's own).
+ */
 export function TxForm({
   wallets,
   categories,
@@ -48,19 +52,37 @@ export function TxForm({
     );
   }
 
+  const switcher = (
+    <Segmented
+      value={kind}
+      onChange={setKind}
+      options={[
+        { value: "expense", label: "Pengeluaran", tone: "text-negative" },
+        { value: "income", label: "Pemasukan", tone: "text-positive" },
+        ...(initial ? [] : [{ value: "transfer" as const, label: "Transfer", tone: "text-tertiary" }]),
+      ]}
+    />
+  );
+
+  if (kind === "transfer") {
+    return (
+      <div className="space-y-4">
+        {switcher}
+        {wallets.length < 2 ? (
+          <p className="text-[15px] text-on-surface-variant">Butuh minimal 2 dompet aktif untuk transfer.</p>
+        ) : (
+          <TransferForm wallets={wallets} onDone={onDone} />
+        )}
+      </div>
+    );
+  }
+
   const options = categories.filter((c) => c.kind === kind);
   return (
     <form onSubmit={onSubmit} key={version} className="space-y-4">
       {initial && <input type="hidden" name="id" value={initial.id} />}
       <input type="hidden" name="kind" value={kind} />
-      <Segmented
-        value={kind}
-        onChange={setKind}
-        options={[
-          { value: "expense", label: "Pengeluaran", tone: "text-negative" },
-          { value: "income", label: "Pemasukan", tone: "text-positive" },
-        ]}
-      />
+      {switcher}
 
       <div className="space-y-2">
         <AmountInput name="amount" value={amount} onChange={setAmount} large />
