@@ -4,6 +4,8 @@ import { SIDEBAR_COOKIE } from "@/components/shell/prefs";
 import { Notifications } from "@/components/shell/Notifications";
 import { QuickAdd } from "@/components/shell/QuickAdd";
 import { UserMenu } from "@/components/shell/UserMenu";
+import { localeOf, makeT } from "@/lib/i18n";
+import { getLang } from "@/lib/i18n-server";
 import { buildNotifications } from "@/lib/notifications";
 import { getPlanningState } from "@/lib/planning";
 import { getCategories, getProfile, getWallets } from "@/lib/queries";
@@ -18,7 +20,8 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     getProfile(supabase, user.email),
     cookies(),
   ]);
-  const notices = buildNotifications(plan, plan.today, Object.fromEntries(wallets.map((w) => [w.id, w.name])));
+  const lang = await getLang();
+  const notices = buildNotifications(plan, plan.today, Object.fromEntries(wallets.map((w) => [w.id, w.name])), makeT(lang), localeOf(lang));
 
   return (
     <AppShell

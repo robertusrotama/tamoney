@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { LocalDate, T } from "@/components/I18n";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
 import type { TxWithCategory } from "@/lib/queries";
@@ -10,8 +11,6 @@ const TILE = {
   transfer: "bg-tertiary text-white",
 };
 
-const shortDate = (iso: string) =>
-  new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(wibDate(iso)));
 
 /** One inset-grouped list row. Put rows inside <TxList> for the hairline separators. */
 export function TxRow({
@@ -26,7 +25,7 @@ export function TxRow({
   actions?: ReactNode;
 }) {
   const transfer = tx.kind === "transfer";
-  const title = transfer ? "Transfer" : tx.note || tx.category_name || "Transaksi";
+  const title = transfer ? <T k="Transfer" /> : tx.note || tx.category_name || <T k="Transaksi" />;
   const subtitle = transfer
     ? `${walletName(tx.wallet_id)} → ${walletName(tx.to_wallet_id!)}`
     : [tx.note ? tx.category_name : null, walletName(tx.wallet_id)].filter(Boolean).join(" · ");
@@ -45,7 +44,11 @@ export function TxRow({
         <div className="shrink-0 text-right">
           <Money value={signed} sign={transfer ? "none" : "auto"} className="text-[17px] font-medium" />
           <p className="text-[13px] text-on-surface-variant tabular-nums">
-            {showDate ? `${shortDate(tx.occurred_at)}, ` : ""}
+            {showDate && (
+              <>
+                <LocalDate date={wibDate(tx.occurred_at)} options={{ day: "numeric", month: "short" }} />,{" "}
+              </>
+            )}
             {wibTime(tx.occurred_at)}
           </p>
         </div>

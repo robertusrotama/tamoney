@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type KeyboardEvent } from "react";
+import { useT } from "@/components/I18n";
 import { Icon } from "./Icon";
 import { Mark, Popover } from "./Popover";
 
@@ -16,7 +17,7 @@ export function Picker({
   value,
   defaultValue = "",
   onChange,
-  placeholder = "Pilih",
+  placeholder: placeholderProp,
   label,
 }: {
   name?: string;
@@ -27,6 +28,8 @@ export function Picker({
   placeholder?: string;
   label?: string;
 }) {
+  const t = useT();
+  const placeholder = placeholderProp ?? t("Pilih");
   const [own, setOwn] = useState(defaultValue);
   const [q, setQ] = useState("");
   const current = value ?? own;
@@ -70,14 +73,14 @@ export function Picker({
                   autoFocus
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  placeholder="Cari"
-                  aria-label="Cari pilihan"
+                  placeholder={t("Cari")}
+                  aria-label={t("Cari pilihan")}
                   className="h-10 w-full rounded-[10px] bg-surface-dim pr-3 pl-9 text-[15px] outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             )}
             <div role="listbox" aria-label={label} className="max-h-64 overflow-y-auto">
-              {shown.length === 0 && <p className="px-3 py-2 text-[15px] text-on-surface-variant">Tidak ada hasil</p>}
+              {shown.length === 0 && <p className="px-3 py-2 text-[15px] text-on-surface-variant">{t("Tidak ada hasil")}</p>}
               {groups.map((g) => (
                 <div key={g || "all"}>
                   {g && <p className="px-3 pt-2 pb-1 text-[12px] font-semibold tracking-wide text-on-surface-variant uppercase">{g}</p>}

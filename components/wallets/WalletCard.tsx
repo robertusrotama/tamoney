@@ -13,14 +13,16 @@ import { WALLET_TYPE_LABEL, type Wallet, type WalletType } from "@/lib/types";
 import { WALLET_ICON } from "./style";
 import { CARD_H, WalletFace } from "./WalletFace";
 import { WalletDialog } from "./WalletForm";
+import { useT } from "@/components/I18n";
 
 const STRIP = 66; // visible top strip of a stacked card (icon, name, balance)
 
 export function RestoreButton({ id }: { id: string }) {
   const [pending, start] = useTransition();
+  const t = useT();
   return (
     <Button variant="tonal" size="sm" disabled={pending} onClick={() => start(() => void setWalletArchived(id, false))}>
-      Pulihkan
+      {t("Pulihkan")}
     </Button>
   );
 }
@@ -28,17 +30,18 @@ export function RestoreButton({ id }: { id: string }) {
 function SelectedActions({ wallet }: { wallet: Wallet }) {
   const [pending, start] = useTransition();
   const [confirm, dialog] = useConfirm();
+  const t = useT();
   return (
     <div className="-mr-1 -mb-1 flex">
       <Link
         href={`/analitik?dompet=${wallet.id}`}
-        aria-label={`Lihat transaksi ${wallet.name}`}
-        title="Lihat transaksi di Analitik"
+        aria-label={t("Lihat transaksi {name}", { name: wallet.name })}
+        title={t("Lihat transaksi di Analitik")}
         className="inline-flex size-9 items-center justify-center rounded-full hover:bg-white/15"
       >
         <Icon name="receipt_long" className="text-[18px]" />
       </Link>
-      <WalletDialog wallet={wallet} label={`Ubah ${wallet.name}`} variant="icon">
+      <WalletDialog wallet={wallet} label={t("Ubah {name}", { name: wallet.name })} variant="icon">
         <Icon name="edit" className="text-[18px]" />
       </WalletDialog>
       {dialog}
@@ -46,13 +49,13 @@ function SelectedActions({ wallet }: { wallet: Wallet }) {
         disabled={pending}
         onClick={async () => {
           const ok = await confirm({
-            title: `Arsipkan ${wallet.name}?`,
-            message: "Dompet disembunyikan dari pilihan dan total saldo. Riwayat transaksinya tetap tersimpan dan bisa dipulihkan kapan saja.",
-            confirmLabel: "Arsipkan",
+            title: t("Arsipkan {name}?", { name: wallet.name }),
+            message: t("Dompet disembunyikan dari pilihan dan total saldo. Riwayat transaksinya tetap tersimpan dan bisa dipulihkan kapan saja."),
+            confirmLabel: t("Arsipkan"),
           });
           if (ok) start(() => void setWalletArchived(wallet.id, true));
         }}
-        aria-label={`Arsipkan ${wallet.name}`}
+        aria-label={t("Arsipkan {name}", { name: wallet.name })}
         tone="inherit"
       >
         <Icon name="archive" className="text-[18px]" />
@@ -83,16 +86,17 @@ export function WalletStacks({ wallets }: { wallets: Wallet[] }) {
  */
 function TypeStack({ type, wallets }: { type: WalletType; wallets: Wallet[] }) {
   const [selectedId, setSelectedId] = useState(wallets[0].id);
+  const t = useT();
   const selected = wallets.find((w) => w.id === selectedId) ?? wallets[0];
   const rest = wallets.filter((w) => w.id !== selected.id);
   const subtotal = wallets.reduce((s, w) => s + w.balance, 0);
 
   return (
-    <section aria-label={WALLET_TYPE_LABEL[type]}>
+    <section aria-label={t(WALLET_TYPE_LABEL[type])}>
       <div className="mb-2.5 flex items-baseline justify-between px-1">
         <h2 className="flex items-center gap-1.5 text-[17px] font-semibold">
           <Icon name={WALLET_ICON[type]} className="text-[18px] text-on-surface-variant" />
-          {WALLET_TYPE_LABEL[type]}
+          {t(WALLET_TYPE_LABEL[type])}
           <span className="text-[13px] font-normal text-on-surface-variant tabular-nums">{wallets.length}</span>
         </h2>
         <Money value={subtotal} className="text-[15px] font-semibold text-on-surface-variant" />
@@ -110,7 +114,7 @@ function TypeStack({ type, wallets }: { type: WalletType; wallets: Wallet[] }) {
                 layoutId={`card-${w.id}`}
                 role="button"
                 tabIndex={0}
-                aria-label={`Pilih dompet ${w.name}`}
+                aria-label={t("Pilih dompet {name}", { name: w.name })}
                 onClick={() => setSelectedId(w.id)}
                 onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setSelectedId(w.id))}
                 whileHover={{ y: -6 }}

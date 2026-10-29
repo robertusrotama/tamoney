@@ -1,3 +1,4 @@
+import { makeT, type T } from "./i18n";
 import type { Tx } from "./types";
 
 export type ReportTx = Pick<Tx, "kind" | "amount" | "occurred_at" | "category_id"> & { category_name?: string | null };
@@ -21,9 +22,9 @@ export function todayWib(now = new Date()): string {
   return wibDate(now.toISOString());
 }
 
-export function wibGreeting(now = new Date()): string {
+export function wibGreeting(now = new Date(), t: T = makeT("id")): string {
   const h = new Date(now.getTime() + WIB_MS).getUTCHours();
-  return h < 11 ? "Selamat Pagi" : h < 15 ? "Selamat Siang" : h < 18 ? "Selamat Sore" : "Selamat Malam";
+  return h < 11 ? t("Selamat Pagi") : h < 15 ? t("Selamat Siang") : h < 18 ? t("Selamat Sore") : t("Selamat Malam");
 }
 
 /** A picked WIB date + the current WIB time; an edit that keeps the date keeps its original timestamp. */

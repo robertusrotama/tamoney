@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale, useT } from "@/components/I18n";
 import { Button } from "./Button";
 import { Icon } from "./Icon";
 import { MonthGrid } from "./MonthGrid";
 import { Popover } from "./Popover";
 
-const nice = (d: string) =>
-  new Intl.DateTimeFormat("id-ID", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
+const niceIn = (locale: string, d: string) =>
+  new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
 
 /** Replaces <input type="date">: field-looking trigger + calendar popover. Posts YYYY-MM-DD via a hidden input. */
 export function DateField({
@@ -25,6 +26,9 @@ export function DateField({
   max?: string | null;
   onChange?: (d: string) => void;
 }) {
+  const t = useT();
+  const locale = useLocale();
+  const nice = (d: string) => niceIn(locale, d);
   const [value, setOwn] = useState(defaultValue);
   const setValue = (d: string) => {
     setOwn(d);
@@ -41,7 +45,7 @@ export function DateField({
         label={
           <>
             <Icon name="calendar_today" className="text-[18px] text-on-surface-variant" />
-            <span className="truncate">{value === today ? `Hari ini · ${nice(value)}` : nice(value)}</span>
+            <span className="truncate">{value === today ? `${t("Hari ini")} · ${nice(value)}` : nice(value)}</span>
           </>
         }
       >
@@ -69,7 +73,7 @@ export function DateField({
                   close();
                 }}
               >
-                Hari ini
+                {t("Hari ini")}
               </Button>
             </div>
           </div>

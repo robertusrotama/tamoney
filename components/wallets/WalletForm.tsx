@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { AmountInput } from "@/components/ui/AmountInput";
+import { useT } from "@/components/I18n";
 import { Button, IconButton } from "@/components/ui/Button";
 import { Dialog, useDialog } from "@/components/ui/Dialog";
 import { Field, FormError, Input } from "@/components/ui/Field";
@@ -16,6 +17,7 @@ import { WalletFace } from "./WalletFace";
 
 function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void }) {
   const { state, pending, onSubmit } = useFormDone(saveWallet, onDone);
+  const t = useT();
   // Controlled only so the preview card updates live as you type and pick
   const [name, setName] = useState(wallet?.name ?? "");
   const [type, setType] = useState<WalletType>(wallet?.type ?? "cash");
@@ -29,41 +31,41 @@ function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void })
       <input type="hidden" name="color" value={color} />
       <input type="hidden" name="pattern" value={pattern} />
 
-      <WalletFace wallet={{ ...look, name: name || "Dompet baru", balance: wallet?.balance ?? 0 }} />
+      <WalletFace wallet={{ ...look, name: name || t("Dompet baru"), balance: wallet?.balance ?? 0 }} />
 
-      <Field label="Nama dompet">
-        <Input name="name" value={name} onChange={(e) => setName(e.target.value)} maxLength={50} required placeholder="Contoh: BCA, GoPay, Tunai" />
+      <Field label={t("Nama dompet")}>
+        <Input name="name" value={name} onChange={(e) => setName(e.target.value)} maxLength={50} required placeholder={t("Contoh: BCA, GoPay, Tunai")} />
       </Field>
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Jenis">
+        <Field label={t("Jenis")}>
           <Picker
             name="type"
-            label="Jenis"
+            label={t("Jenis")}
             value={type}
             onChange={(v) => setType(v as WalletType)}
             options={(Object.keys(WALLET_TYPE_LABEL) as WalletType[]).map((v) => ({ value: v, label: WALLET_TYPE_LABEL[v], icon: WALLET_ICON[v] }))}
           />
         </Field>
-        <Field label="Saldo awal">
+        <Field label={t("Saldo awal")}>
           <AmountInput name="initial_balance" defaultValue={wallet?.initial_balance} required={false} />
         </Field>
       </div>
 
       <fieldset className="space-y-2">
-        <legend className="px-1 text-[13px] text-on-surface-variant">Warna kartu</legend>
-        <div role="radiogroup" aria-label="Warna kartu" className="flex flex-wrap gap-2.5">
-          <Swatch label="Otomatis (sesuai jenis)" selected={!color} onSelect={() => setColor("")} style={cardStyle({ type })}>
+        <legend className="px-1 text-[13px] text-on-surface-variant">{t("Warna kartu")}</legend>
+        <div role="radiogroup" aria-label={t("Warna kartu")} className="flex flex-wrap gap-2.5">
+          <Swatch label={t("Otomatis (sesuai jenis)")} selected={!color} onSelect={() => setColor("")} style={cardStyle({ type })}>
             <Icon name="auto_awesome" className="text-[15px] text-white" />
           </Swatch>
           {(Object.keys(CARD_COLORS) as CardColor[]).map((c) => (
-            <Swatch key={c} label={CARD_COLORS[c][2]} selected={color === c} onSelect={() => setColor(c)} style={cardStyle({ type, color: c })} />
+            <Swatch key={c} label={t(CARD_COLORS[c][2])} selected={color === c} onSelect={() => setColor(c)} style={cardStyle({ type, color: c })} />
           ))}
         </div>
       </fieldset>
 
       <fieldset className="space-y-2">
-        <legend className="px-1 text-[13px] text-on-surface-variant">Motif</legend>
-        <div role="radiogroup" aria-label="Motif" className="grid grid-cols-5 gap-2">
+        <legend className="px-1 text-[13px] text-on-surface-variant">{t("Motif")}</legend>
+        <div role="radiogroup" aria-label={t("Motif")} className="grid grid-cols-5 gap-2">
           {(Object.keys(CARD_PATTERNS) as CardPattern[]).map((p) => {
             const selected = (pattern || "plain") === p;
             return (
@@ -80,7 +82,7 @@ function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void })
                   style={cardStyle({ ...look, pattern: p })}
                   className={`block h-10 rounded-[8px] ring-offset-2 ring-offset-card ${selected ? "ring-2 ring-primary" : ""}`}
                 />
-                <span className={`block text-[12px] ${selected ? "font-semibold text-on-surface" : "text-on-surface-variant"}`}>{CARD_PATTERNS[p].label}</span>
+                <span className={`block text-[12px] ${selected ? "font-semibold text-on-surface" : "text-on-surface-variant"}`}>{t(CARD_PATTERNS[p].label)}</span>
               </motion.button>
             );
           })}
@@ -89,7 +91,7 @@ function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void })
 
       <FormError message={state.error} />
       <Button type="submit" disabled={pending} className="w-full">
-        {pending ? "Menyimpan…" : "Simpan"}
+        {pending ? t("Menyimpan…") : t("Simpan")}
       </Button>
     </form>
   );
@@ -127,6 +129,7 @@ export function WalletDialog({
   variant?: "primary" | "tonal" | "icon";
 }) {
   const d = useDialog();
+  const t = useT();
   return (
     <>
       {variant === "icon" ? (
@@ -138,7 +141,7 @@ export function WalletDialog({
           {children}
         </Button>
       )}
-      <Dialog open={d.open} origin={d.origin} onClose={d.close} title={wallet ? "Ubah Dompet" : "Tambah Dompet"}>
+      <Dialog open={d.open} origin={d.origin} onClose={d.close} title={wallet ? t("Ubah Dompet") : t("Tambah Dompet")}>
         <WalletForm wallet={wallet} onDone={d.close} />
       </Dialog>
     </>

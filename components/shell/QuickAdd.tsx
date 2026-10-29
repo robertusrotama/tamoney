@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { TxForm } from "@/components/transactions/TxForm";
 import { Button } from "@/components/ui/Button";
 import { Dialog, useDialog } from "@/components/ui/Dialog";
+import { useT } from "@/components/I18n";
 import { Icon } from "@/components/ui/Icon";
 import type { Category, Wallet } from "@/lib/types";
 
@@ -14,12 +15,13 @@ const noop = () => () => {};
 /** "Catat" in the toolbar (desktop) and a floating + (mobile); the form grows out of whichever was tapped. */
 export function QuickAdd({ wallets, categories }: { wallets: Wallet[]; categories: Category[] }) {
   const d = useDialog();
+  const t = useT();
   const mounted = useSyncExternalStore(noop, () => true, () => false); // document.body exists only on the client
   return (
     <>
       <span className="hidden md:contents">
         <Button size="sm" onClick={d.show} className="h-9">
-          <Icon name="add" className="text-[18px]" /> Catat
+          <Icon name="add" className="text-[18px]" /> {t("Catat")}
         </Button>
       </span>
       {/* Portaled to <body>: inside the header's glass (backdrop-filter) a fixed child is positioned
@@ -29,7 +31,7 @@ export function QuickAdd({ wallets, categories }: { wallets: Wallet[]; categorie
           <motion.button
             type="button"
             onClick={d.show}
-            aria-label="Catat transaksi"
+            aria-label={t("Catat transaksi")}
             whileTap={{ scale: 0.9 }}
             className="fixed right-5 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-40 flex size-14 items-center justify-center rounded-full bg-primary text-on-primary shadow-[0_8px_24px_-6px_rgb(0_122_255/0.6)] md:hidden"
           >
@@ -37,7 +39,7 @@ export function QuickAdd({ wallets, categories }: { wallets: Wallet[]; categorie
           </motion.button>,
           document.body,
         )}
-      <Dialog open={d.open} origin={d.origin} onClose={d.close} title="Catat Transaksi">
+      <Dialog open={d.open} origin={d.origin} onClose={d.close} title={t("Catat Transaksi")}>
         <TxForm wallets={wallets} categories={categories} onDone={d.close} />
       </Dialog>
     </>

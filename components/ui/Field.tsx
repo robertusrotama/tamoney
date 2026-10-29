@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ComponentProps, type ReactNode } from "react";
+import { useT } from "@/components/I18n";
 import { IconButton } from "./Button";
 import { Icon } from "./Icon";
 
@@ -32,22 +33,25 @@ export function Input(props: ComponentProps<"input">) {
 /** Password with a show/hide toggle inside the field. */
 export function PasswordField(props: Omit<ComponentProps<"input">, "type">) {
   const [show, setShow] = useState(false);
+  const t = useT();
   return (
     <div className={`${fieldClass} flex items-center gap-2 pr-1.5`}>
       <input {...props} type={show ? "text" : "password"} className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-on-surface-variant" />
-      <IconButton onClick={() => setShow((s) => !s)} aria-label={show ? "Sembunyikan password" : "Tampilkan password"} aria-pressed={show}>
+      <IconButton onClick={() => setShow((s) => !s)} aria-label={show ? t("Sembunyikan password") : t("Tampilkan password")} aria-pressed={show}>
         <Icon name={show ? "visibility_off" : "visibility"} className="text-[20px]" />
       </IconButton>
     </div>
   );
 }
 
+/** Server messages are Indonesian keys; shown in the UI language. */
 export function FormError({ message }: { message?: string }) {
+  const t = useT();
   if (!message) return null;
   return (
     <p role="alert" className="flex items-center gap-2 rounded-[12px] bg-negative-container px-4 py-3 text-[15px] text-negative">
       <Icon name="error" className="text-[18px]" filled />
-      {message}
+      {t(message)}
     </p>
   );
 }

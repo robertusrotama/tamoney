@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Avatar, type Profile } from "@/components/ui/Avatar";
+import { useT } from "@/components/I18n";
 import { Icon } from "@/components/ui/Icon";
 import { signOut } from "@/lib/actions/auth";
 import { HeaderPanel } from "./HeaderPanel";
@@ -11,16 +12,17 @@ const item = "flex h-12 w-full items-center gap-3 rounded-[12px] px-3 text-[17px
 
 /** Profile menu: same panel and motion as the notification bell. */
 export function UserMenu({ profile, email }: { profile: Profile; email: string }) {
+  const t = useT();
   return (
     <HeaderPanel
-      label={`Akun ${profile.display_name}`}
+      label={t("Akun {name}", { name: profile.display_name })}
       width={320}
       trigger={(open, toggle) => (
         <motion.button
           type="button"
           onClick={toggle}
           aria-expanded={open}
-          aria-label={`Akun ${profile.display_name}`}
+          aria-label={t("Akun {name}", { name: profile.display_name })}
           whileTap={{ scale: 0.92 }}
           animate={{ scale: open ? 1.06 : 1 }}
           className="flex rounded-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
@@ -40,14 +42,14 @@ export function UserMenu({ profile, email }: { profile: Profile; email: string }
           </Link>
           <div className="my-1.5 h-px bg-outline" />
           <Link href="/pengaturan" onClick={close} className={item}>
-            <Icon name="settings" className="text-[22px] text-primary" /> Pengaturan
+            <Icon name="settings" className="text-[22px] text-primary" /> {t("Pengaturan")}
           </Link>
           <Link href="/pintasan" onClick={close} className={item}>
-            <Icon name="bolt" className="text-[22px] text-primary" /> Pintasan iPhone
+            <Icon name="bolt" className="text-[22px] text-primary" /> {t("Pintasan iPhone")}
           </Link>
           <form action={signOut}>
             <button className={`${item} text-negative`}>
-              <Icon name="logout" className="text-[22px]" /> Keluar
+              <Icon name="logout" className="text-[22px]" /> {t("Keluar")}
             </button>
           </form>
         </div>

@@ -129,12 +129,14 @@ export function safePerDay(pos: PosUsage[], today: string, end: string): number 
   return days > 0 ? Math.floor(left / days) : 0;
 }
 
-const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("id-ID", { ...opts, timeZone: "UTC" });
+const fmt = (opts: Intl.DateTimeFormatOptions, locale = "id-ID") => new Intl.DateTimeFormat(locale, { ...opts, timeZone: "UTC" });
 /** "2026-10-01" or "2026-10" → "Oktober 2026" */
-export const monthLabel = (month: string) => fmt({ month: "long", year: "numeric" }).format(new Date(`${month.slice(0, 7)}-01T00:00:00Z`));
+export const monthLabel = (month: string, locale?: string) => fmt({ month: "long", year: "numeric" }, locale).format(new Date(`${month.slice(0, 7)}-01T00:00:00Z`));
 /** "25 Okt – 24 Nov" */
-export const rangeLabel = (start: string, end: string) =>
-  `${fmt({ day: "numeric", month: "short" }).format(new Date(`${start}T00:00:00Z`))} – ${fmt({ day: "numeric", month: "short" }).format(new Date(`${end}T00:00:00Z`))}`;
+export const rangeLabel = (start: string, end: string, locale?: string) => {
+  const f = fmt({ day: "numeric", month: "short" }, locale);
+  return `${f.format(new Date(`${start}T00:00:00Z`))} – ${f.format(new Date(`${end}T00:00:00Z`))}`;
+};
 /** "YYYY-MM" n months away */
 export const shiftYm = (ym: string, n: number) => {
   const [y, m] = ym.split("-").map(Number);

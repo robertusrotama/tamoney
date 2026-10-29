@@ -1,3 +1,4 @@
+import { makeT, type T } from "./i18n";
 import { addDays } from "./period";
 import type { Bill } from "./types";
 
@@ -26,11 +27,11 @@ export function dueStatus(b: Pick<Bill, "next_due" | "remind_days">, today: stri
   return { kind: d <= b.remind_days ? "soon" : "later", days: d };
 }
 
-export function dueLabel(s: DueState): string {
-  if (s.kind === "late") return `Terlambat ${s.days} hari`;
-  if (s.days === 0) return "Hari ini";
-  if (s.days === 1) return "Besok";
-  return `Dalam ${s.days} hari`;
+export function dueLabel(s: DueState, t: T = makeT("id")): string {
+  if (s.kind === "late") return t("Terlambat {n} hari", { n: s.days });
+  if (s.days === 0) return t("Hari ini");
+  if (s.days === 1) return t("Besok");
+  return t("Dalam {n} hari", { n: s.days });
 }
 
 /** What active bills cost in `month` ("YYYY-MM"), counting every occurrence from next_due on. */

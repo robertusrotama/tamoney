@@ -1,9 +1,10 @@
 import { AuthForm, AuthLink } from "@/components/auth/AuthForm";
 import { FormError } from "@/components/ui/Field";
 import { signIn } from "@/lib/actions/auth";
+import { getT } from "@/lib/i18n-server";
 
 export default async function MasukPage({ searchParams }: PageProps<"/masuk">) {
-  const { error } = await searchParams;
+  const [{ error }, t] = await Promise.all([searchParams, getT()]);
   return (
     <div className="space-y-6">
       {error === "link" && <FormError message="Link sudah kedaluwarsa atau tidak valid. Coba lagi." />}
@@ -20,12 +21,12 @@ export default async function MasukPage({ searchParams }: PageProps<"/masuk">) {
             type: "password",
             autoComplete: "current-password",
             placeholder: "Password kamu",
-            hint: <AuthLink href="/lupa-password">Lupa password?</AuthLink>,
+            hint: <AuthLink href="/lupa-password">{t("Lupa password?")}</AuthLink>,
           },
         ]}
         footer={
           <>
-            Belum punya akun? <AuthLink href="/daftar">Daftar</AuthLink>
+            {t("Belum punya akun?")} <AuthLink href="/daftar">{t("Daftar")}</AuthLink>
           </>
         }
       />

@@ -2,10 +2,10 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
+import { useLocale, useT } from "@/components/I18n";
 import { Icon } from "@/components/ui/Icon";
 import { cardStyle } from "@/components/wallets/style";
 
-const DAYS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 const BARS = [42, 68, 35, 80, 54, 92, 61];
 
 /** One floating card: arrives with a short spring, staggered; then stays still (no looping drift). */
@@ -32,9 +32,14 @@ const glass =
  * card, a wallet card, this week's strip, a recent expense and a 7-day chart. Decorative (aria-hidden).
  */
 export function AuthVisual({ today }: { today: string }) {
+  const tr = useT();
+  const locale = useLocale();
   const t = new Date(`${today}T00:00:00Z`);
   const monday = new Date(t.getTime() - ((t.getUTCDay() + 6) % 7) * 86_400_000);
-  const week = DAYS.map((d, i) => ({ d, n: new Date(monday.getTime() + i * 86_400_000).getUTCDate() }));
+  const week = Array.from({ length: 7 }, (_, i) => {
+    const day = new Date(monday.getTime() + i * 86_400_000);
+    return { d: new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(day), n: day.getUTCDate() };
+  });
   const todayIndex = (t.getUTCDay() + 6) % 7;
 
   return (
@@ -52,12 +57,12 @@ export function AuthVisual({ today }: { today: string }) {
       <Float className="top-[7%] left-[7%] w-[260px]" delay={0.05}>
         <div className={`${solid} p-4`}>
           <div className="flex items-start justify-between">
-            <p className="text-[13px] font-medium text-[#64748b]">Saldo total</p>
+            <p className="text-[13px] font-medium text-[#64748b]">{tr("Saldo total")}</p>
             <span className="size-2 rounded-full bg-[#0a84ff]" />
           </div>
           <p className="mt-1 text-[26px] font-bold tracking-[-0.02em] tabular-nums">Rp 48.750.000</p>
           <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#30d158]/15 px-2 py-0.5 text-[12px] font-semibold text-[#248a3d]">
-            <Icon name="trending_up" className="text-[14px]" /> 8,4% bulan ini
+            <Icon name="trending_up" className="text-[14px]" /> 8,4% {tr("bulan ini")}
           </p>
         </div>
       </Float>
@@ -72,7 +77,7 @@ export function AuthVisual({ today }: { today: string }) {
               BCA
             </span>
             <span className="text-right">
-              <span className="block text-[10px] font-semibold tracking-[0.06em] text-white/75 uppercase">Saldo</span>
+              <span className="block text-[10px] font-semibold tracking-[0.06em] text-white/75 uppercase">{tr("Saldo")}</span>
               <span className="text-[17px] font-semibold tabular-nums">Rp 32.500.000</span>
             </span>
           </div>
@@ -97,7 +102,7 @@ export function AuthVisual({ today }: { today: string }) {
         <div className={`${solid} p-4`}>
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-[15px] font-semibold">Makan siang</p>
+              <p className="text-[15px] font-semibold">{tr("Makan siang")}</p>
               <p className="text-[13px] text-[#64748b]">12:30 · GoPay</p>
             </div>
             <p className="text-[15px] font-semibold text-[#d70015] tabular-nums">−Rp 25.000</p>
@@ -119,7 +124,7 @@ export function AuthVisual({ today }: { today: string }) {
 
       <Float className="right-[8%] bottom-[10%] w-[260px]" delay={0.45}>
         <div className={`${glass} p-4`}>
-          <p className="text-[13px] font-medium text-white/80">Pengeluaran 7 hari</p>
+          <p className="text-[13px] font-medium text-white/80">{tr("Pengeluaran 7 hari")}</p>
           <div className="mt-3 flex h-24 items-end gap-2">
             {BARS.map((h, i) => (
               <motion.span

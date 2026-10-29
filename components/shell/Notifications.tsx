@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PayBillButton } from "@/components/bills/PayBill";
 import { GoalMoneyButton } from "@/components/goals/GoalMoney";
 import { IconButton } from "@/components/ui/Button";
+import { useT } from "@/components/I18n";
 import { Icon } from "@/components/ui/Icon";
 import { HeaderPanel } from "./HeaderPanel";
 import type { GoalWithProgress } from "@/lib/goals";
@@ -25,12 +26,13 @@ const LOOK: Record<NoticeKind, { icon: string; tile: string }> = {
 type Props = { notices: Notice[]; bills: Bill[]; goals: GoalWithProgress[]; wallets: Wallet[] };
 
 function List({ notices, bills, goals, wallets, onNavigate }: Props & { onNavigate: () => void }) {
+  const t = useT();
   if (!notices.length)
     return (
       <div className="flex flex-col items-center gap-1 px-6 py-10 text-center text-on-surface-variant">
         <Icon name="notifications_off" className="text-[36px] opacity-60" />
-        <p className="text-[15px] font-semibold text-on-surface">Semua beres</p>
-        <p className="text-[13px]">Tidak ada yang perlu ditindak</p>
+        <p className="text-[15px] font-semibold text-on-surface">{t("Semua beres")}</p>
+        <p className="text-[13px]">{t("Tidak ada yang perlu ditindak")}</p>
       </div>
     );
   return (
@@ -52,7 +54,7 @@ function List({ notices, bills, goals, wallets, onNavigate }: Props & { onNaviga
             ) : goal && goal.need > goal.depositedThisPeriod ? (
               <GoalMoneyButton goal={goal} wallets={wallets} mode="setor" />
             ) : (
-              <Link href={n.href} onClick={onNavigate} aria-label={`Buka: ${n.title}`} className="flex size-9 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-dim">
+              <Link href={n.href} onClick={onNavigate} aria-label={t("Buka: {x}", { x: n.title })} className="flex size-9 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-dim">
                 <Icon name="chevron_right" className="text-[20px]" />
               </Link>
             )}
@@ -66,12 +68,13 @@ function List({ notices, bills, goals, wallets, onNavigate }: Props & { onNaviga
 /** Bell with a count; opens the shared header panel. */
 export function Notifications(props: Props) {
   const count = props.notices.length;
+  const t = useT();
   return (
     <HeaderPanel
-      label="Notifikasi"
-      title="Notifikasi"
+      label={t("Notifikasi")}
+      title={t("Notifikasi")}
       trigger={(open, toggle) => (
-        <IconButton aria-label={count ? `Notifikasi, ${count} perlu ditindak` : "Notifikasi"} aria-expanded={open} onClick={toggle}>
+        <IconButton aria-label={count ? t("Notifikasi, {n} perlu ditindak", { n: count }) : t("Notifikasi")} aria-expanded={open} onClick={toggle}>
           <Icon name="notifications" className="text-[20px]" filled={open} />
           <AnimatePresence>
             {count > 0 && (

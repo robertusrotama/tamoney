@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion, type PanInfo } from "motion/
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { SPRING, SPRING_MOMENTUM } from "./MotionProvider";
 import { IconButton } from "./Button";
+import { useT } from "@/components/I18n";
 import { Icon } from "./Icon";
 
 const MOBILE = "(max-width: 767px)";
@@ -122,10 +123,11 @@ export function Dialog({
 }
 
 function Header({ title, onClose }: { title: string; onClose: () => void }) {
+  const t = useT();
   return (
     <div className="flex items-center justify-between px-5 pt-3 pb-3 md:px-6 md:pt-5">
       <h2 className="text-[20px] font-bold tracking-[-0.01em]">{title}</h2>
-      <IconButton onClick={onClose} aria-label="Tutup" className="bg-surface-dim">
+      <IconButton onClick={onClose} aria-label={t("Tutup")} className="bg-surface-dim">
         <Icon name="close" className="text-[18px]" />
       </IconButton>
     </div>

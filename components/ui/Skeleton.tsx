@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useT } from "@/components/I18n";
 
 /**
  * Placeholder block that breathes while a page loads. One shared rhythm (all bones in phase), ~0.7 Hz —
@@ -51,9 +52,10 @@ export function ListBones({ rows = 4 }: { rows?: number }) {
 
 /** Screen-reader announcement for every skeleton screen. */
 export function LoadingLabel() {
+  const t = useT();
   return (
     <p role="status" className="sr-only">
-      Memuat…
+      {t("Memuat…")}
     </p>
   );
 }

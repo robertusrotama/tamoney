@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
+import { I18nProvider } from "@/components/I18n";
 import { THEME_COOKIE } from "@/components/shell/prefs";
+import { asLang, LANG_COOKIE } from "@/lib/i18n";
 import { MotionProvider } from "@/components/ui/MotionProvider";
 import "./globals.css";
 
@@ -23,9 +25,11 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const theme = (await cookies()).get(THEME_COOKIE)?.value;
+  const jar = await cookies();
+  const theme = jar.get(THEME_COOKIE)?.value;
+  const lang = asLang(jar.get(LANG_COOKIE)?.value);
   return (
-    <html lang="id" className="h-full antialiased" data-theme={theme === "light" || theme === "dark" ? theme : undefined}>
+    <html lang={lang} className="h-full antialiased" data-theme={theme === "light" || theme === "dark" ? theme : undefined}>
       <head>
         {/* eslint-disable-next-line @next/next/no-page-custom-font, @next/next/google-font-display -- icon font; "block" hides raw ligature names while loading */}
         <link
@@ -34,7 +38,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full font-sans">
-        <MotionProvider>{children}</MotionProvider>
+        <I18nProvider lang={lang}>
+          <MotionProvider>{children}</MotionProvider>
+        </I18nProvider>
       </body>
     </html>
   );

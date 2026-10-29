@@ -1,12 +1,15 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useLocale, useT } from "@/components/I18n";
 import { IconButton } from "./Button";
 import { Icon } from "./Icon";
 
-const WEEKDAYS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
-const title = (ym: string) =>
-  new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${ym}-01T00:00:00Z`));
+// 2024-01-01 is a Monday: weekday names Monday-first in the UI language.
+const weekdays = (locale: string) =>
+  Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2024, 0, 1 + i))));
+const title = (locale: string, ym: string) =>
+  new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${ym}-01T00:00:00Z`));
 export const shiftYm = (ym: string, n: number) => {
   const [y, m] = ym.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1 + n, 1)).toISOString().slice(0, 7);
@@ -46,21 +49,23 @@ export function MonthGrid({
   /** Last pickable day; default today, null = no limit (due dates). */
   max?: string | null;
 }) {
+  const t = useT();
+  const locale = useLocale();
   return (
     <div>
       <div className="mb-1 flex items-center justify-between">
-        <IconButton onClick={() => onView(shiftYm(view, -1))} aria-label="Bulan sebelumnya" tone="primary">
+        <IconButton onClick={() => onView(shiftYm(view, -1))} aria-label={t("Bulan sebelumnya")} tone="primary">
           <Icon name="chevron_left" />
         </IconButton>
         <span className="text-[15px] font-semibold" aria-live="polite">
-          {title(view)}
+          {title(locale, view)}
         </span>
-        <IconButton onClick={() => onView(shiftYm(view, 1))} disabled={max !== null && view >= max.slice(0, 7)} aria-label="Bulan berikutnya" tone="primary">
+        <IconButton onClick={() => onView(shiftYm(view, 1))} disabled={max !== null && view >= max.slice(0, 7)} aria-label={t("Bulan berikutnya")} tone="primary">
           <Icon name="chevron_right" />
         </IconButton>
       </div>
       <div className="grid grid-cols-7 text-center text-[11px] font-semibold text-on-surface-variant">
-        {WEEKDAYS.map((w) => (
+        {weekdays(locale).map((w) => (
           <span key={w} className="py-1">
             {w}
           </span>
@@ -79,7 +84,7 @@ export function MonthGrid({
               onClick={() => onPick(d)}
               onPointerEnter={() => onHover?.(d)}
               aria-pressed={isEdge}
-              aria-label={new Intl.DateTimeFormat("id-ID", { dateStyle: "full", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`))}
+              aria-label={new Intl.DateTimeFormat(locale, { dateStyle: "full", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`))}
               className={`relative h-9 rounded-full text-[14px] tabular-nums hover:bg-surface-dim focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none disabled:pointer-events-none disabled:opacity-25 ${
                 band ? "rounded-none bg-primary-container text-on-primary-container hover:bg-primary-container" : ""
               }`}

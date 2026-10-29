@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
+import { useT } from "@/components/I18n";
 import { Icon } from "@/components/ui/Icon";
 import { SIDEBAR_COOKIE } from "./prefs";
 
@@ -54,6 +55,7 @@ export function AppShell({ initialCollapsed, header, children }: { initialCollap
 
 function Sidebar({ collapsed, width, onToggle }: { collapsed: boolean; width: number; onToggle: () => void }) {
   const path = usePathname();
+  const t = useT();
   const [hovered, setHovered] = useState<string | null>(null);
   return (
     <motion.aside
@@ -61,7 +63,7 @@ function Sidebar({ collapsed, width, onToggle }: { collapsed: boolean; width: nu
       animate={{ width }}
       style={{ width, left: GAP, top: GAP, bottom: GAP }}
       className="glass fixed z-40 hidden flex-col rounded-[26px] p-2.5 md:flex"
-      aria-label="Navigasi utama"
+      aria-label={t("Navigasi utama")}
     >
       {/* Brand is out of flow and the button is pinned right, so both simply ride the width spring:
           nothing waits for the brand's exit animation before moving. */}
@@ -83,7 +85,7 @@ function Sidebar({ collapsed, width, onToggle }: { collapsed: boolean; width: nu
           type="button"
           onClick={onToggle}
           whileTap={{ scale: 0.9 }}
-          aria-label={collapsed ? "Lebarkan sidebar" : "Ciutkan sidebar"}
+          aria-label={collapsed ? t("Lebarkan sidebar") : t("Ciutkan sidebar")}
           aria-expanded={!collapsed}
           className="flex size-9 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-dim"
         >
@@ -103,7 +105,7 @@ function Sidebar({ collapsed, width, onToggle }: { collapsed: boolean; width: nu
           />
         ))}
       </nav>
-      <nav className="mt-auto" aria-label="Pengaturan" onPointerLeave={() => setHovered(null)}>
+      <nav className="mt-auto" aria-label={t("Pengaturan")} onPointerLeave={() => setHovered(null)}>
         <NavItem
           item={SETTINGS}
           active={isActive(path, SETTINGS.href)}
@@ -129,12 +131,13 @@ function NavItem({
   hovered: boolean;
   onHover: (on: boolean) => void;
 }) {
+  const label = useT()(item.label);
   return (
     <div className="relative" onPointerEnter={() => onHover(true)}>
       <Link
         href={item.href}
         aria-current={active ? "page" : undefined}
-        aria-label={collapsed ? item.label : undefined}
+        aria-label={collapsed ? label : undefined}
         onFocus={() => onHover(true)}
         onBlur={() => onHover(false)}
         // Fixed left inset centers the 21px icon in the 44px collapsed rail, so it never moves.
@@ -161,7 +164,7 @@ function NavItem({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, transition: { duration: 0.1 } }}
             >
-              {item.label}
+              {label}
             </motion.span>
           )}
         </AnimatePresence>
@@ -179,7 +182,7 @@ function NavItem({
             // Solid, not clear glass: a light translucent chip over light content loses legibility
             className="pointer-events-none absolute top-1/2 left-[calc(100%+14px)] z-50 -translate-y-1/2 rounded-full bg-card px-3.5 py-1.5 text-[14px] font-semibold whitespace-nowrap shadow-[inset_0_0_0_0.5px_var(--c-glass-edge),0_8px_24px_-8px_rgb(0_0_0/0.3)]"
           >
-            {item.label}
+            {label}
           </motion.span>
         )}
       </AnimatePresence>
@@ -189,9 +192,10 @@ function NavItem({
 
 function TabBar() {
   const path = usePathname();
+  const t = useT();
   return (
     <nav
-      aria-label="Navigasi utama"
+      aria-label={t("Navigasi utama")}
       className="glass fixed inset-x-4 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex rounded-full p-1 md:hidden"
     >
       {ITEMS.map((i) => {
@@ -206,7 +210,7 @@ function TabBar() {
             {active && <motion.span layoutId="tab-lens" className="glass-lens absolute inset-0 rounded-full" />}
             <motion.span whileTap={{ scale: 0.88 }} className="relative flex flex-col items-center gap-0.5">
               <Icon name={i.icon} filled={active} className="text-[24px]" />
-              {i.label}
+              {t(i.label)}
             </motion.span>
           </Link>
         );

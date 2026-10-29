@@ -6,6 +6,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
 import { dueLabel, dueStatus } from "@/lib/bills";
 import { nominalEnd, safePerDay } from "@/lib/budget";
+import { getT } from "@/lib/i18n-server";
 import type { PlanningState } from "@/lib/planning";
 import type { Wallet } from "@/lib/types";
 
@@ -22,14 +23,15 @@ function PlanCard({ title, href, icon, children }: { title: string; href: string
   );
 }
 
-const Empty = ({ href, children }: { href: string; children: ReactNode }) => (
+const Empty = ({ href, cta, children }: { href: string; cta: string; children: ReactNode }) => (
   <Link href={href} className="mt-auto rounded-[10px] bg-surface-dim/60 px-3 py-2.5 text-[13px] text-on-surface-variant hover:bg-surface-dim">
-    {children} <span className="font-semibold text-primary">Mulai →</span>
+    {children} <span className="font-semibold text-primary">{cta} →</span>
   </Link>
 );
 
 /** Ringkasan: this period's budget, the next bills, goal progress. */
-export function PlanCards({ s, wallets }: { s: PlanningState; wallets: Wallet[] }) {
+export async function PlanCards({ s, wallets }: { s: PlanningState; wallets: Wallet[] }) {
+  const t = await getT();
   const cur = s.current;
   const spendable = cur ? cur.usage.pos.filter((p) => !p.group.is_savings).reduce((a, p) => a + p.limit, 0) : 0;
   const left = cur ? spendable - cur.usage.spent : 0;
@@ -39,12 +41,12 @@ export function PlanCards({ s, wallets }: { s: PlanningState; wallets: Wallet[] 
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3">
-      <PlanCard title="Budget periode ini" href="/budget" icon="pie_chart">
+      <PlanCard title={t("Budget periode ini")} href="/budget" icon="pie_chart">
         {cur ? (
           <>
             <Money value={left} className={`text-[24px] leading-tight font-bold tracking-[-0.02em] ${left < 0 ? "text-negative" : ""}`} />
             <p className="text-[13px] text-on-surface-variant">
-              sisa · aman <Money value={safePerDay(cur.usage.pos, s.today, end)} />/hari
+              {t("sisa · aman")} <Money value={safePerDay(cur.usage.pos, s.today, end)} />{t("/hari")}
             </p>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-dim">
               <div
@@ -54,11 +56,11 @@ export function PlanCards({ s, wallets }: { s: PlanningState; wallets: Wallet[] 
             </div>
           </>
         ) : (
-          <Empty href="/budget">Catat gaji untuk membagi budget otomatis.</Empty>
+          <Empty href="/budget" cta={t("Mulai")}>{t("Catat gaji untuk membagi budget otomatis.")}</Empty>
         )}
       </PlanCard>
 
-      <PlanCard title="Tagihan berikutnya" href="/rencana?tab=tagihan" icon="receipt_long">
+      <PlanCard title={t("Tagihan berikutnya")} href="/rencana?tab=tagihan" icon="receipt_long">
         {bills.length ? (
           <ul className="space-y-2">
             {bills.map((b) => {
@@ -68,7 +70,7 @@ export function PlanCards({ s, wallets }: { s: PlanningState; wallets: Wallet[] 
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[15px]">{b.name}</p>
                     <p className={`text-[12px] ${st.kind === "late" ? "text-negative" : st.kind === "soon" ? "text-warning" : "text-on-surface-variant"}`}>
-                      {st.kind === "later" ? b.next_due.slice(8) + "/" + b.next_due.slice(5, 7) : dueLabel(st)} · <Money value={b.amount} />
+                      {st.kind === "later" ? b.next_due.slice(8) + "/" + b.next_due.slice(5, 7) : dueLabel(st, t)} · <Money value={b.amount} />
                     </p>
                   </div>
                   <PayBillButton bill={b} wallets={wallets} />
@@ -77,11 +79,11 @@ export function PlanCards({ s, wallets }: { s: PlanningState; wallets: Wallet[] 
             })}
           </ul>
         ) : (
-          <Empty href="/rencana?tab=tagihan">Catat Netflix, kost, wifi, atau listrik.</Empty>
+          <Empty href="/rencana?tab=tagihan" cta={t("Mulai")}>{t("Catat Netflix, kost, wifi, atau listrik.")}</Empty>
         )}
       </PlanCard>
 
-      <PlanCard title="Goals" href="/rencana" icon="flag">
+      <PlanCard title={t("Goals")} href="/rencana" icon="flag">
         {goals.length ? (
           <ul className="space-y-3">
             {goals.map((g) => (
@@ -99,7 +101,7 @@ export function PlanCards({ s, wallets }: { s: PlanningState; wallets: Wallet[] 
             ))}
           </ul>
         ) : (
-          <Empty href="/rencana">Buat goal seperti dana darurat atau liburan.</Empty>
+          <Empty href="/rencana" cta={t("Mulai")}>{t("Buat goal seperti dana darurat atau liburan.")}</Empty>
         )}
       </PlanCard>
     </div>

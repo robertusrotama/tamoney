@@ -1,7 +1,9 @@
 import { AuthForm, AuthLink } from "@/components/auth/AuthForm";
 import { signUp } from "@/lib/actions/auth";
+import { getT } from "@/lib/i18n-server";
 
-export default function DaftarPage() {
+export default async function DaftarPage() {
+  const t = await getT();
   return (
     <AuthForm
       title="Buat akun"
@@ -16,7 +18,7 @@ export default function DaftarPage() {
       ]}
       footer={
         <>
-          Sudah punya akun? <AuthLink href="/masuk">Masuk</AuthLink>
+          {t("Sudah punya akun?")} <AuthLink href="/masuk">{t("Masuk")}</AuthLink>
         </>
       }
     />

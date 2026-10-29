@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { T } from "@/components/I18n";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
 import { WALLET_TYPE_LABEL, type WalletType } from "@/lib/types";
@@ -25,14 +26,14 @@ export function WalletFace({ wallet, actions, className = "" }: { wallet: Face; 
           <p className="truncate text-[19px] font-semibold tracking-[-0.01em]">{wallet.name}</p>
         </div>
         <div className="shrink-0 text-right">
-          <p className={`text-[10px] font-semibold tracking-[0.06em] uppercase ${muted}`}>Saldo</p>
+          <p className={`text-[10px] font-semibold tracking-[0.06em] uppercase ${muted}`}><T k="Saldo" /></p>
           <Money value={wallet.balance} className="text-[17px] font-semibold" />
         </div>
       </div>
       <div className="flex items-end justify-between">
         <div>
-          <p className={`text-[10px] font-semibold tracking-[0.06em] uppercase ${muted}`}>Jenis</p>
-          <p className="text-[17px]">{WALLET_TYPE_LABEL[wallet.type]}</p>
+          <p className={`text-[10px] font-semibold tracking-[0.06em] uppercase ${muted}`}><T k="Jenis" /></p>
+          <p className="text-[17px]"><T k={WALLET_TYPE_LABEL[wallet.type]} /></p>
         </div>
         {actions}
       </div>
