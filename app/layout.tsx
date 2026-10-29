@@ -5,6 +5,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "TaMoney",
   description: "Catat dan pantau keuangan pribadi",
+  applicationName: "TaMoney",
+  // Home Screen app on iOS: full screen, content runs under a translucent status bar (safe areas handled)
+  appleWebApp: { capable: true, title: "TaMoney", statusBarStyle: "black-translucent" },
+  icons: { apple: "/icons/apple-180.png" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {

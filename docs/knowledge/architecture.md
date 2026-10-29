@@ -13,6 +13,7 @@ updated: 2026-10-29
 - **Auth:** Supabase Auth via `@supabase/ssr` (cookie). `proxy.ts` (nama baru middleware di Next 16) me-refresh sesi dan mengarahkan tamu ke `/masuk`. `app/auth/callback/route.ts` menukar kode email (verifikasi & reset password).
 - **Keamanan:** RLS di semua tabel ([[database]]); hanya anon key di klien; server action juga cek kepemilikan wallet & kategori.
 - **Logika angka** di fungsi murni yang dites Vitest: `lib/money.ts` ([[money-bigint-rupiah]]), `lib/reports.ts` ([[timezone-wib]], [[transfer-not-income-expense]]).
+- **PWA:** `app/manifest.ts` (standalone, portrait), ikon dari `app/icons/[file]/route.tsx` (ImageResponse, static saat build), `appleWebApp` di `app/layout.tsx` (status bar translucent; header memakai `env(safe-area-inset-top)`). Manifest & ikon dikecualikan dari redirect login di `proxy.ts`. Tanpa service worker (tidak perlu untuk install; data selalu live dari Supabase).
 - **Styling:** Tailwind 4 dengan token warna Apple (terang/gelap) dari [[design-system]]. Motion: `motion/react` (motion.dev), spring default di `components/ui/MotionProvider.tsx`. Chart: Recharts.
 
 ## Struktur folder

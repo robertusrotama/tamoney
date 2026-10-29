@@ -2,7 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const AUTH_PAGES = ["/masuk", "/daftar", "/lupa-password"];
-const PUBLIC = [...AUTH_PAGES, "/reset-password", "/auth/", "/api/pintasan"]; // pintasan: token auth, no session
+// pintasan: token auth, no session. manifest/icons: fetched by the OS without cookies when installing.
+const PUBLIC = [...AUTH_PAGES, "/reset-password", "/auth/", "/api/pintasan", "/manifest.webmanifest", "/icons/"];
 
 // Refreshes the Supabase session cookie and does the optimistic login redirect.
 // Real authorization is RLS + requireUser().

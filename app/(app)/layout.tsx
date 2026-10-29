@@ -15,7 +15,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     <AppShell
       initialCollapsed={cookieStore.get(SIDEBAR_COOKIE)?.value === "1"}
       header={
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 px-4 pt-[env(safe-area-inset-top)] md:justify-end md:pr-6 md:pl-0">
+        <header className="sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between gap-3 px-4 pt-[env(safe-area-inset-top)] md:justify-end md:pr-6 md:pl-0">
           <p className="glass rounded-full px-4 py-1.5 text-[17px] font-semibold md:hidden">TaMoney</p>
           <div className="glass flex items-center gap-1.5 rounded-full p-1">
             <QuickAdd wallets={wallets} categories={categories} />
