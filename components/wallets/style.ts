@@ -2,7 +2,13 @@ import type { CSSProperties } from "react";
 import type { WalletType } from "@/lib/types";
 
 // Plain module (not "use client") so server pages can read these values.
-export const WALLET_ICON: Record<WalletType, string> = { cash: "payments", bank: "account_balance", ewallet: "smartphone", other: "wallet" };
+export const WALLET_ICON: Record<WalletType, string> = {
+  cash: "payments",
+  bank: "account_balance",
+  ewallet: "smartphone",
+  credit: "credit_card",
+  other: "wallet",
+};
 
 /** Card colors: Apple system hues as a light→deep gradient. Keys are stored in wallets.color. */
 export const CARD_COLORS = {
@@ -19,7 +25,7 @@ export const CARD_COLORS = {
 } as const;
 export type CardColor = keyof typeof CARD_COLORS;
 
-const DEFAULT_COLOR: Record<WalletType, CardColor> = { bank: "blue", ewallet: "green", cash: "orange", other: "graphite" };
+const DEFAULT_COLOR: Record<WalletType, CardColor> = { bank: "blue", ewallet: "green", credit: "indigo", cash: "orange", other: "graphite" };
 
 const svg = (body: string) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' ${body}</svg>`)}")`;
 

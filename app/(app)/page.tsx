@@ -101,7 +101,7 @@ export default async function DashboardPage() {
                 {wallets.map((w, i) => (
                   <FadeIn key={w.id} index={i} className="snap-start">
                     <Link
-                      href={`/dompet?dompet=${w.id}`}
+                      href="/dompet"
                       style={cardStyle(w)}
                       className={`flex w-40 flex-col gap-6 rounded-[14px] p-3.5 ${cardInk(w)}`}
                     >

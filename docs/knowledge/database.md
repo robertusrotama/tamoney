@@ -13,7 +13,7 @@ Migrasi: `supabase/migrations/`. Semua tabel punya `user_id` dan **RLS** `user_i
 | Tabel | Kolom penting |
 |---|---|
 | `profiles` | `id` (= auth.users.id), `display_name`, `currency` default `IDR` |
-| `wallets` | `name` (≤ 50), `type` `cash\|bank\|ewallet\|other`, `initial_balance bigint`, `archived_at`, `color`/`pattern` (tampilan kartu, opsional, dibatasi check constraint) |
+| `wallets` | `name` (≤ 50), `type` `cash\|bank\|ewallet\|credit\|other`, `initial_balance bigint`, `archived_at`, `color`/`pattern` (tampilan kartu, opsional, dibatasi check constraint) |
 | `categories` | `kind` `income\|expense`, `name`, `icon` (Material Symbol); unik `(user_id, kind, name)` |
 | `transactions` | `kind` `income\|expense\|transfer`, `amount bigint` (> 0, ≤ 1e12), `wallet_id`, `to_wallet_id`, `category_id`, `note` (≤ 200), `occurred_at` |
 
@@ -26,7 +26,7 @@ Aturan `transactions`:
 ## Pintasan iPhone (API token)
 
 - `api_tokens`: `name`, `token_hash` (sha256 hex, unik), `last_used_at`. Token asli (`tm_…`, 32 byte acak) hanya ditampilkan sekali; RLS milik sendiri.
-- `pintasan_add(p_token, p_kind, p_categories[], p_wallets[], p_amount, p_note)` — SECURITY DEFINER, **hanya anon** (Shortcut tidak punya sesi; token adalah kredensialnya). Advisor 0028 sengaja diterima. Semua baris yang disentuh dibatasi ke pemilik token. Lihat [[pintasan-iphone]].
+- `pintasan_add(p_token, p_kind, p_categories[], p_wallets[], p_amount, p_note)` — SECURITY DEFINER, **hanya anon** (Shortcut tidak punya sesi; token adalah kredensialnya). Advisor 0028 sengaja diterima. Semua baris yang disentuh dibatasi ke pemilik token. Sumber "Credit Card" → dompet bernama "Kartu Kredit", atau bila tidak ada → dompet aktif pertama berjenis `credit`. Lihat [[pintasan-iphone]].
 
 ## View `wallet_balances`
 

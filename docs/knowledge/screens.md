@@ -28,12 +28,11 @@ Semua layar memakai [[design-system]]. Shell: sidebar Liquid Glass mengambang & 
 - Grafik per **Hari / Minggu / Bulan**; pengelompokan **Harian · Mingguan · Bulanan · Semua** (default menyesuaikan panjang periode); filter cari + dompet; urut Tanggal/Nominal/Nama. Semua instan di klien.
 
 ## Dompet → `/dompet`
-- Large title + ringkasan total, tombol Tambah.
-- **Stack kartu gaya Apple Wallet** (kiri di desktop, atas di mobile): kartu terpilih utuh di depan, sisanya tertumpuk menampilkan strip atas (ikon, nama, saldo). Klik kartu → maju ke depan dengan layout spring. Pilihan disimpan di `?dompet=<id>`.
-- **Aktivitas dompet terpilih** (kanan): semua perubahan saldo (masuk, keluar, transfer masuk/keluar) dengan **saldo berjalan** per baris (`lib/activity.ts`), 50 terakhir + tautan ke Analitik terfilter.
-- **Tampilan kartu** per dompet di dialog Ubah/Tambah: 10 warna + 5 motif (Polos, Mesh, Garis, Gelombang, Cincin) dengan preview langsung. Kolom `wallets.color`/`pattern`; null = warna bawaan per jenis. Definisi di `components/wallets/style.ts`.
-- Transfer baru dibuat lewat **+ Catat → Transfer**.
-- **Diarsipkan** dengan Pulihkan. Lihat [[wallet-archive-not-delete]].
+- Khusus **kelola dompet** (tambah, ubah, tampilan, arsip, pulihkan). Mencari transaksi dilakukan di Analitik: kartu depan punya tombol **Lihat transaksi** → `/analitik?dompet=<id>`.
+- Atas: **Saldo total** (semua dompet aktif) + tombol Tambah.
+- **Satu stack per jenis**, berjajar ke kanan: Bank · E-Wallet · Kartu Kredit · Tunai · Lainnya (hanya jenis yang ada), tiap kolom dengan jumlah & subtotal; bergulir horizontal (snap) bila tidak muat. Di dalam stack: kartu depan utuh (ubah, arsip, lihat transaksi), sisanya tertumpuk; klik → maju ke depan (layout spring, state lokal per stack).
+- **Tampilan kartu** per dompet di dialog Ubah/Tambah: 10 warna + 5 motif dengan preview langsung (`components/wallets/style.ts`).
+- **Diarsipkan** di bawah dengan Pulihkan. Lihat [[wallet-archive-not-delete]].
 
 ## Auth → `/masuk`, `/daftar`, `/lupa-password`, `/reset-password`
 - Ikon app + nama, kartu form tunggal.

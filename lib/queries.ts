@@ -68,17 +68,3 @@ export async function getRecentTransfers(sb: Supabase, limit = 10): Promise<TxWi
   return flatten(rows as unknown as TxRow[]);
 }
 
-/** Every row that moved this wallet's balance (incl. transfers in and out), newest first. */
-export async function getWalletActivity(sb: Supabase, walletId: string, limit = 50): Promise<TxWithCategory[]> {
-  if (!/^[0-9a-f-]{36}$/i.test(walletId)) return []; // goes into a PostgREST filter string
-  const rows = must(
-    await sb
-      .from("transactions")
-      .select(TX_COLUMNS)
-      .or(`wallet_id.eq.${walletId},to_wallet_id.eq.${walletId}`)
-      .order("occurred_at", { ascending: false })
-      .order("id")
-      .limit(limit),
-  );
-  return flatten(rows as unknown as TxRow[]);
-}
