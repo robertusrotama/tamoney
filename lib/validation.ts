@@ -42,6 +42,15 @@ export const walletSchema = z.object({
   name: z.string().trim().min(1, { error: "Nama dompet wajib diisi" }).max(50, { error: "Nama maksimal 50 karakter" }),
   type: z.enum(["cash", "bank", "ewallet", "other"]),
   initial_balance: z.union([z.literal("").transform(() => 0), rupiah(0)]),
+  // Keys mirror components/wallets/style.ts; "" = default for the wallet type
+  color: z
+    .enum(["", "blue", "indigo", "purple", "pink", "red", "orange", "yellow", "green", "teal", "graphite"])
+    .optional()
+    .transform((v) => v || null),
+  pattern: z
+    .enum(["", "plain", "mesh", "lines", "waves", "rings"])
+    .optional()
+    .transform((v) => v || null),
 });
 
 /** First validation message, for showing in a form. */

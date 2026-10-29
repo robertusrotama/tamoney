@@ -13,7 +13,7 @@ Migrasi: `supabase/migrations/`. Semua tabel punya `user_id` dan **RLS** `user_i
 | Tabel | Kolom penting |
 |---|---|
 | `profiles` | `id` (= auth.users.id), `display_name`, `currency` default `IDR` |
-| `wallets` | `name` (≤ 50), `type` `cash\|bank\|ewallet\|other`, `initial_balance bigint`, `archived_at` |
+| `wallets` | `name` (≤ 50), `type` `cash\|bank\|ewallet\|other`, `initial_balance bigint`, `archived_at`, `color`/`pattern` (tampilan kartu, opsional, dibatasi check constraint) |
 | `categories` | `kind` `income\|expense`, `name`, `icon` (Material Symbol); unik `(user_id, kind, name)` |
 | `transactions` | `kind` `income\|expense\|transfer`, `amount bigint` (> 0, ≤ 1e12), `wallet_id`, `to_wallet_id`, `category_id`, `note` (≤ 200), `occurred_at` |
 

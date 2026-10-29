@@ -13,7 +13,7 @@ function must<T>({ data, error }: { data: T | null; error: { message: string } |
 
 // cache(): layout and page ask for the same data in one request; arguments must be primitives/same refs.
 export const getWallets = cache(async (sb: Supabase, includeArchived = false): Promise<Wallet[]> => {
-  let q = sb.from("wallets").select("id,name,type,initial_balance,archived_at").order("created_at");
+  let q = sb.from("wallets").select("id,name,type,initial_balance,archived_at,color,pattern").order("created_at");
   if (!includeArchived) q = q.is("archived_at", null);
   const [wallets, balances] = await Promise.all([q, sb.from("wallet_balances").select("wallet_id,balance")]);
   const byId = new Map(must(balances).map((b) => [b.wallet_id as string, Number(b.balance)]));
@@ -63,6 +63,21 @@ export async function getRecentTransfers(sb: Supabase, limit = 10): Promise<TxWi
       .select(TX_COLUMNS)
       .eq("kind", "transfer")
       .order("occurred_at", { ascending: false })
+      .limit(limit),
+  );
+  return flatten(rows as unknown as TxRow[]);
+}
+
+/** Every row that moved this wallet's balance (incl. transfers in and out), newest first. */
+export async function getWalletActivity(sb: Supabase, walletId: string, limit = 50): Promise<TxWithCategory[]> {
+  if (!/^[0-9a-f-]{36}$/i.test(walletId)) return []; // goes into a PostgREST filter string
+  const rows = must(
+    await sb
+      .from("transactions")
+      .select(TX_COLUMNS)
+      .or(`wallet_id.eq.${walletId},to_wallet_id.eq.${walletId}`)
+      .order("occurred_at", { ascending: false })
+      .order("id")
       .limit(limit),
   );
   return flatten(rows as unknown as TxRow[]);

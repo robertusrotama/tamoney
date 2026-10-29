@@ -5,7 +5,7 @@ import { Card, EmptyState, Label } from "@/components/ui/EmptyState";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
-import { WALLET_GRADIENT, WALLET_ICON } from "@/components/wallets/style";
+import { WALLET_ICON, cardInk, cardStyle } from "@/components/wallets/style";
 import { WalletDialog } from "@/components/wallets/WalletForm";
 import { getCategories, getTransactionsBetween, getWallets } from "@/lib/queries";
 import { monthKey, monthRange, monthTotals, todayWib, wibDate, wibGreeting } from "@/lib/reports";
@@ -101,8 +101,9 @@ export default async function DashboardPage() {
                 {wallets.map((w, i) => (
                   <FadeIn key={w.id} index={i} className="snap-start">
                     <Link
-                      href="/dompet"
-                      className={`flex w-40 flex-col gap-6 rounded-[14px] bg-gradient-to-br p-3.5 text-white ${WALLET_GRADIENT[w.type]}`}
+                      href={`/dompet?dompet=${w.id}`}
+                      style={cardStyle(w)}
+                      className={`flex w-40 flex-col gap-6 rounded-[14px] p-3.5 ${cardInk(w)}`}
                     >
                       <span className="flex items-center gap-1.5 text-[13px] font-semibold">
                         <Icon name={WALLET_ICON[w.type]} className="text-[17px]" filled />

@@ -8,6 +8,8 @@ export type Wallet = {
   initial_balance: number;
   archived_at: string | null;
   balance: number;
+  color: string | null;
+  pattern: string | null;
 };
 
 export type Category = {

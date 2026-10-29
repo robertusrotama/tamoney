@@ -26,8 +26,10 @@ Semua layar memakai [[design-system]]. Shell: sidebar Liquid Glass mengambang & 
 
 ## Dompet → `/dompet`
 - Large title + ringkasan total, tombol Tambah.
-- Kartu dompet gaya Apple Wallet (gradien per jenis), ubah/arsipkan.
-- **Riwayat Transfer** (list). Transfer baru dibuat lewat **+ Catat → Transfer**.
+- **Stack kartu gaya Apple Wallet** (kiri di desktop, atas di mobile): kartu terpilih utuh di depan, sisanya tertumpuk menampilkan strip atas (ikon, nama, saldo). Klik kartu → maju ke depan dengan layout spring. Pilihan disimpan di `?dompet=<id>`.
+- **Aktivitas dompet terpilih** (kanan): semua perubahan saldo (masuk, keluar, transfer masuk/keluar) dengan **saldo berjalan** per baris (`lib/activity.ts`), 50 terakhir + tautan ke Analitik terfilter.
+- **Tampilan kartu** per dompet di dialog Ubah/Tambah: 10 warna + 5 motif (Polos, Mesh, Garis, Gelombang, Cincin) dengan preview langsung. Kolom `wallets.color`/`pattern`; null = warna bawaan per jenis. Definisi di `components/wallets/style.ts`.
+- Transfer baru dibuat lewat **+ Catat → Transfer**.
 - **Diarsipkan** dengan Pulihkan. Lihat [[wallet-archive-not-delete]].
 
 ## Auth → `/masuk`, `/daftar`, `/lupa-password`, `/reset-password`
