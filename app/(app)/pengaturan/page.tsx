@@ -3,11 +3,10 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { PasswordForm, ProfileForm, SignOutButton, ThemePicker } from "@/components/settings/AccountSettings";
-import { BudgetSettings } from "@/components/settings/BudgetSettings";
 import { THEME_COOKIE, type Theme } from "@/components/shell/prefs";
 import { Icon } from "@/components/ui/Icon";
 import { getPlanningState } from "@/lib/planning";
-import { getCategories, getProfile } from "@/lib/queries";
+import { getProfile } from "@/lib/queries";
 import { requireUser } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Pengaturan · TaMoney" };
@@ -25,7 +24,7 @@ function Section({ title, hint, children }: { title: string; hint?: string; chil
 
 export default async function PengaturanPage() {
   const { supabase, user } = await requireUser();
-  const [s, categories, profile, cookieStore] = await Promise.all([getPlanningState(supabase), getCategories(supabase), getProfile(supabase, user.email), cookies()]);
+  const [s, profile, cookieStore] = await Promise.all([getPlanningState(supabase), getProfile(supabase, user.email), cookies()]);
   const theme = (cookieStore.get(THEME_COOKIE)?.value ?? "system") as Theme;
 
   return (
@@ -52,8 +51,19 @@ export default async function PengaturanPage() {
         </div>
       </Section>
 
-      <Section title="Budget" hint="Persentase gaji per pos dan kategori yang masuk ke tiap pos. Berlaku untuk gaji berikutnya; periode berjalan diubah lewat “Ubah alokasi” di Budget.">
-        <BudgetSettings groups={s.groups} categories={categories.filter((c) => c.kind === "expense")} payday={s.payday} salary={s.periods.at(-1)?.salary ?? 12_000_000} />
+      <Section title="Budget">
+        <Link href="/pengaturan/budget" className="flex items-center gap-3 rounded-[14px] bg-card px-4 py-3 hover:bg-surface-dim">
+          <span className="flex size-9 items-center justify-center rounded-[10px] bg-primary-container text-primary">
+            <Icon name="pie_chart" className="text-[20px]" filled />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[17px]">Persentase & pos budget</span>
+            <span className="block truncate text-[13px] text-on-surface-variant">
+              Gajian tanggal {s.payday} · {s.groups.length} pos · Tabungan {((s.groups.find((g) => g.is_savings)?.pct_bp ?? 0) / 100).toLocaleString("id-ID")}%
+            </span>
+          </span>
+          <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
+        </Link>
       </Section>
 
       <Section title="Lainnya">

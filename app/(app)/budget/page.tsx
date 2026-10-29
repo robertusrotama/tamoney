@@ -117,7 +117,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
             />
           ))}
           {usage.unassigned > 0 && (
-            <Link href="/pengaturan" className="flex items-center gap-3 px-4 py-3 hover:bg-surface-dim">
+            <Link href="/pengaturan/budget" className="flex items-center gap-3 px-4 py-3 hover:bg-surface-dim">
               <span className="flex size-9 items-center justify-center rounded-[10px] bg-surface-dim text-on-surface-variant">
                 <Icon name="help" className="text-[20px]" />
               </span>

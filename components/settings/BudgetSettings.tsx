@@ -183,8 +183,7 @@ export function BudgetSettings({ groups, categories, payday: initialPayday, sala
         </Button>
       </div>
 
-      {/* Mobile: leaves room on the right for the floating + button. */}
-      <div className="glass glass-thick sticky bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-10 flex items-center gap-3 rounded-[18px] py-2.5 pr-20 pl-4 md:bottom-4 md:pr-2.5">
+      <div className="flex flex-wrap items-center gap-3 rounded-[14px] bg-card px-4 py-3">
         <div className="mr-auto min-w-0">
           <p className={`text-[17px] font-semibold tabular-nums ${total === 10_000 ? "" : "text-negative"}`}>Total {showPct(total)}%</p>
           <p className="truncate text-[13px] text-on-surface-variant">

@@ -2,12 +2,11 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
 import { PayBillButton } from "@/components/bills/PayBill";
 import { GoalMoneyButton } from "@/components/goals/GoalMoney";
 import { IconButton } from "@/components/ui/Button";
-import { Dialog } from "@/components/ui/Dialog";
 import { Icon } from "@/components/ui/Icon";
+import { HeaderPanel } from "./HeaderPanel";
 import type { GoalWithProgress } from "@/lib/goals";
 import type { Notice, NoticeKind } from "@/lib/notifications";
 import type { Bill, Wallet } from "@/lib/types";
@@ -64,80 +63,33 @@ function List({ notices, bills, goals, wallets, onNavigate }: Props & { onNaviga
   );
 }
 
-/** Bell with a count; glass dropdown on desktop, sheet on mobile. */
+/** Bell with a count; opens the shared header panel. */
 export function Notifications(props: Props) {
-  const [open, setOpen] = useState(false);
-  const [mobile, setMobile] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
   const count = props.notices.length;
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const sync = () => setMobile(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-
-  // Desktop dropdown closes on outside press / Esc; nested dialogs (Bayar, Setor) live in the top layer, so ignore those.
-  useEffect(() => {
-    if (!open || mobile) return;
-    const onDown = (e: PointerEvent) => {
-      const t = e.target as Element;
-      if (!ref.current?.contains(t) && !t.closest("dialog")) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && !document.querySelector("dialog[open]") && setOpen(false);
-    document.addEventListener("pointerdown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("pointerdown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open, mobile]);
-
   return (
-    <div ref={ref} className="relative">
-      <IconButton aria-label={count ? `Notifikasi, ${count} perlu ditindak` : "Notifikasi"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        <Icon name="notifications" className="text-[20px]" filled={open} />
-        <AnimatePresence>
-          {count > 0 && (
-            <motion.span
-              key={count}
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.5, opacity: 0 }}
-              className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-negative px-1 text-[11px] font-bold text-white tabular-nums"
-            >
-              {count > 9 ? "9+" : count}
-            </motion.span>
-          )}
-        </AnimatePresence>
-      </IconButton>
-
-      {mobile ? (
-        <Dialog open={open} onClose={() => setOpen(false)} title="Notifikasi">
-          <div className="-mx-5">
-            <List {...props} onNavigate={() => setOpen(false)} />
-          </div>
-        </Dialog>
-      ) : (
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              role="dialog"
-              aria-label="Notifikasi"
-              initial={{ opacity: 0, scale: 0.95, y: -6 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -6 }}
-              style={{ originX: 1, originY: 0 }}
-              className="glass glass-thick absolute right-0 z-50 mt-2 max-h-[70vh] w-[380px] overflow-y-auto rounded-[18px] border border-outline shadow-[0_20px_40px_-12px_rgb(0_0_0/0.3)]"
-            >
-              <p className="px-4 pt-3 pb-1 text-[17px] font-bold">Notifikasi</p>
-              <List {...props} onNavigate={() => setOpen(false)} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+    <HeaderPanel
+      label="Notifikasi"
+      title="Notifikasi"
+      trigger={(open, toggle) => (
+        <IconButton aria-label={count ? `Notifikasi, ${count} perlu ditindak` : "Notifikasi"} aria-expanded={open} onClick={toggle}>
+          <Icon name="notifications" className="text-[20px]" filled={open} />
+          <AnimatePresence>
+            {count > 0 && (
+              <motion.span
+                key={count}
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+                className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-negative px-1 text-[11px] font-bold text-white tabular-nums"
+              >
+                {count > 9 ? "9+" : count}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </IconButton>
       )}
-    </div>
+    >
+      {(close) => <List {...props} onNavigate={close} />}
+    </HeaderPanel>
   );
 }

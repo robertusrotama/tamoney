@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar, AVATARS, type Profile } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
@@ -130,11 +131,13 @@ export function PasswordForm({ email }: { email: string }) {
 /** Applies at once (data-theme on <html>) and remembers it in a cookie the root layout reads. */
 export function ThemePicker({ initial }: { initial: Theme }) {
   const [theme, setTheme] = useState(initial);
+  const router = useRouter();
   const pick = (t: Theme) => {
     setTheme(t);
     if (t === "system") delete document.documentElement.dataset.theme;
     else document.documentElement.dataset.theme = t;
     document.cookie = `${THEME_COOKIE}=${t}; path=/; max-age=31536000; samesite=lax`;
+    router.refresh(); // server re-renders <html data-theme> from the cookie, so nothing can put the old theme back
   };
   return (
     <Segmented
