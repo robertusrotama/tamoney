@@ -11,7 +11,7 @@ Gaya Apple (iOS/macOS) untuk web. Sumber prinsip: skill `apple-design`. Lihat [[
 
 ## Warna
 
-Token semantik di `app/globals.css` (variabel `--c-*`, dipetakan ke kelas Tailwind lewat `@theme inline`). Terang/gelap otomatis via `prefers-color-scheme`.
+Token semantik di `app/globals.css` (variabel `--c-*`, dipetakan ke kelas Tailwind lewat `@theme inline`). Terang/gelap mengikuti sistem, kecuali Pengaturan memaksa satu tema (`<html data-theme>` dari cookie `theme`); varian Tailwind `dark:` mengikuti aturan yang sama (`@custom-variant dark`).
 
 | Token (kelas Tailwind) | Peran | Terang | Gelap |
 |---|---|---|---|
@@ -19,6 +19,7 @@ Token semantik di `app/globals.css` (variabel `--c-*`, dipetakan ke kelas Tailwi
 | `positive` | Pemasukan (systemGreen, varian aksesibel) | `#248A3D` | `#30D158` |
 | `negative` | Pengeluaran (systemRed, varian aksesibel) | `#D70015` | `#FF453A` |
 | `tertiary` | Transfer (systemIndigo) | `#5856D6` | `#5E5CE6` |
+| `warning` | Hampir habis ≥80%, tertinggal (systemOrange, varian aksesibel) | `#C93400` | `#FF9F0A` |
 | `surface` | Latar (systemGroupedBackground) | `#F2F2F7` | `#000000` |
 | `card` | Kartu/list (secondarySystemGroupedBackground) | `#FFFFFF` | `#1C1C1E` |
 | `surface-dim` | Fill: field, segmented control | rgba(118,118,128,.12) | .24 |
@@ -98,6 +99,12 @@ Tidak ada `<select>`, `<input type="date|month">`, `confirm()`/`alert()` atau to
 | Filter | `MultiSelect`, `SingleSelect` (`components/analytics/Filters.tsx`) di atas `Popover` | checklist / radio dengan tanda `Mark`. |
 | Konfirmasi | `useConfirm()` | dialog sendiri (sheet di mobile); `destructive` untuk tindakan tak bisa dibatalkan. |
 | Lainnya | `Segmented`, `Dialog` + `useDialog`, `Popover`, `Money`, `FadeIn`, `Card`/`Label`/`EmptyState`, `Bone`/`ListBones`, `Icon` | |
+
+## Pola perencanaan
+- **Bar pos** (`PosRow`): `scaleX` dari kiri; level ok=primary, warn=warning, over=negative, saved=positive.
+- **Cincin progres** (`Ring` di `components/goals/GoalList.tsx`): `pathLength` dianimasikan; hijau saat tercapai.
+- **Avatar** (`components/ui/Avatar.tsx`): emoji di lingkaran gradien `CARD_COLORS`, atau inisial abu. Tanpa foto.
+- **Form**: semua form `method="post"` + `onSubmit` (`useFormDone`) — submit sebelum hidrasi tak pernah menaruh isi field di URL.
 
 ## Halaman auth
 Layout terbelah (`app/(auth)/layout.tsx`): panel form kiri (pill logo, judul tengah + subjudul, field berlabel, tombol `lg`), panel visual kanan ≥1024px (`components/auth/AuthVisual.tsx`): kartu UI TaMoney melayang di atas mesh biru — muncul bertahap sekali, tanpa animasi berulang. Tanpa login sosial.

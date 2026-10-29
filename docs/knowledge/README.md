@@ -36,7 +36,12 @@ Satu catatan per keputusan atau fakta proyek. Keputusan baru → catatan baru di
 - [[ponytail-coding-style]]
 - [[pintasan-iphone]]
 - [[performance-region]]
+- [[budget-payday-pos]]
+- [[goals-via-transfers]]
+- [[notifications-derived]]
 
 ## Riwayat desain
 - Spec: `docs/superpowers/specs/2026-10-29-tamoney-fase1-2-design.md`
 - Plan: `docs/superpowers/plans/2026-10-29-tamoney-fase1-2.md`
+- Spec budget/tagihan/goals: `docs/superpowers/specs/2026-10-29-budget-tagihan-goals-design.md`
+- Plan budget/tagihan/goals: `docs/superpowers/plans/2026-10-29-budget-tagihan-goals.md`

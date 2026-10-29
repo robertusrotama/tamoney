@@ -37,6 +37,10 @@ Status: ✅ dibangun di Fase 1+2 · ⏳ belum. Cakupan saat ini: [[scope-fase-1-
 | # | Fitur | Detail | Status |
 |---|---|---|---|
 | 8 | Akun & Login | Daftar, login & logout, lupa password | ✅ (ditarik ke Fase 1+2) |
-| 9 | Pengaturan & Ekspor | Profil & mata uang, ekspor CSV/PDF, pengingat catat harian | ⏳ |
+| 9 | Pengaturan & Ekspor | Profil (avatar), password, tema, persen budget ✅ · bahasa EN, ekspor CSV/PDF ⏳ | sebagian |
+| 10 | Budget gajian | Gaji tgl 25 dibagi ke pos per persen; pemakaian per pos; drill-down | ✅ |
+| 11 | Tagihan rutin | Pengingat H-n + Bayar sekali tap | ✅ |
+| 12 | Goals | Target, due date, dompet tujuan, setoran bulanan | ✅ |
+| 13 | Notifikasi | Panel in-app (tanpa push) | ✅ |
 
 Lihat juga: [[screens]], [[no-bank-sync-no-ai-yet]].
