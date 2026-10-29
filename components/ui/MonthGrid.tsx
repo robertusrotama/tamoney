@@ -22,7 +22,7 @@ function cells(ym: string) {
 
 /**
  * Month calendar shared by DateField (single date) and RangeCalendar (range). Selection drawing is the
- * caller's: `edge(d)` = filled circle (start/end/selected), `between(d)` = tinted band. Future dates off.
+ * caller's: `edge(d)` = filled circle (start/end/selected), `between(d)` = tinted band. Days after `max` off.
  */
 export function MonthGrid({
   view,
@@ -33,6 +33,7 @@ export function MonthGrid({
   onPick,
   onHover,
   layoutId,
+  max = today,
 }: {
   view: string;
   onView: (ym: string) => void;
@@ -42,6 +43,8 @@ export function MonthGrid({
   onPick: (d: string) => void;
   onHover?: (d: string | null) => void;
   layoutId: string;
+  /** Last pickable day; default today, null = no limit (due dates). */
+  max?: string | null;
 }) {
   return (
     <div>
@@ -52,7 +55,7 @@ export function MonthGrid({
         <span className="text-[15px] font-semibold" aria-live="polite">
           {title(view)}
         </span>
-        <IconButton onClick={() => onView(shiftYm(view, 1))} disabled={view >= today.slice(0, 7)} aria-label="Bulan berikutnya" tone="primary">
+        <IconButton onClick={() => onView(shiftYm(view, 1))} disabled={max !== null && view >= max.slice(0, 7)} aria-label="Bulan berikutnya" tone="primary">
           <Icon name="chevron_right" />
         </IconButton>
       </div>
@@ -72,7 +75,7 @@ export function MonthGrid({
             <button
               key={d}
               type="button"
-              disabled={d > today}
+              disabled={max !== null && d > max}
               onClick={() => onPick(d)}
               onPointerEnter={() => onHover?.(d)}
               aria-pressed={isEdge}

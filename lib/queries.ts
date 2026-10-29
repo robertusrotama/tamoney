@@ -25,10 +25,10 @@ export async function getActiveWalletIds(sb: Supabase): Promise<string[]> {
 }
 
 export const getCategories = cache(async (sb: Supabase): Promise<Category[]> =>
-  must(await sb.from("categories").select("id,kind,name,icon").order("created_at")),
+  must(await sb.from("categories").select("id,kind,name,icon,budget_group_id").order("created_at")),
 );
 
-const TX_COLUMNS = "id,kind,amount,wallet_id,to_wallet_id,category_id,note,occurred_at,category:categories(name,icon)";
+const TX_COLUMNS = "id,kind,amount,wallet_id,to_wallet_id,category_id,note,occurred_at,goal_id,bill_id,category:categories(name,icon)";
 
 type TxRow = Tx & { category: { name: string; icon: string } | null };
 const flatten = (rows: TxRow[]): TxWithCategory[] =>
