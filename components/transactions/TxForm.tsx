@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { AmountInput, withDots } from "@/components/ui/AmountInput";
 import { useT } from "@/components/I18n";
@@ -45,6 +46,8 @@ export function TxForm({
   // An edited income keeps the period it already tops up; a new one can join the running period.
   const period = initial?.budget_period_id ? { id: initial.budget_period_id, label: "" } : budgetPeriod;
   const [toBudget, setToBudget] = useState(!!initial?.budget_period_id);
+  // Kept here (not in the form) so switching Pengeluaran ↔ Pemasukan keeps the chosen wallet.
+  const [walletId, setWalletId] = useState(initial?.wallet_id ?? wallets[0]?.id ?? "");
   const [amount, setAmount] = useState(initial ? withDots(String(initial.amount)) : "");
   const [seenVersion, setSeenVersion] = useState(version);
   if (version !== seenVersion) {
@@ -68,94 +71,135 @@ export function TxForm({
       value={kind}
       onChange={setKind}
       options={[
-        { value: "expense", label: t("Pengeluaran"), icon: "north_east" },
-        { value: "income", label: t("Pemasukan"), icon: "south_west" },
-        ...(initial ? [] : [{ value: "transfer" as const, label: t("Transfer"), icon: "swap_horiz" }]),
+        {
+          value: "expense",
+          label: t("Pengeluaran"),
+          icon: "north_east",
+          tone: "bg-[#f97316]",
+        },
+        {
+          value: "income",
+          label: t("Pemasukan"),
+          icon: "south_west",
+          tone: "bg-primary",
+        },
+        ...(initial
+          ? []
+          : [
+              {
+                value: "transfer" as const,
+                label: t("Transfer"),
+                icon: "swap_horiz",
+                tone: "bg-positive",
+              },
+            ]),
       ]}
     />
   );
 
-  if (kind === "transfer") {
-    return (
-      <div className="space-y-4">
-        {switcher}
-        {wallets.length < 2 ? (
-          <p className="text-[15px] text-on-surface-variant">{t("Butuh minimal 2 dompet aktif untuk transfer.")}</p>
-        ) : (
-          <TransferForm wallets={wallets} onDone={onDone} />
-        )}
-      </div>
-    );
-  }
-
   const options = categories.filter((c) => c.kind === kind);
+  // One tab bar for all three kinds (so its pill always slides), and the same crossfade for every switch below it.
   return (
-    <form method="post" onSubmit={onSubmit} key={version} className="space-y-4">
-      {initial && <input type="hidden" name="id" value={initial.id} />}
-      <input type="hidden" name="kind" value={kind} />
+    <div className="space-y-4">
       {switcher}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={kind}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ type: "spring", bounce: 0, duration: 0.25 }}
+        >
+          {kind === "transfer" ? (
+            wallets.length < 2 ? (
+              <p className="text-[15px] text-on-surface-variant">{t("Butuh minimal 2 dompet aktif untuk transfer.")}</p>
+            ) : (
+              <TransferForm wallets={wallets} onDone={onDone} />
+            )
+          ) : (
+            <form method="post" onSubmit={onSubmit} key={version} className="space-y-4">
+              {initial && <input type="hidden" name="id" value={initial.id} />}
+              <input type="hidden" name="kind" value={kind} />
 
-      <div className="space-y-2">
-        <AmountInput name="amount" value={amount} onChange={setAmount} large />
-        <div className="flex gap-2">
-          {QUICK.map((q) => (
-            <Button
-              key={q}
-              type="button"
-              variant="tonal"
-              size="sm"
-              onClick={() => setAmount(withDots(String((parseRupiah(amount) ?? 0) + q)))}
-              className="flex-1 tabular-nums"
-            >
-              +{q / 1000}{t("rb")}
-            </Button>
-          ))}
-        </div>
-      </div>
+              <div className="space-y-2">
+                <AmountInput name="amount" value={amount} onChange={setAmount} large />
+                <div className="flex gap-2">
+                  {QUICK.map((q) => (
+                    <Button
+                      key={q}
+                      type="button"
+                      variant="tonal"
+                      size="sm"
+                      onClick={() => setAmount(withDots(String((parseRupiah(amount) ?? 0) + q)))}
+                      className="flex-1 tabular-nums"
+                    >
+                      +{q / 1000}
+                      {t("rb")}
+                    </Button>
+                  ))}
+                </div>
+              </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Field label={t("Dompet")}>
-          <Picker
-            name="wallet_id"
-            label={t("Dompet")}
-            defaultValue={initial?.wallet_id ?? wallets[0].id}
-            options={wallets.map((w) => ({ value: w.id, label: w.name, icon: WALLET_ICON[w.type] }))}
-          />
-        </Field>
-        <Field label={t("Kategori")}>
-          <Picker
-            key={kind}
-            name="category_id"
-            label={t("Kategori")}
-            defaultValue={initial?.kind === kind ? (initial.category_id ?? "") : ""}
-            options={options.map((c) => ({ value: c.id, label: c.name, icon: c.icon }))}
-          />
-        </Field>
-      </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label={t("Dompet")}>
+                  <Picker
+                    name="wallet_id"
+                    label={t("Dompet")}
+                    value={walletId}
+                    onChange={setWalletId}
+                    options={wallets.map((w) => ({
+                      value: w.id,
+                      label: w.name,
+                      icon: WALLET_ICON[w.type],
+                    }))}
+                  />
+                </Field>
+                <Field label={t("Kategori")}>
+                  <Picker
+                    key={kind}
+                    name="category_id"
+                    label={t("Kategori")}
+                    defaultValue={initial?.kind === kind ? (initial.category_id ?? "") : ""}
+                    options={options.map((c) => ({
+                      value: c.id,
+                      label: c.name,
+                      icon: c.icon,
+                    }))}
+                  />
+                </Field>
+              </div>
 
-      {kind === "income" && period && (
-        <>
-          <input type="hidden" name="budget_period" value={toBudget ? period.id : ""} />
-          <Check
-            checked={toBudget}
-            onChange={setToBudget}
-            hint={period.label ? t("Ditambahkan ke budget {month}, dibagi sesuai persentase pos", { month: period.label }) : t("Dibagi sesuai persentase pos")}
-          >
-            {t("Masukkan ke budget bulanan")}
-          </Check>
-        </>
-      )}
-      <Field label={t("Catatan")}>
-        <Input name="note" defaultValue={initial?.note ?? ""} maxLength={200} placeholder={t("Contoh: Makan siang mie ayam")} />
-      </Field>
-      <Field label={t("Tanggal")}>
-        <DateField name="occurred_at" label={t("Tanggal")} today={todayWib()} defaultValue={initial ? wibDate(initial.occurred_at) : todayWib()} />
-      </Field>
+              {kind === "income" && period && (
+                <>
+                  <input type="hidden" name="budget_period" value={toBudget ? period.id : ""} />
+                  <Check
+                    checked={toBudget}
+                    onChange={setToBudget}
+                    hint={
+                      period.label
+                        ? t("Ditambahkan ke budget {month}, dibagi sesuai persentase pos", { month: period.label })
+                        : t("Dibagi sesuai persentase pos")
+                    }
+                  >
+                    {t("Masukkan ke budget bulanan")}
+                  </Check>
+                </>
+              )}
+              <Field label={t("Catatan")}>
+                <Input name="note" defaultValue={initial?.note ?? ""} maxLength={200} placeholder={t("Contoh: Makan siang mie ayam")} />
+              </Field>
+              <Field label={t("Tanggal")}>
+                <DateField name="occurred_at" label={t("Tanggal")} today={todayWib()} defaultValue={initial ? wibDate(initial.occurred_at) : todayWib()} />
+              </Field>
 
-      <FormError message={state.error} />
-      <Button type="submit" disabled={pending} className="w-full">
-        {pending ? t("Menyimpan…") : t("Simpan")}
-      </Button>
-    </form>
+              <FormError message={state.error} />
+              <Button type="submit" disabled={pending} className="w-full">
+                {pending ? t("Menyimpan…") : t("Simpan")}
+              </Button>
+            </form>
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 }

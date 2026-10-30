@@ -4,8 +4,16 @@ import { motion } from "motion/react";
 import { useId } from "react";
 import { Icon } from "./Icon";
 
-/** Rounded pill tabs with an icon; the active one is a blue pill that glides between options. */
-export function PillTabs<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { value: T; label: string; icon: string }[] }) {
+/** Rounded pill tabs with an icon; the active pill (blue, or the option's `tone` bg class) glides between options. */
+export function PillTabs<T extends string>({
+  value,
+  onChange,
+  options,
+}: {
+  value: T;
+  onChange: (v: T) => void;
+  options: { value: T; label: string; icon: string; tone?: string }[];
+}) {
   const id = useId();
   return (
     <div role="tablist" className="flex gap-1 overflow-x-auto [scrollbar-width:none]">
@@ -23,7 +31,13 @@ export function PillTabs<T extends string>({ value, onChange, options }: { value
               active ? "text-on-primary" : "text-on-surface-variant hover:bg-surface-dim hover:text-on-surface"
             }`}
           >
-            {active && <motion.span layoutId={`pill-${id}`} className="absolute inset-0 rounded-full bg-primary" transition={{ type: "spring", bounce: 0.15, duration: 0.4 }} />}
+            {active && (
+              <motion.span
+                layoutId={`pill-${id}`}
+                className={`absolute inset-0 rounded-full ${o.tone ?? "bg-primary"}`}
+                transition={{ type: "spring", bounce: 0.15, duration: 0.4 }}
+              />
+            )}
             <Icon name={o.icon} className={`relative -ms-0.5 me-1.5 text-[17px] ${active ? "" : "opacity-60"}`} filled={active} />
             <span className="relative">{o.label}</span>
           </motion.button>
