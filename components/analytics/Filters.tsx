@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { Button, IconButton } from "@/components/ui/Button";
 import { fieldClass } from "@/components/ui/Field";
+import { Ring, useFocusWithin } from "@/components/ui/FocusRing";
 import { Icon } from "@/components/ui/Icon";
 import { Mark, Popover } from "@/components/ui/Popover";
 
@@ -116,8 +117,10 @@ export function SingleSelect({
 
 /** Search with our own clear button (the native one differs per browser). */
 export function SearchField({ value, onChange, placeholder = "Cari catatan atau kategori" }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const { focused, focusProps } = useFocusWithin();
   return (
-    <div className={`${fieldClass} flex items-center gap-2 bg-card pr-1.5`}>
+    <div {...focusProps} className={`${fieldClass} flex items-center gap-2 bg-card pr-1.5`}>
+      <Ring on={focused} />
       <Icon name="search" className="text-[20px] text-on-surface-variant" />
       <input
         type="text"

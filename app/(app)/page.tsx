@@ -6,7 +6,6 @@ import { Card, EmptyState, Label } from "@/components/ui/EmptyState";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
-import { WALLET_ICON, cardInk, cardStyle } from "@/components/wallets/style";
 import { WalletDialog } from "@/components/wallets/WalletForm";
 import { getPlanningState } from "@/lib/planning";
 import { getCategories, getProfile, getTransactionsBetween, getWallets } from "@/lib/queries";
@@ -104,27 +103,6 @@ export default async function DashboardPage() {
             </Card>
 
             <PlanCards s={plan} wallets={wallets} />
-
-            <section>
-              <SectionHeader title={t("Dompet")} href="/dompet" linkLabel={t("Kelola")} />
-              <div className="-mx-4 flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 pb-1 md:-mx-1 md:px-1 [scrollbar-width:none]">
-                {wallets.map((w, i) => (
-                  <FadeIn key={w.id} index={i} className="snap-start">
-                    <Link
-                      href="/dompet"
-                      style={cardStyle(w)}
-                      className={`flex w-40 flex-col gap-6 rounded-[14px] p-3.5 ${cardInk(w)}`}
-                    >
-                      <span className="flex items-center gap-1.5 text-[13px] font-semibold">
-                        <Icon name={WALLET_ICON[w.type]} className="text-[17px]" filled />
-                        <span className="truncate">{w.name}</span>
-                      </span>
-                      <Money value={w.balance} className="text-[17px] font-bold tracking-[-0.01em]" />
-                    </Link>
-                  </FadeIn>
-                ))}
-              </div>
-            </section>
 
             <section>
               <SectionHeader title={t("Hari Ini")} href="/analitik" linkLabel={t("Semua")} />

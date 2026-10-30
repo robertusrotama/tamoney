@@ -51,7 +51,7 @@ function GoalForm({ goal, wallets, payday, periodMonth, onDone }: { goal?: Goal;
       <Field label="Target">
         <AmountInput name="target" value={target} onChange={setTarget} large />
       </Field>
-      <Field label="Sudah terkumpul" hint="Uang yang sudah ada sebelum memakai TaMoney">
+      <Field label="Sudah terkumpul" info="Uang yang sudah ada sebelum memakai TaMoney">
         <AmountInput name="initial_amount" value={initial} onChange={setInitial} required={false} />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">

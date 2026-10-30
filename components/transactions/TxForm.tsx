@@ -9,7 +9,7 @@ import { DateField } from "@/components/ui/DateField";
 import { Field, FormError, Input } from "@/components/ui/Field";
 import { Picker } from "@/components/ui/Picker";
 import { WALLET_ICON } from "@/components/wallets/style";
-import { Segmented } from "@/components/ui/Segmented";
+import { PillTabs } from "@/components/ui/PillTabs";
 import { useFormDone } from "@/components/ui/useFormDone";
 import { TransferForm } from "@/components/wallets/TransferForm";
 import { saveTransaction } from "@/lib/actions/transactions";
@@ -57,13 +57,13 @@ export function TxForm({
   }
 
   const switcher = (
-    <Segmented
+    <PillTabs
       value={kind}
       onChange={setKind}
       options={[
-        { value: "expense", label: t("Pengeluaran"), tone: "text-negative" },
-        { value: "income", label: t("Pemasukan"), tone: "text-positive" },
-        ...(initial ? [] : [{ value: "transfer" as const, label: "Transfer", tone: "text-tertiary" }]),
+        { value: "expense", label: t("Pengeluaran"), icon: "north_east" },
+        { value: "income", label: t("Pemasukan"), icon: "south_west" },
+        ...(initial ? [] : [{ value: "transfer" as const, label: t("Transfer"), icon: "swap_horiz" }]),
       ]}
     />
   );

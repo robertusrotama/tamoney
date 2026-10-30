@@ -228,3 +228,18 @@ body {
   font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
   line-height: 1;
 }
+
+/* Everything clickable shows a hand (Tailwind's preflight leaves buttons on the arrow). */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="tab"],
+  [role="radio"],
+  [role="checkbox"],
+  [role="option"],
+  summary,
+  select,
+  label:has(input[type="checkbox"]) {
+    cursor: pointer;
+  }
+}

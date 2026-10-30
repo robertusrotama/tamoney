@@ -6,6 +6,7 @@ import { MultiSelect } from "@/components/analytics/Filters";
 import { Button, IconButton } from "@/components/ui/Button";
 import { useConfirm } from "@/components/ui/Confirm";
 import { FormError, Input } from "@/components/ui/Field";
+import { Ring, useFocusWithin } from "@/components/ui/FocusRing";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
 import { Picker } from "@/components/ui/Picker";
@@ -19,6 +20,16 @@ const ICONS = [
   "subscriptions", "volunteer_activism", "more_horiz", "bolt", "school", "pets", "child_care", "fitness_center",
   "flight", "local_cafe", "checkroom", "redeem", "phone_iphone", "spa", "sports_esports", "trending_up",
 ];
+
+function PctField({ children }: { children: React.ReactNode }) {
+  const { focused, focusProps } = useFocusWithin();
+  return (
+    <div {...focusProps} className="relative flex w-24 shrink-0 items-center rounded-[14px] bg-surface-dim pr-3">
+      <Ring on={focused} />
+      {children}
+    </div>
+  );
+}
 
 type Row = { key: string; id: string | null; name: string; icon: string; pct: string; is_savings: boolean; category_ids: string[] };
 
@@ -128,7 +139,7 @@ export function BudgetSettings({ groups, categories, payday: initialPayday, sala
                 <div className="min-w-0 flex-1">
                   <Input aria-label="Nama pos" value={r.name} maxLength={40} onChange={(e) => edit(r.key, { name: e.target.value })} className="h-10" />
                 </div>
-                <div className="flex w-24 shrink-0 items-center rounded-[14px] bg-surface-dim pr-3 focus-within:ring-2 focus-within:ring-primary">
+                <PctField>
                   <input
                     aria-label={`Persentase ${r.name}`}
                     inputMode="decimal"
@@ -137,7 +148,7 @@ export function BudgetSettings({ groups, categories, payday: initialPayday, sala
                     className="h-10 w-full min-w-0 bg-transparent pl-3 text-right text-[17px] tabular-nums outline-none"
                   />
                   <span className="pl-0.5 text-[15px] text-on-surface-variant">%</span>
-                </div>
+                </PctField>
                 <div className="flex w-full items-center gap-2 sm:w-auto">
                   <div className="flex-1 sm:flex-none">
                     <MultiSelect

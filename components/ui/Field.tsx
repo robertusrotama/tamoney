@@ -3,22 +3,28 @@
 import { useState, type ComponentProps, type ReactNode } from "react";
 import { useT } from "@/components/I18n";
 import { IconButton } from "./Button";
+import { Ring, useFocusWithin } from "./FocusRing";
 import { Icon } from "./Icon";
+import { InfoTip } from "./InfoTip";
 
 /**
  * The one field look shared by every input-like control (Input, AmountInput, Picker, DateField,
- * PasswordField, SearchField): 48px tall pill-rounded fill, blue ring on focus.
+ * PasswordField, SearchField): 48px tall pill-rounded fill; the blue focus ring is <Ring> (FocusRing.tsx).
  */
 export const fieldClass =
-  "w-full h-12 rounded-[14px] bg-surface-dim px-4 text-[17px] text-on-surface outline-none placeholder:text-on-surface-variant focus:ring-2 focus:ring-primary focus-within:ring-2 focus-within:ring-primary disabled:opacity-50";
+  "relative w-full h-12 rounded-[14px] bg-surface-dim px-4 text-[17px] text-on-surface outline-none placeholder:text-on-surface-variant disabled:opacity-50";
 /** @deprecated name kept for existing imports */
 export const inputClass = fieldClass;
 
-export function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
+/** `info` = help text behind an ⓘ tooltip next to the label. */
+export function Field({ label, children, hint, info }: { label: string; children: ReactNode; hint?: string; info?: string }) {
   return (
     <label className="block space-y-1.5">
       <span className="flex items-baseline justify-between px-1 text-[13px] font-medium text-on-surface-variant">
-        {label}
+        <span className="flex items-center gap-1">
+          {label}
+          {info && <InfoTip text={info} />}
+        </span>
         {hint && <span className="font-normal">{hint}</span>}
       </span>
       {children}
@@ -26,16 +32,24 @@ export function Field({ label, children, hint }: { label: string; children: Reac
   );
 }
 
-export function Input(props: ComponentProps<"input">) {
-  return <input {...props} className={`${fieldClass} ${props.className ?? ""}`} />;
+export function Input({ className = "", ...props }: ComponentProps<"input">) {
+  const { focused, focusProps } = useFocusWithin();
+  return (
+    <span {...focusProps} className={`${fieldClass} flex items-center ${className}`}>
+      <input {...props} className="h-full w-full min-w-0 bg-transparent outline-none placeholder:text-on-surface-variant disabled:opacity-50" />
+      <Ring on={focused} />
+    </span>
+  );
 }
 
 /** Password with a show/hide toggle inside the field. */
 export function PasswordField(props: Omit<ComponentProps<"input">, "type">) {
   const [show, setShow] = useState(false);
   const t = useT();
+  const { focused, focusProps } = useFocusWithin();
   return (
-    <div className={`${fieldClass} flex items-center gap-2 pr-1.5`}>
+    <div {...focusProps} className={`${fieldClass} flex items-center gap-2 pr-1.5`}>
+      <Ring on={focused} />
       <input {...props} type={show ? "text" : "password"} className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-on-surface-variant" />
       <IconButton onClick={() => setShow((s) => !s)} aria-label={show ? t("Sembunyikan password") : t("Tampilkan password")} aria-pressed={show}>
         <Icon name={show ? "visibility_off" : "visibility"} className="text-[20px]" />

@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { fieldClass } from "./Field";
+import { Ring, useFocusWithin } from "./FocusRing";
 import { Icon } from "./Icon";
 
 /**
@@ -33,6 +34,7 @@ export function Popover({
   const trigger = useRef<HTMLButtonElement>(null);
   const id = useId();
   const close = () => setOpen(false);
+  const { focused, focusProps } = useFocusWithin();
   const wasOpen = useRef(false);
 
   // Closing (by pick, Esc or close()) hands focus back to the trigger, like a native menu.
@@ -63,15 +65,17 @@ export function Popover({
         aria-controls={id}
         aria-haspopup="dialog"
         aria-label={ariaLabel}
+        {...(variant === "field" ? focusProps : {})}
         whileTap={{ scale: variant === "field" ? 0.99 : 0.96 }}
         className={
           variant === "field"
-            ? `${fieldClass} flex items-center justify-between gap-2 text-left ${open ? "ring-2 ring-primary" : ""}`
+            ? `${fieldClass} flex items-center justify-between gap-2 text-left`
             : `flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[14px] font-medium focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
                 active ? "bg-primary-container text-on-primary-container" : "bg-card text-on-surface hover:bg-surface-dim"
               }`
         }
       >
+        {variant === "field" && <Ring on={open || focused} />}
         <span className="flex min-w-0 items-center gap-1.5 truncate">{label}</span>
         <motion.span animate={{ rotate: open ? 180 : 0 }} className="flex">
           <Icon name="expand_more" className="text-[18px] opacity-70" />
