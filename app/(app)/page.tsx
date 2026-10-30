@@ -48,7 +48,7 @@ export default async function DashboardPage() {
   const { income, expense } = monthTotals(monthTxs);
   const todayTxs = monthTxs.filter((t) => wibDate(t.occurred_at) === today);
   const expensesToday = todayTxs.filter((t) => t.kind === "expense");
-  const spentToday = expensesToday.reduce((s, t) => s + t.amount, 0);
+  const spentToday = monthTotals(todayTxs).expense; // net of friends' paybacks
   const names = new Map(wallets.map((w) => [w.id, w.name]));
   const walletName = (id: string) => names.get(id) ?? t("Diarsipkan");
   const firstName = profile.display_name.split(" ")[0];

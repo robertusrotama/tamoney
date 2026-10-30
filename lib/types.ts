@@ -34,6 +34,11 @@ export type Tx = {
   goal_id?: string | null;
   bill_id?: string | null;
   budget_period_id?: string | null;
+  /** Expense: part others owe you ("Tagih ke teman"); settled when paid back. Income: reimburses_id = that expense. */
+  owed_amount?: number | null;
+  owed_note?: string | null;
+  owed_settled_at?: string | null;
+  reimburses_id?: string | null;
 };
 
 export type BudgetGroup = { id: string; name: string; icon: string; pct_bp: number; is_savings: boolean; sort: number; archived_at?: string | null };

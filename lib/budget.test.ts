@@ -121,3 +121,16 @@ describe("withTopup", () => {
   });
   it("no topup leaves the allocations untouched", () => expect(withTopup({ a: 5 }, 0, groups)).toEqual({ a: 5 }));
 });
+
+describe("usage with refunds", () => {
+  it("a refund lowers the pos it came from", () => {
+    const p = { id: "p", month: "2026-10-01", start_date: "2026-10-25", salary: 12_000_000, income_tx_id: null, allocations: allocate(12_000_000, groups) };
+    const rows: UsageRow[] = [
+      { kind: "expense", amount: 200_000, category_id: "makan", wallet_id: "bca", to_wallet_id: null, goal_id: null },
+      { kind: "income", amount: 150_000, category_id: "makan", wallet_id: "bca", to_wallet_id: null, goal_id: null, reimburses_id: "x" },
+    ];
+    const u = usage(groups, p, rows, { makan: "Makanan" }, {});
+    expect(u.pos.find((x) => x.group.id === "Makanan")!.used).toBe(50_000);
+    expect(u.spent).toBe(50_000);
+  });
+});

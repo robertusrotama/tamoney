@@ -90,3 +90,10 @@ describe("pctChange", () => {
     expect(pctChange(5, 0)).toBeNull();
   });
 });
+
+describe("refunds from friends (reimburses_id)", () => {
+  const lunch = { kind: "expense" as const, amount: 200_000, occurred_at: "2026-10-30T05:00:00Z", category_id: "makan", category_name: "Makan & Minum" };
+  const back = { kind: "income" as const, amount: 150_000, occurred_at: "2026-10-31T05:00:00Z", category_id: "makan", reimburses_id: "lunch" };
+  it("count as less expense, not as income", () => expect(monthTotals([lunch, back])).toEqual({ income: 0, expense: 50_000, net: -50_000 }));
+  it("shrink the category, not add a new one", () => expect(categoryBreakdown([lunch, back], [])).toMatchObject([{ categoryId: "makan", amount: 50_000, share: 1 }]));
+});

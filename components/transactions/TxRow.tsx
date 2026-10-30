@@ -40,6 +40,11 @@ export function TxRow({
         <div className="min-w-0 flex-1">
           <p className="truncate text-[17px] leading-tight">{title}</p>
           <p className="truncate text-[13px] text-on-surface-variant">{subtitle}</p>
+          {tx.owed_amount && !tx.owed_settled_at ? (
+            <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-warning-container px-2 py-0.5 text-[11px] font-semibold text-warning">
+              <T k="Tagih" /> <Money value={tx.owed_amount} />
+            </span>
+          ) : null}
         </div>
         <div className="shrink-0 text-right">
           <Money value={signed} sign={transfer ? "none" : "auto"} className="text-[17px] font-medium" />

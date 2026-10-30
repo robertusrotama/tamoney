@@ -12,7 +12,7 @@ import { Bone, ListBones } from "@/components/ui/Skeleton";
 import { groupTxs, sortTxs, type Dir, type Grouping, type SortBy } from "@/lib/drilldown";
 import { filterRows, periodParams, series, type Period, type Unit } from "@/lib/period";
 import type { TxWithCategory } from "@/lib/queries";
-import { pctChange } from "@/lib/reports";
+import { pctChange, isRefund } from "@/lib/reports";
 import type { Category, Wallet } from "@/lib/types";
 import { Delta, FilterBar, dayHeader, type FilterInit } from "./AnalyticsView";
 import { DrillChart, SortControl } from "./Drilldown";
@@ -69,13 +69,15 @@ export function CategoryView({
   const filter = { q: f.q, wallets: csv(f.dompet) };
   const mine = filterRows(rows, filter);
   const prev = filterRows(prevRows, filter);
-  const total = mine.reduce((s, t) => s + t.amount, 0);
-  const delta = pctChange(total, prev.reduce((s, t) => s + t.amount, 0));
-  const biggest = mine.reduce<TxWithCategory | null>((m, t) => (!m || t.amount > m.amount ? t : m), null);
+  // A friend's payback in this category counts against it (negative), like in the reports.
+  const signed = (t: TxWithCategory) => (isRefund(t) ? -t.amount : t.amount);
+  const total = mine.reduce((s, t) => s + signed(t), 0);
+  const delta = pctChange(total, prev.reduce((s, t) => s + signed(t), 0));
+  const biggest = mine.reduce<TxWithCategory | null>((m, t) => (!isRefund(t) && (!m || t.amount > m.amount) ? t : m), null);
   const sorted = sortTxs(mine, by, dir);
   const groups = groupTxs(sorted, grouping, by === "tanggal" ? dir : "desc");
   const chartUnit = grouping === "semua" ? defaultUnit(period) : grouping;
-  const bars = series(mine, period.start, period.end, chartUnit);
+  const bars = series(mine.map((t) => ({ ...t, amount: signed(t) })), period.start, period.end, chartUnit);
   const names = new Map(wallets.map((w) => [w.id, w.name]));
   const walletName = (id: string) => names.get(id) ?? "—";
   const expense = category.kind === "expense";

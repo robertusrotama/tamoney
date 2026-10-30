@@ -47,6 +47,9 @@ export function TxForm({
   // An edited income keeps the period it already tops up; a new one can join the running period.
   const period = initial?.budget_period_id ? { id: initial.budget_period_id, label: "" } : budgetPeriod;
   const [toBudget, setToBudget] = useState(!!initial?.budget_period_id);
+  // "Tagih ke teman": you paid for others and need to collect it back.
+  const [owed, setOwed] = useState(!!initial?.owed_amount);
+  const [owedAmount, setOwedAmount] = useState(initial?.owed_amount ? withDots(String(initial.owed_amount)) : "");
   // Kept here (not in the form) so switching Pengeluaran ↔ Pemasukan keeps the chosen wallet.
   const [walletId, setWalletId] = useState(initial?.wallet_id ?? wallets[0]?.id ?? "");
   const [amount, setAmount] = useState(initial ? withDots(String(initial.amount)) : "");
@@ -172,6 +175,32 @@ export function TxForm({
                     />
                   </Field>
                 </div>
+
+                {kind === "expense" && (
+                  <>
+                    {owed && <input type="hidden" name="owed" value="1" />}
+                    <Check
+                      checked={owed}
+                      onChange={(v) => {
+                        setOwed(v);
+                        if (v && !owedAmount) setOwedAmount(amount);
+                      }}
+                      hint={initial?.owed_settled_at ? t("Sudah dibayar kembali") : t("Masuk notifikasi sampai ditandai sudah dibayar")}
+                    >
+                      {t("Tagih ke teman")}
+                    </Check>
+                    {owed && (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <Field label={t("Yang ditagih")}>
+                          <AmountInput name="owed_amount" value={owedAmount} onChange={setOwedAmount} required={false} />
+                        </Field>
+                        <Field label={t("Ke siapa")}>
+                          <Input name="owed_note" defaultValue={initial?.owed_note ?? ""} maxLength={100} placeholder={t("Contoh: Budi, Sari")} />
+                        </Field>
+                      </div>
+                    )}
+                  </>
+                )}
 
                 {kind === "income" && period && (
                   <>

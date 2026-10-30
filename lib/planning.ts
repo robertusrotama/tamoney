@@ -38,7 +38,11 @@ export type PlanningState = {
   current: PeriodView | null;
   bills: Bill[];
   goals: GoalWithProgress[];
+  /** Expenses others still owe you ("Tagih ke teman"), oldest first. */
+  owed: OwedItem[];
 };
+
+export type OwedItem = { id: string; owed_amount: number; owed_note: string | null; note: string | null; category_name: string | null; occurred_at: string };
 
 function must<T>({ data, error }: { data: T | null; error: { message: string } | null }): T {
   if (error) throw new Error(error.message);
@@ -67,7 +71,7 @@ export async function loadPeriodView(sb: Supabase, s: Pick<PlanningState, "allGr
 /** Everything Budget, Rencana, Ringkasan and the notification bell read — once per request. */
 export const getPlanningState = cache(async (sb: Supabase): Promise<PlanningState> => {
   const today = todayWib();
-  const [profile, groups, periodRows, billRows, goalRows, goalTxRows, topupRows] = await Promise.all([
+  const [profile, groups, periodRows, billRows, goalRows, goalTxRows, topupRows, owedRows] = await Promise.all([
     sb.from("profiles").select("payday_day").maybeSingle(),
     sb.from("budget_groups").select("id,name,icon,pct_bp,is_savings,sort,archived_at").order("sort"),
     sb
@@ -81,7 +85,15 @@ export const getPlanningState = cache(async (sb: Supabase): Promise<PlanningStat
       .order("created_at"),
     sb.from("transactions").select("goal_id,kind,amount,wallet_id,to_wallet_id,occurred_at").not("goal_id", "is", null),
     sb.from("transactions").select("budget_period_id,amount").not("budget_period_id", "is", null),
+    sb
+      .from("transactions")
+      .select("id,owed_amount,owed_note,note,occurred_at,category:categories(name)")
+      .not("owed_amount", "is", null)
+      .is("owed_settled_at", null)
+      .order("occurred_at"),
   ]);
+  type OwedRow = Omit<OwedItem, "category_name" | "owed_amount"> & { owed_amount: number | string; category: { name: string } | null };
+  const owed: OwedItem[] = (must(owedRows) as unknown as OwedRow[]).map(({ category, ...o }) => ({ ...o, owed_amount: Number(o.owed_amount), category_name: category?.name ?? null }));
   const topups = new Map<string, number>();
   for (const r of must(topupRows) as { budget_period_id: string; amount: number }[]) topups.set(r.budget_period_id, (topups.get(r.budget_period_id) ?? 0) + Number(r.amount));
   const rows = must(periodRows) as unknown as PeriodRow[];
@@ -121,6 +133,7 @@ export const getPlanningState = cache(async (sb: Supabase): Promise<PlanningStat
     salaryWallet: rows.at(-1)?.transactions?.wallet_id ?? null,
     bills: (must(billRows) as Bill[]).map((b) => ({ ...b, amount: Number(b.amount) })),
     goals,
+    owed,
   };
   const current = last >= 0 ? await loadPeriodView(sb, base, last) : null;
   return { ...base, current };

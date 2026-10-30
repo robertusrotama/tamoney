@@ -113,3 +113,11 @@ describe("cardSchema", () => {
   it("rejects a mistyped number (Luhn)", () => expect(cardSchema.safeParse({ card_number: "4111 1111 1111 1112", card_expiry: "08/29", card_holder: "" }).error?.issues[0].message).toBe("Nomor kartu tidak valid"));
   it("rejects month 13", () => expect(cardSchema.safeParse({ card_number: "4111111111111111", card_expiry: "13/29", card_holder: "" }).success).toBe(false));
 });
+
+describe("txSchema: tagih ke teman", () => {
+  it("reads the owed amount and who", () =>
+    expect(txSchema.safeParse({ ...okTx, amount: "200.000", owed: "1", owed_amount: "150.000", owed_note: " Budi, Sari " }).data).toMatchObject({ owed_amount: 150_000, owed_note: "Budi, Sari" }));
+  it("unticked means nothing is owed", () => expect(txSchema.safeParse({ ...okTx, owed_amount: "150.000" }).data).toMatchObject({ owed_amount: null, owed_note: null }));
+  it("cannot be more than the expense", () =>
+    expect(txSchema.safeParse({ ...okTx, amount: "100.000", owed: "1", owed_amount: "150.000" }).error?.issues[0].message).toBe("Yang ditagih melebihi total"));
+});

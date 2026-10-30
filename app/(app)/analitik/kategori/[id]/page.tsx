@@ -4,7 +4,7 @@ import { CategoryView } from "@/components/analytics/CategoryView";
 import { PeriodProvider } from "@/components/analytics/Period";
 import { isoRange, periodFromParams } from "@/lib/period";
 import { getCategories, getTransactionsBetween, getWallets } from "@/lib/queries";
-import { todayWib, wibDate } from "@/lib/reports";
+import { todayWib, wibDate, monthTotals } from "@/lib/reports";
 import { requireUser } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Kategori · Analitik · TaMoney" };
@@ -34,7 +34,7 @@ export default async function KategoriPage({ params, searchParams }: PageProps<"
         category={category}
         rows={current.filter((t) => t.category_id === id)}
         prevRows={txs.filter((t) => !inPeriod(t) && t.category_id === id)}
-        kindTotal={current.filter((t) => t.kind === category.kind).reduce((s, t) => s + t.amount, 0)}
+        kindTotal={category.kind === "expense" ? monthTotals(current).expense : monthTotals(current).income}
         wallets={wallets}
         categories={categories}
         period={period}

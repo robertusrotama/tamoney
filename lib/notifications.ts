@@ -7,10 +7,10 @@ import { wibDate } from "./reports";
 
 // Notification panel (spec §7): derived from data on every render, no stored state.
 
-export type NoticeKind = "bill-late" | "salary" | "budget-over" | "bill-soon" | "goal-behind" | "budget-warn" | "goal-deposit" | "goal-done";
-export type Notice = { id: string; kind: NoticeKind; title: string; body: string; href: string; billId?: string; goalId?: string };
+export type NoticeKind = "bill-late" | "salary" | "budget-over" | "owed" | "bill-soon" | "goal-behind" | "budget-warn" | "goal-deposit" | "goal-done";
+export type Notice = { id: string; kind: NoticeKind; title: string; body: string; href: string; billId?: string; goalId?: string; owedId?: string };
 
-const ORDER: NoticeKind[] = ["bill-late", "salary", "budget-over", "bill-soon", "goal-behind", "budget-warn", "goal-deposit", "goal-done"];
+const ORDER: NoticeKind[] = ["bill-late", "salary", "budget-over", "owed", "bill-soon", "goal-behind", "budget-warn", "goal-deposit", "goal-done"];
 const monthName = (ym: string, locale: string) => new Intl.DateTimeFormat(locale, { month: "long", timeZone: "UTC" }).format(new Date(`${ym}-01T00:00:00Z`));
 
 export function buildNotifications(s: PlanningState, today: string, walletNames: Record<string, string> = {}, t: T = makeT("id"), locale = "id-ID"): Notice[] {
@@ -47,6 +47,22 @@ export function buildNotifications(s: PlanningState, today: string, walletNames:
       body: over ? t("Lebih {x}", { x: formatRupiah(-p.left) }) : t("Sisa {x}", { x: formatRupiah(p.left) }),
       href: "/budget",
     });
+  }
+
+  // Paid for friends and not collected yet ("Tagih ke teman"), oldest first.
+  for (const o of s.owed) {
+    const when = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${wibDate(o.occurred_at)}T00:00:00Z`));
+    push(
+      {
+        id: `owed-${o.id}`,
+        kind: "owed",
+        title: t("Tagih {who} · {x}", { who: o.owed_note || t("teman"), x: formatRupiah(o.owed_amount) }),
+        body: `${o.note || o.category_name || t("Pengeluaran")} · ${when}`,
+        href: "/analitik",
+        owedId: o.id,
+      },
+      o.occurred_at,
+    );
   }
 
   for (const g of s.goals) {

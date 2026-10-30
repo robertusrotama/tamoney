@@ -22,14 +22,26 @@ const note = z
   .optional()
   .transform((v) => v || null);
 
-export const txSchema = z.object({
-  kind: z.enum(["income", "expense"]),
-  amount: rupiah(1),
-  wallet_id: id,
-  category_id: id,
-  note,
-  occurred_at: date,
-});
+export const txSchema = z
+  .object({
+    kind: z.enum(["income", "expense"]),
+    amount: rupiah(1),
+    wallet_id: id,
+    category_id: id,
+    note,
+    occurred_at: date,
+    // "Tagih ke teman": only when ticked (owed = "1") and for expenses.
+    owed: z.literal("1").optional(),
+    owed_amount: z.union([z.literal(""), rupiah(1)]).optional(),
+    owed_note: z.string().trim().max(100, { error: "Nama maksimal 100 karakter" }).optional(),
+  })
+  .transform(({ owed, owed_amount, owed_note, ...t }) => {
+    const on = owed === "1" && t.kind === "expense";
+    return { ...t, owed_amount: on ? (typeof owed_amount === "number" ? owed_amount : t.amount) : null, owed_note: on ? owed_note || null : null };
+  })
+  .refine((t) => t.owed_amount === null || t.owed_amount <= t.amount, { error: "Yang ditagih melebihi total", path: ["owed_amount"] });
+
+export const settleSchema = z.object({ tx_id: id, wallet_id: id, occurred_at: date });
 
 export const transferSchema = z
   .object({ amount: rupiah(1), wallet_id: id, to_wallet_id: id, note, occurred_at: date })

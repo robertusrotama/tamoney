@@ -10,9 +10,12 @@ import { Icon } from "@/components/ui/Icon";
 import { HeaderPanel } from "./HeaderPanel";
 import type { GoalWithProgress } from "@/lib/goals";
 import type { Notice, NoticeKind } from "@/lib/notifications";
+import type { OwedItem } from "@/lib/planning";
 import type { Bill, Wallet } from "@/lib/types";
+import { SettleOwedButton } from "@/components/transactions/SettleOwed";
 
 const LOOK: Record<NoticeKind, { icon: string; tile: string }> = {
+  owed: { icon: "group", tile: "bg-warning-container text-warning" },
   "bill-late": { icon: "error", tile: "bg-negative-container text-negative" },
   "bill-soon": { icon: "receipt_long", tile: "bg-warning-container text-warning" },
   salary: { icon: "payments", tile: "bg-primary-container text-primary" },
@@ -23,9 +26,9 @@ const LOOK: Record<NoticeKind, { icon: string; tile: string }> = {
   "goal-done": { icon: "celebration", tile: "bg-positive-container text-positive" },
 };
 
-type Props = { notices: Notice[]; bills: Bill[]; goals: GoalWithProgress[]; wallets: Wallet[] };
+type Props = { notices: Notice[]; bills: Bill[]; goals: GoalWithProgress[]; wallets: Wallet[]; owed: OwedItem[] };
 
-function List({ notices, bills, goals, wallets, onNavigate }: Props & { onNavigate: () => void }) {
+function List({ notices, bills, goals, wallets, owed, onNavigate }: Props & { onNavigate: () => void }) {
   const t = useT();
   if (!notices.length)
     return (
@@ -39,6 +42,7 @@ function List({ notices, bills, goals, wallets, onNavigate }: Props & { onNaviga
     <ul className="divide-y divide-outline">
       {notices.map((n) => {
         const bill = n.billId ? bills.find((b) => b.id === n.billId) : undefined;
+        const debt = n.owedId ? owed.find((o) => o.id === n.owedId) : undefined;
         const goal = n.kind === "goal-deposit" || n.kind === "goal-behind" ? goals.find((g) => g.id === n.goalId) : undefined;
         return (
           <li key={n.id} className="flex items-center gap-3 px-3 py-2.5">
@@ -49,7 +53,9 @@ function List({ notices, bills, goals, wallets, onNavigate }: Props & { onNaviga
               <p className="truncate text-[15px] font-semibold">{n.title}</p>
               <p className="truncate text-[13px] text-on-surface-variant">{n.body}</p>
             </div>
-            {bill ? (
+            {debt ? (
+              <SettleOwedButton owed={debt} wallets={wallets} />
+            ) : bill ? (
               <PayBillButton bill={bill} wallets={wallets} />
             ) : goal && goal.need > goal.depositedThisPeriod ? (
               <GoalMoneyButton goal={goal} wallets={wallets} mode="setor" />

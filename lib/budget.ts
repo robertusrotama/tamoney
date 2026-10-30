@@ -92,6 +92,7 @@ export type UsageRow = {
   wallet_id: string;
   to_wallet_id: string | null;
   goal_id: string | null;
+  reimburses_id?: string | null;
 };
 export type PosUsage = { group: BudgetGroup; limit: number; used: number; left: number; pct: number; level: "ok" | "warn" | "over" | "saved" };
 
@@ -110,10 +111,13 @@ export function usage(
   let unassigned = 0;
   const savings = groups.find((g) => g.is_savings);
   for (const r of rows) {
-    if (r.kind === "expense" && r.category_id) {
+    // A friend's payback (income linked to an expense) shrinks the pos of that expense's category.
+    const refund = r.kind === "income" && !!r.reimburses_id;
+    if ((r.kind === "expense" || refund) && r.category_id) {
+      const amount = refund ? -r.amount : r.amount;
       const g = catGroup[r.category_id];
-      if (g) used[g] = (used[g] ?? 0) + r.amount;
-      else unassigned += r.amount;
+      if (g) used[g] = (used[g] ?? 0) + amount;
+      else unassigned += amount;
     } else if (r.kind === "transfer" && r.goal_id && savings) {
       const w = goalWallets[r.goal_id];
       const sign = r.to_wallet_id === w ? 1 : r.wallet_id === w ? -1 : 0;

@@ -15,7 +15,7 @@ const goal = (p: Partial<GoalWithProgress>): GoalWithProgress => ({
   id: "g", name: "Dana Darurat", icon: "savings", target: 24_000_000, initial_amount: 0, due_date: null, monthly_amount: 1_000_000, wallet_id: "jago",
   source_wallet_id: "bca", achieved_at: null, archived_at: null, created_at: "", saved: 0, need: 1_000_000, depositedThisPeriod: 0, status: "tertinggal", ...p,
 });
-const empty: PlanningState = { today, payday: 25, periodStart: "2026-10-25", periodMonth: "2026-10-01", groups: [], allGroups: [], periods: [], salaryWallet: null, current: null, bills: [], goals: [] };
+const empty: PlanningState = { today, payday: 25, periodStart: "2026-10-25", periodMonth: "2026-10-01", owed: [], groups: [], allGroups: [], periods: [], salaryWallet: null, current: null, bills: [], goals: [] };
 
 describe("buildNotifications", () => {
   const state: PlanningState = {
@@ -38,5 +38,14 @@ describe("buildNotifications", () => {
   it("asks for a deposit when on track but not yet deposited", () => {
     const d = buildNotifications({ ...empty, goals: [goal({ status: "sesuai", depositedThisPeriod: 400_000 })] }, "2026-10-10");
     expect(d).toMatchObject([{ kind: "goal-deposit", title: "Setor Dana Darurat", body: "Rp 600.000 lagi bulan ini", goalId: "g" }]);
+  });
+});
+
+describe("owed by friends", () => {
+  const owedItem = { id: "lunch", owed_amount: 150_000, owed_note: "Budi, Sari", note: "Makan siang", category_name: "Makan & Minum", occurred_at: "2026-10-24T05:00:00Z" };
+  it("lists what friends still owe, oldest first, right after budget overruns", () => {
+    const n = buildNotifications({ ...empty, owed: [{ ...owedItem, id: "b", occurred_at: "2026-10-25T05:00:00Z" }, owedItem] }, "2026-10-26");
+    expect(n.map((x) => [x.kind, x.owedId])).toEqual([["salary", undefined], ["owed", "lunch"], ["owed", "b"]]);
+    expect(n[1]).toMatchObject({ title: "Tagih Budi, Sari · Rp 150.000", body: "Makan siang · 24 Okt" });
   });
 });

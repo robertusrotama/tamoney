@@ -35,7 +35,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
             <p className="glass rounded-full px-4 py-1.5 text-[17px] font-semibold md:hidden">TaMoney</p>
             <div className="glass flex items-center gap-1.5 rounded-full p-1">
               <QuickAdd wallets={wallets} categories={categories} budgetPeriod={budgetPeriod} />
-              <Notifications notices={notices} bills={plan.bills} goals={plan.goals} wallets={wallets} />
+              <Notifications notices={notices} bills={plan.bills} goals={plan.goals} wallets={wallets} owed={plan.owed} />
               <UserMenu profile={profile} email={user.email} />
             </div>
           </header>

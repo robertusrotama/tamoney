@@ -8,6 +8,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
 import { monthLabel, nominalEnd, rangeLabel } from "@/lib/budget";
 import { isoRange } from "@/lib/period";
+import { isRefund } from "@/lib/reports";
 import { getPlanningState, loadPeriodView } from "@/lib/planning";
 import { getCategories, getTransactionsBetween, getWallets } from "@/lib/queries";
 import { requireUser } from "@/lib/supabase/server";
@@ -31,7 +32,7 @@ export default async function PosPage({ params, searchParams }: PageProps<"/budg
   const goalWallets = new Map(s.goals.map((g) => [g.id, g.wallet_id]));
   const rows = (await getTransactionsBetween(supabase, start, endIso)).filter(
     (t) =>
-      (t.kind === "expense" && t.category_id && inPos.has(t.category_id)) ||
+      ((t.kind === "expense" || isRefund(t)) && t.category_id && inPos.has(t.category_id)) ||
       (group.is_savings && t.kind === "transfer" && t.goal_id && [t.wallet_id, t.to_wallet_id].includes(goalWallets.get(t.goal_id) ?? "")),
   );
 
@@ -39,7 +40,7 @@ export default async function PosPage({ params, searchParams }: PageProps<"/budg
   const byCat = new Map<string, { name: string; icon: string; total: number; n: number }>();
   for (const t of rows) {
     const key = t.kind === "transfer" ? "goal" : t.category_id!;
-    const sign = t.kind === "transfer" && t.wallet_id === goalWallets.get(t.goal_id!) ? -1 : 1;
+    const sign = isRefund(t) || (t.kind === "transfer" && t.wallet_id === goalWallets.get(t.goal_id!)) ? -1 : 1;
     const cur = byCat.get(key) ?? { name: key === "goal" ? "Setoran goal" : (t.category_name ?? "—"), icon: key === "goal" ? "savings" : (t.category_icon ?? "more_horiz"), total: 0, n: 0 };
     byCat.set(key, { ...cur, total: cur.total + sign * t.amount, n: cur.n + 1 });
   }

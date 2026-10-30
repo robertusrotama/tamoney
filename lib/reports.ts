@@ -1,7 +1,10 @@
 import { makeT, type T } from "./i18n";
 import type { Tx } from "./types";
 
-export type ReportTx = Pick<Tx, "kind" | "amount" | "occurred_at" | "category_id"> & { category_name?: string | null };
+/** reimburses_id: income that pays back an expense (a friend's share) — counted as less expense, not income. */
+export type ReportTx = Pick<Tx, "kind" | "amount" | "occurred_at" | "category_id"> & { category_name?: string | null; reimburses_id?: string | null };
+
+export const isRefund = (t: { kind: string; reimburses_id?: string | null }) => t.kind === "income" && !!t.reimburses_id;
 
 // Asia/Jakarta is a fixed UTC+7 with no DST, so a constant offset is exact.
 const WIB_MS = 7 * 60 * 60 * 1000;
@@ -49,7 +52,8 @@ export function monthTotals(txs: ReportTx[]): { income: number; expense: number;
   let income = 0;
   let expense = 0;
   for (const t of txs) {
-    if (t.kind === "income") income += t.amount;
+    if (isRefund(t)) expense -= t.amount;
+    else if (t.kind === "income") income += t.amount;
     else if (t.kind === "expense") expense += t.amount;
   }
   return { income, expense, net: income - expense };
@@ -63,9 +67,10 @@ export function categoryBreakdown(
   const sumByCategory = (list: ReportTx[]) => {
     const m = new Map<string, { name: string; amount: number }>();
     for (const t of list) {
-      if (t.kind !== "expense" || !t.category_id) continue;
+      if ((t.kind !== "expense" && !isRefund(t)) || !t.category_id) continue;
       const cur = m.get(t.category_id) ?? { name: t.category_name ?? "Lainnya", amount: 0 };
-      cur.amount += t.amount;
+      cur.amount += isRefund(t) ? -t.amount : t.amount;
+      if (t.kind === "expense" && t.category_name) cur.name = t.category_name;
       m.set(t.category_id, cur);
     }
     return m;
