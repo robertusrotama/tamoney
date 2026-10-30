@@ -36,13 +36,16 @@ export function PointerCursor() {
   // An open <dialog> sits in the top layer above every z-index, so the cursor must live inside it then.
   const [host, setHost] = useState<Element | null>(null);
 
-  const shape = { type: "spring", stiffness: 420, damping: 30, mass: 0.5 } as const;
-  const x = useSpring(useMotionValue(0), { stiffness: 520, damping: 34, mass: 0.4 });
-  const y = useSpring(useMotionValue(0), { stiffness: 520, damping: 34, mass: 0.4 });
+  // Position: very stiff, so the dot sits on the mouse; shape: a quick spring that still morphs visibly.
+  const shape = { type: "spring", stiffness: 650, damping: 38, mass: 0.35 } as const;
+  const follow = { stiffness: 1400, damping: 34, mass: 0.2 }; // ≈ critically damped: settles in ~40ms, no overshoot
+  const x = useSpring(useMotionValue(0), follow);
+  const y = useSpring(useMotionValue(0), follow);
   const w = useSpring(DOT, shape);
   const h = useSpring(DOT, shape);
   const r = useSpring(DOT / 2, shape);
   const last = useRef({ x: 0, y: 0 });
+  const modeRef = useRef<Mode>("dot");
 
   // Hide the native pointer only while ours is running.
   useEffect(() => {
@@ -66,6 +69,7 @@ export function PointerCursor() {
       if (field) {
         const lh = parseFloat(getComputedStyle(field).fontSize) * 1.25 || 20;
         setMode("text");
+        modeRef.current = "text";
         x.set(px);
         y.set(py);
         w.set(3);
@@ -83,6 +87,7 @@ export function PointerCursor() {
         const cy = box.top + box.height / 2;
         const lean = (d: number, size: number) => Math.max(-size * 0.1, Math.min(size * 0.1, d * 0.2));
         setMode("block");
+        modeRef.current = "block";
         x.set(cx + lean(px - cx, box.width));
         y.set(cy + lean(py - cy, box.height));
         w.set(box.width + pad);
@@ -92,6 +97,7 @@ export function PointerCursor() {
       }
 
       setMode("dot");
+      modeRef.current = "dot";
       x.set(px);
       y.set(py);
       w.set(DOT);
@@ -106,6 +112,11 @@ export function PointerCursor() {
       if (e.pointerType !== "mouse") return;
       last.current = { x: e.clientX, y: e.clientY };
       setVisible(true);
+      // Dot and text bar follow the mouse right away; which shape to take is decided on the next frame.
+      if (modeRef.current !== "block") {
+        x.set(e.clientX);
+        y.set(e.clientY);
+      }
       schedule();
     };
     const onLeave = () => setVisible(false);
