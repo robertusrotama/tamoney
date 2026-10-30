@@ -6,7 +6,6 @@ import { Card, EmptyState, Label } from "@/components/ui/EmptyState";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
-import { BalanceEye } from "@/components/ui/Privacy";
 import { WalletDialog } from "@/components/wallets/WalletForm";
 import { monthLabel } from "@/lib/budget";
 import { getPlanningState } from "@/lib/planning";
@@ -46,9 +45,10 @@ export default async function DashboardPage() {
     getProfile(supabase, user.email),
   ]);
 
-  const total = wallets.reduce((s, w) => s + w.balance, 0);
   const { income, expense } = monthTotals(monthTxs);
   const todayTxs = monthTxs.filter((t) => wibDate(t.occurred_at) === today);
+  const expensesToday = todayTxs.filter((t) => t.kind === "expense");
+  const spentToday = expensesToday.reduce((s, t) => s + t.amount, 0);
   const names = new Map(wallets.map((w) => [w.id, w.name]));
   const walletName = (id: string) => names.get(id) ?? t("Diarsipkan");
   const firstName = profile.display_name.split(" ")[0];
@@ -77,13 +77,13 @@ export default async function DashboardPage() {
       ) : (
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
           <div className="min-w-0 space-y-8">
-            {/* Hero: the one number that matters most, then this month's flow */}
+            {/* Hero: what went out today, then this month's flow */}
             <Card className="p-5">
-              <div className="flex items-center justify-between">
-                <Label>{t("Saldo total")}</Label>
-                <BalanceEye className="-my-2 -mr-2" />
-              </div>
-              <Money value={total} sensitive className="mt-0.5 block text-[clamp(2.25rem,1.6rem+3vw,3rem)] leading-none font-bold tracking-[-0.03em]" />
+              <Label>{t("Pengeluaran hari ini")}</Label>
+              <Money value={spentToday} className="mt-0.5 block text-[clamp(2.25rem,1.6rem+3vw,3rem)] leading-none font-bold tracking-[-0.03em]" />
+              <p className="mt-1 text-[13px] text-on-surface-variant">
+                {expensesToday.length ? t("dari {n} transaksi", { n: expensesToday.length }) : t("Belum ada pengeluaran hari ini")}
+              </p>
               <div className="mt-5 grid grid-cols-2 gap-4">
                 <div>
                   <p className="flex items-center gap-1 text-[13px] text-on-surface-variant">

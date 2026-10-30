@@ -16,7 +16,7 @@ export function PillTabs<T extends string>({
 }) {
   const id = useId();
   return (
-    <div role="tablist" className="flex gap-1 overflow-x-auto [scrollbar-width:none]">
+    <div role="tablist" className="@container flex gap-1 overflow-x-auto [scrollbar-width:none]">
       {options.map((o) => {
         const active = o.value === value;
         return (
@@ -27,7 +27,7 @@ export function PillTabs<T extends string>({
             aria-selected={active}
             onClick={() => onChange(o.value)}
             whileTap={{ scale: 0.96 }}
-            className={`relative flex h-9 shrink-0 items-center rounded-full px-3.5 text-[14px] font-semibold focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
+            className={`relative flex h-9 shrink-0 items-center rounded-full px-3 text-[14px] font-semibold focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
               active ? "text-on-primary" : "text-on-surface-variant hover:bg-surface-dim hover:text-on-surface"
             }`}
           >
@@ -38,8 +38,9 @@ export function PillTabs<T extends string>({
                 transition={{ type: "spring", bounce: 0.15, duration: 0.4 }}
               />
             )}
-            <Icon name={o.icon} className={`relative -ms-0.5 me-1.5 text-[17px] ${active ? "" : "opacity-60"}`} filled={active} />
-            <span className="relative">{o.label}</span>
+            <Icon name={o.icon} className={`relative -ms-0.5 me-1.5 text-[17px] ${active ? "" : "opacity-60 @max-[340px]:mx-0"}`} filled={active} />
+            {/* Narrow bar: inactive tabs collapse to their icon; the active one always shows its label. */}
+            <span className={`relative ${active ? "" : "@max-[340px]:sr-only"}`}>{o.label}</span>
           </motion.button>
         );
       })}
