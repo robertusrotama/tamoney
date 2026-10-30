@@ -204,6 +204,7 @@ function TabBar() {
   const current = Math.max(0, ITEMS.findIndex((i) => isActive(path, i.href)));
   const bar = useRef<HTMLElement>(null);
   const dragged = useRef(false);
+  const pressing = useRef(false);
   const start = useRef(0);
   const [drag, setDrag] = useState<number | null>(null); // fractional tab position under the finger
   // Tab chosen by a drag, shown until the route catches up (adjusted during render when the path changes).
@@ -229,22 +230,30 @@ function TabBar() {
       onPointerDown={(e) => {
         start.current = e.clientX;
         dragged.current = false;
-        bar.current?.setPointerCapture(e.pointerId);
+        pressing.current = true;
       }}
       onPointerMove={(e) => {
-        if (!bar.current?.hasPointerCapture(e.pointerId)) return;
-        if (!dragged.current && Math.abs(e.clientX - start.current) < 6) return;
-        dragged.current = true;
+        if (!pressing.current) return;
+        if (!dragged.current) {
+          if (Math.abs(e.clientX - start.current) < 6) return;
+          // Only now take over the pointer: capturing on press would steal a plain tap from the tab link.
+          dragged.current = true;
+          bar.current?.setPointerCapture(e.pointerId);
+        }
         setDrag(posAt(e.clientX));
       }}
       onPointerUp={(e) => {
+        pressing.current = false;
         if (!dragged.current) return; // a plain tap: the link handles it
         const target = Math.round(posAt(e.clientX));
         setDrag(null);
         setChosen(target);
         if (target !== current) router.push(ITEMS[target].href);
       }}
-      onPointerCancel={() => setDrag(null)}
+      onPointerCancel={() => {
+        pressing.current = false;
+        setDrag(null);
+      }}
     >
       <motion.span
         aria-hidden
