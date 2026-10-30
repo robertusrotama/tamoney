@@ -54,11 +54,11 @@ function GoalForm({ goal, wallets, payday, periodMonth, onDone }: { goal?: Goal;
       <Field label="Sudah terkumpul" info="Uang yang sudah ada sebelum memakai TaMoney">
         <AmountInput name="initial_amount" value={initial} onChange={setInitial} required={false} />
       </Field>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4">
         <Field label="Due date">
           {hasDue ? (
-            <div className="flex items-center gap-1">
-              <div className="flex-1">
+            <div className="flex min-w-0 items-center gap-1">
+              <div className="min-w-0 flex-1">
                 <DateField name="due_date" label="Due date" today={today} defaultValue={due} max={null} onChange={setDue} />
               </div>
               <IconButton aria-label="Tanpa due date" onClick={() => setHasDue(false)}>
@@ -71,9 +71,12 @@ function GoalForm({ goal, wallets, payday, periodMonth, onDone }: { goal?: Goal;
             </Button>
           )}
         </Field>
-        <Field label="Setoran bulanan" hint={suggest ? `Saran: Rp ${suggest.toLocaleString("id-ID")}/bulan` : hasDue ? "Opsional jika ada due date" : "Wajib tanpa due date"}>
+        <Field label="Setoran bulanan" info={hasDue ? "Opsional jika ada due date — kalau kosong, TaMoney menghitungnya dari target dan due date" : "Wajib tanpa due date"}>
           <AmountInput name="monthly_amount" defaultValue={goal?.monthly_amount ?? undefined} required={false} />
+          {suggest > 0 && <p className="px-1 pt-1 text-[12px] text-primary">Saran: Rp {suggest.toLocaleString("id-ID")}/bulan</p>}
         </Field>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Disimpan di">
           <Picker name="wallet_id" label="Disimpan di" placeholder="Pilih dompet" defaultValue={goal?.wallet_id ?? ""} options={options} />
         </Field>

@@ -55,10 +55,10 @@ function WalletForm({ wallet, defaultType, onDone }: { wallet?: Wallet; defaultT
       </div>
 
       {cardType && (
-        <fieldset className="space-y-3 rounded-[16px] bg-surface-dim/50 p-3">
-          <legend className="flex items-center gap-1 px-1 text-[13px] font-medium text-on-surface-variant">
+        <div role="group" aria-label={t("Data kartu (terenkripsi)")} className="space-y-3 rounded-[16px] bg-surface-dim/50 p-3">
+          <p className="flex items-center gap-1 px-1 text-[13px] font-medium text-on-surface-variant">
             <Icon name="lock" className="text-[15px]" /> {t("Data kartu (terenkripsi)")}
-          </legend>
+          </p>
           {cardMode === "keep" ? (
             <div className="flex items-center gap-2">
               <span className="flex-1 text-[15px] tabular-nums">•••• •••• •••• {wallet?.card_last4}</span>
@@ -93,7 +93,7 @@ function WalletForm({ wallet, defaultType, onDone }: { wallet?: Wallet; defaultT
               <p className="px-1 text-[12px] text-on-surface-variant">{t("CVV tidak pernah disimpan.")}</p>
             </>
           )}
-        </fieldset>
+        </div>
       )}
 
       <fieldset className="space-y-2">
