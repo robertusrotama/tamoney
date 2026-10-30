@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import { I18nProvider } from "@/components/I18n";
+import { PointerCursor } from "@/components/shell/PointerCursor";
 import { THEME_COOKIE } from "@/components/shell/prefs";
 import { asLang, LANG_COOKIE } from "@/lib/i18n";
 import { MotionProvider } from "@/components/ui/MotionProvider";
@@ -39,7 +40,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-full font-sans">
         <I18nProvider lang={lang}>
-          <MotionProvider>{children}</MotionProvider>
+          <MotionProvider>
+            {children}
+            <PointerCursor />
+          </MotionProvider>
         </I18nProvider>
       </body>
     </html>

@@ -39,6 +39,8 @@
   --c-label-2: rgb(60 60 67 / 0.6); /* secondaryLabel */
   --c-material: rgb(249 249 249 / 0.78); /* bar material */
   --c-scrim: rgb(0 0 0 / 0.32);
+  --c-cursor: rgb(120 120 128 / 0.5);
+  --c-cursor-block: rgb(0 0 0 / 0.07);
 
   --c-glass-hi: rgb(255 255 255 / 0.62);
   --c-glass-lo: rgb(255 255 255 / 0.42);
@@ -75,6 +77,8 @@
     --c-label-2: rgb(235 235 245 / 0.6);
     --c-material: rgb(30 30 30 / 0.72);
     --c-scrim: rgb(0 0 0 / 0.5);
+    --c-cursor: rgb(200 200 210 / 0.5);
+    --c-cursor-block: rgb(255 255 255 / 0.1);
 
     --c-glass-hi: rgb(60 60 64 / 0.55);
     --c-glass-lo: rgb(30 30 32 / 0.5);
@@ -107,6 +111,8 @@
   --c-label-2: rgb(235 235 245 / 0.6);
   --c-material: rgb(30 30 30 / 0.72);
   --c-scrim: rgb(0 0 0 / 0.5);
+  --c-cursor: rgb(200 200 210 / 0.5);
+  --c-cursor-block: rgb(255 255 255 / 0.1);
 
   --c-glass-hi: rgb(60 60 64 / 0.55);
   --c-glass-lo: rgb(30 30 32 / 0.5);
@@ -254,4 +260,10 @@ body {
    so the top bar doesn't jump while a page loads. (No effect with overlay scrollbars, e.g. iOS/macOS default.) */
 html {
   scrollbar-gutter: stable;
+}
+
+/* iPadOS-style pointer (components/shell/PointerCursor.tsx) replaces the native one on mouse devices. */
+html.ipad-cursor,
+html.ipad-cursor * {
+  cursor: none !important;
 }
