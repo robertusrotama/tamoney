@@ -141,3 +141,36 @@ export function filterRows<T extends FilterableRow>(rows: T[], f: Filter): T[] {
       (!f.kind || f.kind === "all" || t.kind === f.kind),
   );
 }
+
+// Kibana-style picker (components/analytics/Period.tsx): quick "last N" ranges and commonly used presets.
+export type QuickUnit = "hari" | "minggu" | "bulan" | "tahun";
+
+/** Same day n months back, clamped to the month's last day (31 Mar − 1 month = 28/29 Feb). */
+const monthsBack = (d: string, n: number) => {
+  const [y, m, day] = d.split("-").map(Number);
+  const last = new Date(Date.UTC(y, m - 1 - n + 1, 0)).getUTCDate();
+  return fmt(new Date(Date.UTC(y, m - 1 - n, Math.min(day, last))));
+};
+
+/** "Terakhir N unit" ending today, as range params. */
+export function lastN(today: string, n: number, unit: QuickUnit): { p: "rentang"; dari: string; sampai: string } {
+  const back = unit === "hari" ? addDays(today, -n) : unit === "minggu" ? addDays(today, -7 * n) : monthsBack(today, unit === "bulan" ? n : 12 * n);
+  return { p: "rentang", dari: addDays(back, 1), sampai: today };
+}
+
+/** The "Sering dipakai" list. Labels are Indonesian keys (translated by the caller). */
+export function commonRanges(today: string): { label: string; params: Record<string, string> }[] {
+  return [
+    { label: "Hari ini", params: { p: "rentang", dari: today, sampai: today } },
+    { label: "Minggu ini", params: { p: "minggu", d: today } },
+    { label: "Bulan ini", params: { p: "bulan", d: today } },
+    { label: "Tahun ini", params: { p: "tahun", d: today } },
+    { label: "7 hari terakhir", params: lastN(today, 7, "hari") },
+    { label: "30 hari terakhir", params: lastN(today, 30, "hari") },
+    { label: "90 hari terakhir", params: lastN(today, 90, "hari") },
+    { label: "1 tahun terakhir", params: lastN(today, 1, "tahun") },
+    { label: "Minggu lalu", params: { p: "minggu", d: addDays(monday(today), -7) } },
+    { label: "Bulan lalu", params: { p: "bulan", d: shiftMonth(today, -1) } },
+    { label: "Tahun lalu", params: { p: "tahun", d: `${Number(today.slice(0, 4)) - 1}-01-01` } },
+  ];
+}

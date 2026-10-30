@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { TxActions } from "@/components/transactions/TxActions";
 import { TxList, TxRow } from "@/components/transactions/TxRow";
 import { Button } from "@/components/ui/Button";
@@ -51,9 +51,12 @@ export function FilterBar({
   categories,
   wallets,
   show = { categories: true, kind: true },
+  date,
 }: {
   f: FilterInit;
   set: (p: Partial<FilterInit>) => void;
+  /** The period picker, shown right beside the search field. */
+  date?: ReactNode;
   categories: Category[];
   wallets: Wallet[];
   show?: { categories?: boolean; kind?: boolean };
@@ -61,7 +64,12 @@ export function FilterBar({
   const active = !!(f.q || f.kategori || f.dompet || (f.jenis && f.jenis !== "all"));
   return (
     <div className="space-y-2.5">
-      <SearchField value={f.q} onChange={(q) => set({ q })} />
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="min-w-0 flex-1">
+          <SearchField value={f.q} onChange={(q) => set({ q })} />
+        </div>
+        {date && <div className="shrink-0">{date}</div>}
+      </div>
       <div className="flex flex-wrap items-center gap-2">
         {show.categories && (
           <MultiSelect
@@ -133,8 +141,7 @@ export function AnalyticsView({
 
   return (
     <div className="space-y-6">
-      <PeriodBar period={period} today={today} />
-      <FilterBar f={f} set={(p) => (setLimit(PAGE), set(p))} categories={categories} wallets={wallets} />
+      <FilterBar f={f} set={(p) => (setLimit(PAGE), set(p))} categories={categories} wallets={wallets} date={<PeriodBar period={period} today={today} />} />
 
       {pending ? (
         <Bone className="h-[104px] rounded-[14px]" />

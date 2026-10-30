@@ -1,5 +1,5 @@
 export type TxKind = "income" | "expense" | "transfer";
-export type WalletType = "cash" | "bank" | "ewallet" | "credit" | "other";
+export type WalletType = "cash" | "bank" | "ewallet" | "credit" | "investment" | "other";
 
 export type Wallet = {
   id: string;
@@ -73,5 +73,6 @@ export const WALLET_TYPE_LABEL: Record<WalletType, string> = {
   bank: "Bank",
   ewallet: "E-Wallet",
   credit: "Kartu Kredit",
+  investment: "Investasi",
   other: "Lainnya",
 };

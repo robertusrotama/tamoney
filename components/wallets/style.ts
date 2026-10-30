@@ -7,6 +7,7 @@ export const WALLET_ICON: Record<WalletType, string> = {
   bank: "account_balance",
   ewallet: "smartphone",
   credit: "credit_card",
+  investment: "trending_up",
   other: "wallet",
 };
 
@@ -25,7 +26,7 @@ export const CARD_COLORS = {
 } as const;
 export type CardColor = keyof typeof CARD_COLORS;
 
-const DEFAULT_COLOR: Record<WalletType, CardColor> = { bank: "blue", ewallet: "green", credit: "indigo", cash: "orange", other: "graphite" };
+const DEFAULT_COLOR: Record<WalletType, CardColor> = { bank: "blue", ewallet: "green", credit: "indigo", investment: "purple", cash: "orange", other: "graphite" };
 
 const svg = (body: string) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' ${body}</svg>`)}")`;
 

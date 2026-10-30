@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { filterRows, periodFromParams, periodParams, series } from "./period";
+import { commonRanges, filterRows, lastN, periodFromParams, periodParams, series } from "./period";
 
 const today = "2026-10-29"; // a Thursday
 
@@ -83,5 +83,22 @@ describe("filterRows", () => {
     expect(filterRows([...rows], { q: "MIE" })).toHaveLength(1);
     expect(filterRows([...rows], { q: "gaji" })).toHaveLength(1); // category name counts
     expect(filterRows([...rows], {})).toHaveLength(3);
+  });
+});
+
+describe("quick ranges", () => {
+  it("last N units end today", () => {
+    expect(lastN(today, 7, "hari")).toEqual({ p: "rentang", dari: "2026-10-23", sampai: today });
+    expect(lastN(today, 2, "minggu")).toEqual({ p: "rentang", dari: "2026-10-16", sampai: today });
+    expect(lastN(today, 3, "bulan")).toEqual({ p: "rentang", dari: "2026-07-30", sampai: today });
+    expect(lastN(today, 1, "tahun")).toEqual({ p: "rentang", dari: "2025-10-30", sampai: today });
+  });
+  it("month ends clamp (31 Mar minus 1 month)", () => expect(lastN("2026-03-31", 1, "bulan").dari).toBe("2026-03-01"));
+  it("commonly used presets map to period params", () => {
+    const c = Object.fromEntries(commonRanges(today).map((r) => [r.label, r.params]));
+    expect(c["Hari ini"]).toEqual({ p: "rentang", dari: today, sampai: today });
+    expect(c["Bulan ini"]).toEqual({ p: "bulan", d: today });
+    expect(c["Bulan lalu"]).toEqual({ p: "bulan", d: "2026-09-01" });
+    expect(c["Tahun lalu"]).toEqual({ p: "tahun", d: "2025-01-01" });
   });
 });

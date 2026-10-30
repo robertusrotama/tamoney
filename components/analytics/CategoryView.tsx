@@ -99,8 +99,7 @@ export function CategoryView({
         </div>
       </div>
 
-      <PeriodBar period={period} today={today} />
-      <FilterBar f={f} set={set} categories={categories} wallets={wallets} show={{ categories: false, kind: false }} />
+      <FilterBar f={f} set={set} categories={categories} wallets={wallets} show={{ categories: false, kind: false }} date={<PeriodBar period={period} today={today} />} />
 
       {pending ? (
         <Bone className="h-[104px] rounded-[14px]" />

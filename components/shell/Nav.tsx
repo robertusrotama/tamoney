@@ -59,6 +59,7 @@ function Sidebar({ collapsed, width, onToggle }: { collapsed: boolean; width: nu
   const [hovered, setHovered] = useState<string | null>(null);
   return (
     <motion.aside
+      layoutRoot
       initial={false}
       animate={{ width }}
       style={{ width, left: GAP, top: GAP, bottom: GAP }}
@@ -194,7 +195,10 @@ function TabBar() {
   const path = usePathname();
   const t = useT();
   return (
-    <nav
+    // layoutRoot: the bar is fixed, so measure the lens relative to it — otherwise a page scroll between routes
+    // makes the highlight fly in from below instead of sliding sideways.
+    <motion.nav
+      layoutRoot
       aria-label={t("Navigasi utama")}
       className="glass fixed inset-x-4 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex rounded-full p-1 md:hidden"
     >
@@ -207,7 +211,7 @@ function TabBar() {
             aria-current={active ? "page" : undefined}
             className={`relative flex flex-1 flex-col items-center gap-0.5 rounded-full py-1.5 text-[10px] font-semibold ${active ? "text-primary" : "text-on-surface"}`}
           >
-            {active && <motion.span layoutId="tab-lens" className="glass-lens absolute inset-0 rounded-full" />}
+            {active && <motion.span layoutId="tab-lens" transition={{ type: "spring", bounce: 0.2, duration: 0.4 }} className="glass-lens absolute inset-0 rounded-full" />}
             <motion.span whileTap={{ scale: 0.88 }} className="relative flex flex-col items-center gap-0.5">
               <Icon name={i.icon} filled={active} className="text-[24px]" />
               {t(i.label)}
@@ -215,6 +219,6 @@ function TabBar() {
           </Link>
         );
       })}
-    </nav>
+    </motion.nav>
   );
 }

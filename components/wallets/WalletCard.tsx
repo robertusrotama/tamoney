@@ -66,7 +66,7 @@ function SelectedActions({ wallet }: { wallet: Wallet }) {
   );
 }
 
-const TYPE_ORDER: WalletType[] = ["bank", "ewallet", "credit", "cash", "other"];
+const TYPE_ORDER: WalletType[] = ["bank", "ewallet", "credit", "investment", "cash", "other"];
 
 /** One glass pocket per wallet type (bank, e-wallet, …), in a responsive grid. */
 export function WalletStacks({ wallets }: { wallets: Wallet[] }) {

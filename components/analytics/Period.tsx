@@ -3,11 +3,14 @@
 import { motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useState, useTransition, type ReactNode } from "react";
+import { useT } from "@/components/I18n";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Field";
 import { IconButton } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Popover } from "@/components/ui/Popover";
 import { Segmented } from "@/components/ui/Segmented";
-import { periodParams, type Period, type PeriodKind } from "@/lib/period";
+import { commonRanges, lastN, periodParams, type Period, type QuickUnit } from "@/lib/period";
 import { RangeCalendar } from "./RangeCalendar";
 
 const PERIOD_KEYS = ["p", "d", "dari", "sampai", "bulan"];
@@ -33,71 +36,160 @@ export function PeriodProvider({ children }: { children: ReactNode }) {
   return <Ctx.Provider value={{ pending, go }}>{children}</Ctx.Provider>;
 }
 
-const KINDS: { value: PeriodKind; label: string }[] = [
-  { value: "minggu", label: "Mingguan" },
-  { value: "bulan", label: "Bulanan" },
-  { value: "tahun", label: "Tahunan" },
-  { value: "rentang", label: "Rentang" },
+const RECENT_KEY = "tm_recent_ranges";
+type Saved = { label: string; params: Record<string, string> };
+// Recently used ranges live in this browser only — a convenience, so any storage failure just means "none".
+const readRecent = (): Saved[] => {
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+};
+const remember = (r: Saved) => {
+  try {
+    const next = [r, ...readRecent().filter((x) => JSON.stringify(x.params) !== JSON.stringify(r.params))].slice(0, 5);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {}
+};
+
+const UNITS: { value: QuickUnit; label: string }[] = [
+  { value: "hari", label: "Hari" },
+  { value: "minggu", label: "Minggu" },
+  { value: "bulan", label: "Bulan" },
+  { value: "tahun", label: "Tahun" },
 ];
 
-/** Mingguan · Bulanan · Tahunan · Rentang, plus ‹ label › (or a range calendar for Rentang). */
+const sectionTitle = "px-1 pb-1.5 text-[12px] font-semibold tracking-[0.04em] text-on-surface-variant uppercase";
+const link = "rounded-[10px] px-2 py-1.5 text-left text-[14px] text-primary hover:bg-primary-container focus-visible:bg-primary-container focus-visible:outline-none";
+
+/** Kibana-style panel: quick select, commonly used, recently used, and an absolute range calendar. */
+function RangePanel({ period, today, onPick }: { period: Period; today: string; onPick: (r: Saved) => void }) {
+  const t = useT();
+  const [n, setN] = useState("7");
+  const [unit, setUnit] = useState<QuickUnit>("hari");
+  const [custom, setCustom] = useState(false);
+  const [recent] = useState(readRecent);
+  const count = Math.max(1, Math.min(999, Number(n) || 1));
+
+  if (custom)
+    return (
+      <div>
+        <button type="button" onClick={() => setCustom(false)} className={`${link} mb-1 flex items-center gap-0.5`}>
+          <Icon name="chevron_left" className="text-[18px]" /> {t("Kembali")}
+        </button>
+        <RangeCalendar
+          start={period.start}
+          end={period.end}
+          today={today}
+          onApply={(s, e) => onPick({ label: rangeText(s, e), params: { p: "rentang", dari: s, sampai: e } })}
+        />
+      </div>
+    );
+
+  return (
+    <div className="space-y-4 p-1.5">
+      <section>
+        <p className={sectionTitle}>{t("Pilih cepat")}</p>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[15px]">{t("Terakhir")}</span>
+            <div className="w-20">
+              <Input inputMode="numeric" aria-label={t("Jumlah")} value={n} onChange={(e) => setN(e.target.value.replace(/\D/g, "").slice(0, 3))} className="h-10 text-center" />
+            </div>
+            <Button
+              size="sm"
+              className="ml-auto"
+              onClick={() => onPick({ label: t("{n} {unit} terakhir", { n: count, unit: t(UNITS.find((u) => u.value === unit)!.label).toLowerCase() }), params: lastN(today, count, unit) })}
+            >
+              {t("Terapkan")}
+            </Button>
+          </div>
+          <Segmented value={unit} onChange={setUnit} options={UNITS.map((u) => ({ ...u, label: t(u.label) }))} />
+        </div>
+      </section>
+
+      <section>
+        <p className={sectionTitle}>{t("Sering dipakai")}</p>
+        <div className="grid grid-cols-2 gap-0.5">
+          {commonRanges(today).map((r) => (
+            <button key={r.label} type="button" className={link} onClick={() => onPick({ label: t(r.label), params: r.params })}>
+              {t(r.label)}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {recent.length > 0 && (
+        <section>
+          <p className={sectionTitle}>{t("Baru dipakai")}</p>
+          <div className="flex flex-col">
+            {recent.map((r) => (
+              <button key={JSON.stringify(r.params)} type="button" className={`${link} flex items-center gap-2`} onClick={() => onPick(r)}>
+                <Icon name="history" className="text-[16px] opacity-60" /> {r.label}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <Button variant="tonal" size="sm" className="w-full" onClick={() => setCustom(true)}>
+        <Icon name="date_range" className="text-[16px]" /> {t("Rentang khusus…")}
+      </Button>
+    </div>
+  );
+}
+
+const rangeText = (s: string, e: string) => {
+  const f = (d: string) => new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
+  return `${f(s)} – ${f(e)}`;
+};
+
+/** ‹ [📅 period ▾] › — the panel picks any range; the arrows step through periods of the same length. */
 export function PeriodBar({ period, today }: { period: Period; today: string }) {
   const { go, pending } = useContext(Ctx);
-  const [kind, setKind] = useState(period.kind); // optimistic: the tab moves before the server answers
-  const [seen, setSeen] = useState(period.kind);
-  if (period.kind !== seen) {
-    setSeen(period.kind);
-    setKind(period.kind);
-  }
-
-  const switchKind = (k: PeriodKind) => {
-    setKind(k);
-    // land on the period that contains today, or keep the current span for a custom range
-    if (k === "rentang") go({ p: "rentang", dari: period.start, sampai: period.end });
-    else go({ p: k, d: period.start <= today && today <= period.end ? today : period.start });
+  const t = useT();
+  const pick = (r: Saved) => {
+    remember(r);
+    go(r.params);
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="w-full sm:w-[400px]">
-        <Segmented value={kind} onChange={switchKind} options={KINDS} />
-      </div>
-      <div className="glass flex items-center rounded-full p-1">
-        {period.kind !== "rentang" && (
-          <IconButton onClick={() => go(periodParams(period, -1))} aria-label="Periode sebelumnya" tone="primary">
-            <Icon name="chevron_left" />
-          </IconButton>
-        )}
-        {period.kind === "rentang" ? (
-          <Popover align="right" width={316} label={<><Icon name="date_range" className="text-[18px] text-primary" />{period.label}</>}>
-            {(close) => (
-              <RangeCalendar
-                start={period.start}
-                end={period.end}
-                today={today}
-                onApply={(s, e) => {
-                  close();
-                  go({ p: "rentang", dari: s, sampai: e });
-                }}
-              />
-            )}
-          </Popover>
-        ) : (
-          <span className="flex min-w-40 items-center justify-center gap-1.5 px-2 text-[15px] font-semibold tabular-nums" aria-live="polite">
-            {pending && (
+    <div className="glass inline-flex h-12 max-w-full items-center rounded-full p-1">
+      <IconButton onClick={() => go(periodParams(period, -1))} aria-label={t("Periode sebelumnya")} tone="primary">
+        <Icon name="chevron_left" />
+      </IconButton>
+      <Popover
+        align="left"
+        width={360}
+        ariaLabel={t("Pilih periode: {x}", { x: period.label })}
+        label={
+          <span className="flex items-center gap-1.5 text-[15px] font-semibold tabular-nums">
+            {pending ? (
               <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.9, ease: "linear" }} className="flex">
-                <Icon name="progress_activity" className="text-[16px] text-primary" />
+                <Icon name="progress_activity" className="text-[18px] text-primary" />
               </motion.span>
+            ) : (
+              <Icon name="calendar_month" className="text-[18px] text-primary" />
             )}
             {period.label}
           </span>
+        }
+      >
+        {(close) => (
+          <RangePanel
+            period={period}
+            today={today}
+            onPick={(r) => {
+              close();
+              pick(r);
+            }}
+          />
         )}
-        {period.kind !== "rentang" && (
-          <IconButton onClick={() => go(periodParams(period, 1))} disabled={!period.canNext} aria-label="Periode berikutnya" tone="primary">
-            <Icon name="chevron_right" />
-          </IconButton>
-        )}
-      </div>
+      </Popover>
+      <IconButton onClick={() => go(periodParams(period, 1))} disabled={!period.canNext} aria-label={t("Periode berikutnya")} tone="primary">
+        <Icon name="chevron_right" />
+      </IconButton>
     </div>
   );
 }

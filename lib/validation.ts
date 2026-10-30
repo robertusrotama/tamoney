@@ -40,7 +40,7 @@ export const transferSchema = z
 
 export const walletSchema = z.object({
   name: z.string().trim().min(1, { error: "Nama dompet wajib diisi" }).max(50, { error: "Nama maksimal 50 karakter" }),
-  type: z.enum(["cash", "bank", "ewallet", "credit", "other"]),
+  type: z.enum(["cash", "bank", "ewallet", "credit", "investment", "other"]),
   /** Current balance; new wallets start here, edits log an adjustment (set_wallet_balance). */
   balance: z.union([z.literal("").transform(() => 0), rupiah(0)]),
   // Keys mirror components/wallets/style.ts; "" = default for the wallet type
