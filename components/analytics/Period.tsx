@@ -155,7 +155,7 @@ export function PeriodBar({ period, today }: { period: Period; today: string }) 
   };
 
   return (
-    <div className="glass inline-flex h-12 max-w-full items-center rounded-full p-1">
+    <div className="inline-flex h-12 max-w-full items-center rounded-full bg-card p-1">
       <IconButton onClick={() => go(periodParams(period, -1))} aria-label={t("Periode sebelumnya")} tone="primary">
         <Icon name="chevron_left" />
       </IconButton>

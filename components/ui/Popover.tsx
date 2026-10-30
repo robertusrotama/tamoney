@@ -119,7 +119,7 @@ export function Popover({
                   originX: align === "left" ? 0 : 1,
                   originY: place.up ? 1 : 0,
                 }}
-                className="z-[60] overflow-y-auto overscroll-contain rounded-[18px] border border-outline bg-card p-2 shadow-[0_20px_44px_-12px_rgb(0_0_0/0.35)]"
+                className="z-[60] overflow-y-auto overscroll-contain rounded-[18px] border border-outline bg-card p-2"
               >
                 {typeof children === "function" ? children(close) : children}
               </motion.div>
