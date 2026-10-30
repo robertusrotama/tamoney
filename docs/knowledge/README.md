@@ -21,6 +21,8 @@ Vault Obsidian untuk TaMoney — web app pencatatan keuangan pribadi. Buka folde
 - [[deployment]] — Supabase & Vercel
 
 ## Memory
+**Mulai sesi baru dari [[session-handoff]]** — ringkasan kerja, preferensi, dan sisa pekerjaan.
+
 Satu catatan per keputusan atau fakta proyek. Keputusan baru → catatan baru di `memory/`, tautkan di sini.
 
 - [[scope-fase-1-2]]
