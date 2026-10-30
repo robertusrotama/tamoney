@@ -2,8 +2,8 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useRef, useState, type ReactNode } from "react";
 import { useT } from "@/components/I18n";
 import { Icon } from "@/components/ui/Icon";
 import { SIDEBAR_COOKIE } from "./prefs";
@@ -191,34 +191,91 @@ function NavItem({
   );
 }
 
+/**
+ * Mobile tab bar with one glass lens. The lens is moved by transform only (x = tab index × its width), so a
+ * page scroll between routes can't make it fly in from below. Press and drag along the bar like iOS: the lens
+ * follows the finger (slightly magnified), then snaps to the nearest tab on release and opens it.
+ */
 function TabBar() {
   const path = usePathname();
+  const router = useRouter();
   const t = useT();
+  const n = ITEMS.length;
+  const current = Math.max(0, ITEMS.findIndex((i) => isActive(path, i.href)));
+  const bar = useRef<HTMLElement>(null);
+  const dragged = useRef(false);
+  const start = useRef(0);
+  const [drag, setDrag] = useState<number | null>(null); // fractional tab position under the finger
+  // Tab chosen by a drag, shown until the route catches up (adjusted during render when the path changes).
+  const [chosen, setChosen] = useState<number | null>(null);
+  const [seenPath, setSeenPath] = useState(path);
+  if (path !== seenPath) {
+    setSeenPath(path);
+    setChosen(null);
+  }
+  const at = drag ?? chosen ?? current;
+  const lit = Math.round(at);
+
+  const posAt = (clientX: number) => {
+    const r = bar.current!.getBoundingClientRect();
+    return Math.min(n - 1, Math.max(0, ((clientX - r.left - 4) / (r.width - 8)) * n - 0.5));
+  };
+
   return (
-    // layoutRoot: the bar is fixed, so measure the lens relative to it — otherwise a page scroll between routes
-    // makes the highlight fly in from below instead of sliding sideways.
-    <motion.nav
-      layoutRoot
+    <nav
+      ref={bar}
       aria-label={t("Navigasi utama")}
-      className="glass fixed inset-x-4 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex rounded-full p-1 md:hidden"
+      className="glass fixed inset-x-4 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 flex touch-none rounded-full p-1 select-none md:hidden"
+      onPointerDown={(e) => {
+        start.current = e.clientX;
+        dragged.current = false;
+        bar.current?.setPointerCapture(e.pointerId);
+      }}
+      onPointerMove={(e) => {
+        if (!bar.current?.hasPointerCapture(e.pointerId)) return;
+        if (!dragged.current && Math.abs(e.clientX - start.current) < 6) return;
+        dragged.current = true;
+        setDrag(posAt(e.clientX));
+      }}
+      onPointerUp={(e) => {
+        if (!dragged.current) return; // a plain tap: the link handles it
+        const target = Math.round(posAt(e.clientX));
+        setDrag(null);
+        setChosen(target);
+        if (target !== current) router.push(ITEMS[target].href);
+      }}
+      onPointerCancel={() => setDrag(null)}
     >
-      {ITEMS.map((i) => {
-        const active = isActive(path, i.href);
+      <motion.span
+        aria-hidden
+        className="glass-lens pointer-events-none absolute top-1 bottom-1 left-1 rounded-full"
+        style={{ width: `calc((100% - 8px) / ${n})` }}
+        initial={false}
+        animate={{ x: `${at * 100}%`, scale: drag !== null ? 1.12 : 1 }}
+        transition={drag !== null ? { type: "spring", stiffness: 900, damping: 50, mass: 0.4 } : { type: "spring", bounce: 0.2, duration: 0.4 }}
+      />
+      {ITEMS.map((i, idx) => {
+        const active = idx === lit;
         return (
           <Link
             key={i.href}
             href={i.href}
-            aria-current={active ? "page" : undefined}
+            aria-current={idx === current ? "page" : undefined}
+            onClick={(e) => dragged.current && e.preventDefault()}
+            draggable={false}
             className={`relative flex flex-1 flex-col items-center gap-0.5 rounded-full py-1.5 text-[10px] font-semibold ${active ? "text-primary" : "text-on-surface"}`}
           >
-            {active && <motion.span layoutId="tab-lens" transition={{ type: "spring", bounce: 0.2, duration: 0.4 }} className="glass-lens absolute inset-0 rounded-full" />}
-            <motion.span whileTap={{ scale: 0.88 }} className="relative flex flex-col items-center gap-0.5">
+            <motion.span
+              animate={{ scale: drag !== null && active ? 1.08 : 1 }}
+              whileTap={{ scale: 0.88 }}
+              className="relative flex flex-col items-center gap-0.5"
+            >
               <Icon name={i.icon} filled={active} className="text-[24px]" />
               {t(i.label)}
             </motion.span>
           </Link>
         );
       })}
-    </motion.nav>
+    </nav>
   );
 }
