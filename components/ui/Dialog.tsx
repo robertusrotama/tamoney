@@ -29,12 +29,15 @@ export function Dialog({
   onClose,
   title,
   origin = null,
+  glass = false,
   children,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   origin?: Origin;
+  /** Frosted glass panel instead of the solid card (wallet card modal). */
+  glass?: boolean;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -87,7 +90,7 @@ export function Dialog({
               <motion.div
                 data-sheet
                 role="document"
-                className="relative max-h-[92dvh] w-full overflow-y-auto rounded-t-[14px] bg-card pb-[env(safe-area-inset-bottom)] text-left shadow-2xl"
+                className={`relative max-h-[92dvh] w-full overflow-y-auto rounded-t-[14px] pb-[env(safe-area-inset-bottom)] text-left shadow-2xl ${glass ? "glass glass-thick" : "bg-card"}`}
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
                 exit={{ y: "100%", transition: SPRING_MOMENTUM }}
@@ -106,7 +109,7 @@ export function Dialog({
             ) : (
               <motion.div
                 role="document"
-                className="relative max-h-[85vh] w-full max-w-md overflow-y-auto rounded-[20px] bg-card text-left shadow-[0_25px_60px_-12px_rgb(0_0_0/0.35)]"
+                className={`relative max-h-[85vh] w-full max-w-md overflow-y-auto rounded-[24px] text-left shadow-[0_25px_60px_-12px_rgb(0_0_0/0.35)] ${glass ? "glass glass-thick" : "bg-card"}`}
                 initial={fromTrigger()}
                 animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
                 exit={fromTrigger()}

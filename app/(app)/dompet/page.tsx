@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Card, EmptyState, Label } from "@/components/ui/EmptyState";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
+import { BalanceEye } from "@/components/ui/Privacy";
 import { RestoreButton, WalletStacks } from "@/components/wallets/WalletCard";
 import { WalletDialog } from "@/components/wallets/WalletForm";
 import { WALLET_ICON } from "@/components/wallets/style";
@@ -20,7 +21,7 @@ export default async function DompetPage() {
   const h2 = "text-[20px] font-bold tracking-[-0.01em]";
 
   return (
-    <div className="space-y-8">
+    <div className="dot-grid -mx-4 -mt-2 min-h-[calc(100dvh-4rem)] space-y-10 px-4 pt-2 pb-10 md:-mx-2 md:px-2">
       <div className="space-y-3 px-1">
         <div className="flex items-center justify-between gap-4">
           <h1 className="large-title">{t("Dompet")}</h1>
@@ -29,8 +30,10 @@ export default async function DompetPage() {
           </WalletDialog>
         </div>
         <div>
-          <p className="text-[13px] font-semibold tracking-[0.04em] text-on-surface-variant uppercase">{t("Saldo total")}</p>
-          <Money value={total} className="block text-[clamp(2.25rem,1.6rem+3vw,3rem)] leading-none font-bold tracking-[-0.03em] whitespace-nowrap" />
+          <p className="flex items-center gap-1 text-[13px] font-semibold tracking-[0.04em] text-on-surface-variant uppercase">
+            {t("Saldo total")} <BalanceEye className="-my-2" />
+          </p>
+          <Money value={total} sensitive className="block text-[clamp(2.25rem,1.6rem+3vw,3rem)] leading-none font-bold tracking-[-0.03em] whitespace-nowrap" />
           <p className="mt-1 text-[15px] text-on-surface-variant">{t("dari {n} dompet aktif", { n: active.length })}</p>
         </div>
       </div>

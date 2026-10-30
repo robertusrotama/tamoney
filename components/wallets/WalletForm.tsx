@@ -15,12 +15,12 @@ import { WALLET_TYPE_LABEL, type Wallet, type WalletType } from "@/lib/types";
 import { CARD_COLORS, CARD_PATTERNS, WALLET_ICON, cardStyle, type CardColor, type CardPattern } from "./style";
 import { WalletFace } from "./WalletFace";
 
-function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void }) {
+function WalletForm({ wallet, defaultType, onDone }: { wallet?: Wallet; defaultType?: WalletType; onDone: () => void }) {
   const { state, pending, onSubmit } = useFormDone(saveWallet, onDone);
   const t = useT();
   // Controlled only so the preview card updates live as you type and pick
   const [name, setName] = useState(wallet?.name ?? "");
-  const [type, setType] = useState<WalletType>(wallet?.type ?? "cash");
+  const [type, setType] = useState<WalletType>(wallet?.type ?? defaultType ?? "cash");
   const [color, setColor] = useState(wallet?.color ?? "");
   const [pattern, setPattern] = useState(wallet?.pattern ?? "");
   const look = { type, color: color || null, pattern: pattern || null };
@@ -167,11 +167,14 @@ export function WalletDialog({
   children,
   label,
   variant = "primary",
+  defaultType,
 }: {
   wallet?: Wallet;
   children: ReactNode;
   label?: string;
-  variant?: "primary" | "tonal" | "icon";
+  /** squircle = the black "+" tile on a wallet pocket */
+  variant?: "primary" | "tonal" | "icon" | "ghost" | "squircle";
+  defaultType?: WalletType;
 }) {
   const d = useDialog();
   const t = useT();
@@ -181,13 +184,24 @@ export function WalletDialog({
         <IconButton onClick={d.show} aria-label={label} tone="inherit">
           {children}
         </IconButton>
+      ) : variant === "squircle" ? (
+        <motion.button
+          type="button"
+          onClick={d.show}
+          aria-label={label}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.92 }}
+          className="flex size-12 shrink-0 items-center justify-center rounded-[16px] bg-[#111] text-white shadow-[0_8px_20px_-8px_rgb(0_0_0/0.6)] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none dark:bg-white dark:text-[#111]"
+        >
+          {children}
+        </motion.button>
       ) : (
         <Button variant={variant} onClick={d.show}>
           {children}
         </Button>
       )}
       <Dialog open={d.open} origin={d.origin} onClose={d.close} title={wallet ? t("Ubah Dompet") : t("Tambah Dompet")}>
-        <WalletForm wallet={wallet} onDone={d.close} />
+        <WalletForm wallet={wallet} defaultType={defaultType} onDone={d.close} />
       </Dialog>
     </>
   );

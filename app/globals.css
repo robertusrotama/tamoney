@@ -243,3 +243,9 @@ body {
     cursor: pointer;
   }
 }
+
+/* Faint dot grid behind the wallet pockets (Dompet). */
+.dot-grid {
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--c-label) 14%, transparent) 1px, transparent 1.2px);
+  background-size: 18px 18px;
+}

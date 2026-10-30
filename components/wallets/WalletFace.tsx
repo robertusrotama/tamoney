@@ -10,7 +10,8 @@ export const CARD_H = 212; // px; the stack's overlap math depends on a fixed ca
 type Face = { name: string; type: WalletType; balance: number; color?: string | null; pattern?: string | null };
 
 /** Apple Wallet–style card face: header strip (icon, name, balance) stays readable when stacked. */
-export function WalletFace({ wallet, actions, className = "" }: { wallet: Face; actions?: ReactNode; className?: string }) {
+/** `card` = number/expiry/holder line for bank & credit cards (masked unless revealed by the caller). */
+export function WalletFace({ wallet, actions, card, className = "" }: { wallet: Face; actions?: ReactNode; card?: { number: string; expiry?: string; holder?: string }; className?: string }) {
   const ink = cardInk(wallet);
   const muted = ink === "text-black" ? "text-black/60" : "text-white/75";
   return (
@@ -31,10 +32,19 @@ export function WalletFace({ wallet, actions, className = "" }: { wallet: Face; 
         </div>
       </div>
       <div className="flex items-end justify-between">
-        <div>
-          <p className={`text-[10px] font-semibold tracking-[0.06em] uppercase ${muted}`}><T k="Jenis" /></p>
-          <p className="text-[17px]"><T k={WALLET_TYPE_LABEL[wallet.type]} /></p>
-        </div>
+        {card ? (
+          <div className="min-w-0">
+            <p className="text-[17px] tracking-[0.14em] tabular-nums">{card.number}</p>
+            <p className={`mt-0.5 truncate text-[12px] font-medium tracking-[0.04em] uppercase ${muted}`}>
+              {[card.holder, card.expiry && `${card.expiry}`].filter(Boolean).join(" · ")}
+            </p>
+          </div>
+        ) : (
+          <div>
+            <p className={`text-[10px] font-semibold tracking-[0.06em] uppercase ${muted}`}><T k="Jenis" /></p>
+            <p className="text-[17px]"><T k={WALLET_TYPE_LABEL[wallet.type]} /></p>
+          </div>
+        )}
         {actions}
       </div>
     </div>
