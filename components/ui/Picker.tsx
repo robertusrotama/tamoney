@@ -70,12 +70,13 @@ export function Picker({
               <div className="relative mb-1.5">
                 <Icon name="search" className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[18px] text-on-surface-variant" />
                 <input
-                  autoFocus
+                  // Mouse: type straight away. Touch: don't pop the keyboard just for opening the list.
+                  autoFocus={window.matchMedia("(pointer: fine)").matches}
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder={t("Cari")}
                   aria-label={t("Cari pilihan")}
-                  className="h-10 w-full rounded-[10px] bg-surface-dim pr-3 pl-9 text-[15px] outline-none focus:ring-2 focus:ring-primary"
+                  className="h-10 w-full rounded-[10px] bg-surface-dim pr-3 pl-9 text-[16px] outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             )}

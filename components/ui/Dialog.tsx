@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion, type PanInfo } from "motion/react";
+import { AnimatePresence, motion, useDragControls, useReducedMotion, type PanInfo } from "motion/react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { SPRING, SPRING_MOMENTUM } from "./MotionProvider";
 import { IconButton } from "./Button";
@@ -43,6 +43,7 @@ export function Dialog({
   const ref = useRef<HTMLDialogElement>(null);
   const [mobile, setMobile] = useState(false);
   const reduce = useReducedMotion();
+  const drag = useDragControls();
 
   useEffect(() => {
     const mq = window.matchMedia(MOBILE);
@@ -90,21 +91,27 @@ export function Dialog({
               <motion.div
                 data-sheet
                 role="document"
-                className={`relative max-h-[92dvh] w-full overflow-y-auto rounded-t-[14px] pb-[env(safe-area-inset-bottom)] text-left shadow-2xl ${glass ? "glass glass-thick" : "bg-card"}`}
+                className={`relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[14px] text-left shadow-2xl ${glass ? "glass glass-thick" : "bg-card"}`}
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
                 exit={{ y: "100%", transition: SPRING_MOMENTUM }}
                 transition={SPRING}
+                // Dragged only from the grab area: a sheet-wide drag would swallow every vertical swipe, so a
+                // long form (e.g. a goal) couldn't scroll and looked frozen on iPhone.
                 drag="y"
+                dragListener={false}
+                dragControls={drag}
                 dragConstraints={{ top: 0, bottom: 0 }}
                 dragElastic={{ top: 0.05, bottom: 1 }} // 1:1 down, rubber-band up
                 onDragEnd={onDragEnd}
               >
-                <div className="flex justify-center pt-2 pb-1">
-                  <span className="h-1.5 w-9 rounded-full bg-on-surface-variant/40" />
+                <div className="shrink-0 touch-none" onPointerDown={(e) => drag.start(e)}>
+                  <div className="flex justify-center pt-2 pb-1">
+                    <span className="h-1.5 w-9 rounded-full bg-on-surface-variant/40" />
+                  </div>
+                  <Header title={title} onClose={onClose} />
                 </div>
-                <Header title={title} onClose={onClose} />
-                <div className="px-5 pb-6">{children}</div>
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">{children}</div>
               </motion.div>
             ) : (
               <motion.div

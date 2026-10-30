@@ -267,3 +267,12 @@ html.ipad-cursor,
 html.ipad-cursor * {
   cursor: none !important;
 }
+
+/* iPhone Safari zooms into any focused field under 16px and doesn't zoom back out: keep fields at 16px+ there. */
+@supports (-webkit-touch-callout: none) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    font-size: max(16px, 1em);
+  }
+}
