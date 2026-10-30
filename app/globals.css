@@ -249,3 +249,9 @@ body {
   background-image: radial-gradient(circle, color-mix(in srgb, var(--c-label) 14%, transparent) 1px, transparent 1.2px);
   background-size: 18px 18px;
 }
+
+/* Always reserve the scrollbar's width: a short skeleton and the long page then share the same right edge,
+   so the top bar doesn't jump while a page loads. (No effect with overlay scrollbars, e.g. iOS/macOS default.) */
+html {
+  scrollbar-gutter: stable;
+}
