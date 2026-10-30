@@ -2,7 +2,10 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
+import { useT } from "@/components/I18n";
+import { Pagination } from "@/components/ui/Pagination";
+import { useMedia } from "@/components/ui/useMedia";
 import { TxActions } from "@/components/transactions/TxActions";
 import { TxList, TxRow } from "@/components/transactions/TxRow";
 import { Button } from "@/components/ui/Button";
@@ -29,7 +32,8 @@ const KIND_OPTIONS = [
   { value: "income", label: "Masuk" },
   { value: "transfer", label: "Transfer" },
 ];
-const PAGE = 60;
+const PAGE = 60; // mobile: rows per "show more"
+const PER_PAGE = 20; // desktop: rows per page
 
 export function Delta({ value, invert }: { value: number | null; invert?: boolean }) {
   if (value === null) return <span className="text-on-surface-variant">—</span>;
@@ -122,8 +126,20 @@ export function AnalyticsView({
   initial: FilterInit;
 }) {
   const pending = usePeriodPending();
+  const t = useT();
   const [f, set] = useUrlState(initial);
   const [limit, setLimit] = useState(PAGE);
+  const [page, setPage] = useState(1);
+  const mobile = useMedia("(max-width: 767px)");
+  const listTop = useRef<HTMLElement>(null);
+  // Any filter, sort or period change starts the list over (adjusted during render, no effect needed).
+  const resetKey = JSON.stringify([f, period.start, period.end]);
+  const [seenKey, setSeenKey] = useState(resetKey);
+  if (resetKey !== seenKey) {
+    setSeenKey(resetKey);
+    setPage(1);
+    setLimit(PAGE);
+  }
   const filter = { q: f.q, categories: csv(f.kategori), wallets: csv(f.dompet), kind: f.jenis };
   const cur = filterRows(rows, filter);
   const prev = filterRows(prevRows, filter);
@@ -133,7 +149,14 @@ export function AnalyticsView({
   const by = (f.urut || "tanggal") as SortBy;
   const dir = (f.arah || "desc") as Dir;
   const sorted = sortTxs(cur, by, dir);
-  const groups = groupTxs(sorted.slice(0, limit), by === "tanggal" ? "hari" : "semua", dir);
+  const pages = Math.ceil(sorted.length / PER_PAGE);
+  const shownPage = Math.min(page, Math.max(1, pages));
+  const visible = mobile ? sorted.slice(0, limit) : sorted.slice((shownPage - 1) * PER_PAGE, shownPage * PER_PAGE);
+  const groups = groupTxs(visible, by === "tanggal" ? "hari" : "semua", dir);
+  const goPage = (p: number) => {
+    setPage(p);
+    listTop.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+  };
   const names = new Map(wallets.map((w) => [w.id, w.name]));
   const walletName = (id: string) => names.get(id) ?? "—";
   const periodQs = new URLSearchParams(periodParams(period, 0)).toString();
@@ -141,7 +164,7 @@ export function AnalyticsView({
 
   return (
     <div className="space-y-6">
-      <FilterBar f={f} set={(p) => (setLimit(PAGE), set(p))} categories={categories} wallets={wallets} date={<PeriodBar period={period} today={today} />} />
+      <FilterBar f={f} set={set} categories={categories} wallets={wallets} date={<PeriodBar period={period} today={today} />} />
 
       {pending ? (
         <Bone className="h-[104px] rounded-[14px]" />
@@ -199,7 +222,7 @@ export function AnalyticsView({
           </Card>
         </section>
 
-        <section className="min-w-0 lg:order-1">
+        <section ref={listTop} className="min-w-0 scroll-mt-20 lg:order-1">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-3 px-1">
             <h2 className={h2}>
               Riwayat <span className="text-[15px] font-medium text-on-surface-variant tabular-nums">{cur.length}</span>
@@ -232,12 +255,16 @@ export function AnalyticsView({
                   </TxList>
                 </div>
               ))}
-              {sorted.length > limit && (
-                <div className="flex justify-center">
-                  <Button variant="tonal" onClick={() => setLimit((l) => l + PAGE)}>
-                    Tampilkan lebih banyak ({sorted.length - limit})
-                  </Button>
-                </div>
+              {mobile ? (
+                sorted.length > limit && (
+                  <div className="flex justify-center">
+                    <Button variant="tonal" onClick={() => setLimit((l) => l + PAGE)}>
+                      {t("Tampilkan lebih banyak ({n})", { n: sorted.length - limit })}
+                    </Button>
+                  </div>
+                )
+              ) : (
+                <Pagination page={shownPage} total={pages} onPage={goPage} />
               )}
             </div>
           )}
