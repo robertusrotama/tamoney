@@ -6,6 +6,7 @@ import { Card, EmptyState, Label } from "@/components/ui/EmptyState";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
+import { BalanceEye } from "@/components/ui/Privacy";
 import { WalletDialog } from "@/components/wallets/WalletForm";
 import { getPlanningState } from "@/lib/planning";
 import { getCategories, getProfile, getTransactionsBetween, getWallets } from "@/lib/queries";
@@ -77,8 +78,11 @@ export default async function DashboardPage() {
           <div className="min-w-0 space-y-8">
             {/* Hero: the one number that matters most, then this month's flow */}
             <Card className="p-5">
-              <Label>{t("Saldo total")}</Label>
-              <Money value={total} className="mt-0.5 block text-[clamp(2.25rem,1.6rem+3vw,3rem)] leading-none font-bold tracking-[-0.03em]" />
+              <div className="flex items-center justify-between">
+                <Label>{t("Saldo total")}</Label>
+                <BalanceEye className="-my-2 -mr-2" />
+              </div>
+              <Money value={total} sensitive className="mt-0.5 block text-[clamp(2.25rem,1.6rem+3vw,3rem)] leading-none font-bold tracking-[-0.03em]" />
               <div className="mt-5 grid grid-cols-2 gap-4">
                 <div>
                   <p className="flex items-center gap-1 text-[13px] text-on-surface-variant">

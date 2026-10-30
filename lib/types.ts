@@ -10,6 +10,8 @@ export type Wallet = {
   balance: number;
   color: string | null;
   pattern: string | null;
+  /** Last 4 digits when card details are stored (bank/credit); the rest is encrypted server-side. */
+  card_last4: string | null;
 };
 
 export type Category = {

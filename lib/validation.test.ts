@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { billSchema, budgetSettingsSchema, goalSchema, passwordSchema, profileSchema, payBillSchema, salarySchema, transferSchema, txSchema, walletSchema } from "./validation";
+import { billSchema, budgetSettingsSchema, cardSchema, goalSchema, passwordSchema, profileSchema, payBillSchema, salarySchema, transferSchema, txSchema, walletSchema } from "./validation";
 
 const A = "6f1c2b9e-3a4d-4c5e-8f70-1a2b3c4d5e6f";
 const B = "7a2d3c0f-4b5e-4d6f-9081-2b3c4d5e6f70";
@@ -31,13 +31,13 @@ describe("transferSchema", () => {
 
 describe("walletSchema", () => {
   it("requires a name of 1-50 characters", () => {
-    expect(walletSchema.safeParse({ name: "BCA", type: "bank", initial_balance: "0" }).success).toBe(true);
-    expect(walletSchema.safeParse({ name: "  ", type: "cash", initial_balance: "0" }).success).toBe(false);
-    expect(walletSchema.safeParse({ name: "x".repeat(51), type: "cash", initial_balance: "0" }).success).toBe(false);
+    expect(walletSchema.safeParse({ name: "BCA", type: "bank", balance: "0" }).success).toBe(true);
+    expect(walletSchema.safeParse({ name: "  ", type: "cash", balance: "0" }).success).toBe(false);
+    expect(walletSchema.safeParse({ name: "x".repeat(51), type: "cash", balance: "0" }).success).toBe(false);
   });
 
-  it("allows an empty starting balance as 0", () => {
-    expect(walletSchema.safeParse({ name: "Tunai", type: "cash", initial_balance: "" }).data?.initial_balance).toBe(0);
+  it("allows an empty balance as 0", () => {
+    expect(walletSchema.safeParse({ name: "Tunai", type: "cash", balance: "" }).data?.balance).toBe(0);
   });
 });
 
@@ -105,4 +105,11 @@ describe("profileSchema / passwordSchema", () => {
   it("confirmation must match", () => expect(passwordSchema.safeParse({ ...pw, confirm: "lain-123456" }).error?.issues[0].message).toBe("Konfirmasi password tidak sama"));
   it("must differ from the current one", () =>
     expect(passwordSchema.safeParse({ current: pw.password, password: pw.password, confirm: pw.password }).error?.issues[0].message).toBe("Password baru harus berbeda"));
+});
+
+describe("cardSchema", () => {
+  it("accepts a valid card, spaces removed", () =>
+    expect(cardSchema.safeParse({ card_number: "4111 1111 1111 1111", card_expiry: "08/29", card_holder: " Tama " }).data).toEqual({ number: "4111111111111111", expiry: "08/29", holder: "TAMA" }));
+  it("rejects a mistyped number (Luhn)", () => expect(cardSchema.safeParse({ card_number: "4111 1111 1111 1112", card_expiry: "08/29", card_holder: "" }).error?.issues[0].message).toBe("Nomor kartu tidak valid"));
+  it("rejects month 13", () => expect(cardSchema.safeParse({ card_number: "4111111111111111", card_expiry: "13/29", card_holder: "" }).success).toBe(false));
 });

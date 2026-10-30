@@ -14,7 +14,7 @@ function must<T>({ data, error }: { data: T | null; error: { message: string } |
 
 // cache(): layout and page ask for the same data in one request; arguments must be primitives/same refs.
 export const getWallets = cache(async (sb: Supabase, includeArchived = false): Promise<Wallet[]> => {
-  let q = sb.from("wallets").select("id,name,type,initial_balance,archived_at,color,pattern").order("created_at");
+  let q = sb.from("wallets").select("id,name,type,initial_balance,archived_at,color,pattern,card_last4").order("created_at");
   if (!includeArchived) q = q.is("archived_at", null);
   const [wallets, balances] = await Promise.all([q, sb.from("wallet_balances").select("wallet_id,balance")]);
   const byId = new Map(must(balances).map((b) => [b.wallet_id as string, Number(b.balance)]));

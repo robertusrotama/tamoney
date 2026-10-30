@@ -4,3 +4,6 @@ export const SIDEBAR_COOKIE = "sb_collapsed";
 /** "light" | "dark"; absent = follow the system. Read by the root layout for <html data-theme>. */
 export const THEME_COOKIE = "theme";
 export type Theme = "system" | "light" | "dark";
+
+/** "1" = balances hidden (eye toggle). */
+export const HIDE_BALANCE_COOKIE = "hide_bal";

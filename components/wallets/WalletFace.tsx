@@ -27,7 +27,7 @@ export function WalletFace({ wallet, actions, className = "" }: { wallet: Face; 
         </div>
         <div className="shrink-0 text-right">
           <p className={`text-[10px] font-semibold tracking-[0.06em] uppercase ${muted}`}><T k="Saldo" /></p>
-          <Money value={wallet.balance} className="text-[17px] font-semibold" />
+          <Money value={wallet.balance} sensitive className="text-[17px] font-semibold" />
         </div>
       </div>
       <div className="flex items-end justify-between">

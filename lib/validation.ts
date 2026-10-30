@@ -41,7 +41,8 @@ export const transferSchema = z
 export const walletSchema = z.object({
   name: z.string().trim().min(1, { error: "Nama dompet wajib diisi" }).max(50, { error: "Nama maksimal 50 karakter" }),
   type: z.enum(["cash", "bank", "ewallet", "credit", "other"]),
-  initial_balance: z.union([z.literal("").transform(() => 0), rupiah(0)]),
+  /** Current balance; new wallets start here, edits log an adjustment (set_wallet_balance). */
+  balance: z.union([z.literal("").transform(() => 0), rupiah(0)]),
   // Keys mirror components/wallets/style.ts; "" = default for the wallet type
   color: z
     .enum(["", "blue", "indigo", "purple", "pink", "red", "orange", "yellow", "green", "teal", "graphite"])
@@ -133,6 +134,23 @@ export const budgetSettingsSchema = z
     const all = s.groups.flatMap((g) => g.category_ids);
     return new Set(all).size === all.length;
   }, { error: "Satu kategori hanya boleh di satu pos" });
+
+/** Luhn checksum — catches a mistyped card number. */
+const luhn = (n: string) =>
+  [...n].reverse().reduce((sum, ch, i) => {
+    const d = Number(ch) * (i % 2 ? 2 : 1);
+    return sum + (d > 9 ? d - 9 : d);
+  }, 0) % 10 === 0;
+
+/** Card details (bank/credit wallets). CVV is deliberately not accepted. */
+export const cardSchema = z
+  .object({
+    card_number: z.string().transform((v) => v.replace(/[\s-]/g, "")),
+    card_expiry: z.string().trim().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, { error: "Masa berlaku format BB/TT" }),
+    card_holder: z.string().trim().max(40, { error: "Nama pemilik maksimal 40 karakter" }).transform((v) => v.toUpperCase()),
+  })
+  .refine((c) => /^\d{12,19}$/.test(c.card_number) && luhn(c.card_number), { error: "Nomor kartu tidak valid", path: ["card_number"] })
+  .transform((c) => ({ number: c.card_number, expiry: c.card_expiry, holder: c.card_holder }));
 
 /** First validation message, for showing in a form. */
 export function firstError(error: z.ZodError): string {

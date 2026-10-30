@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { AppShell } from "@/components/shell/Nav";
-import { SIDEBAR_COOKIE } from "@/components/shell/prefs";
+import { HIDE_BALANCE_COOKIE, SIDEBAR_COOKIE } from "@/components/shell/prefs";
+import { PrivacyProvider } from "@/components/ui/Privacy";
 import { Notifications } from "@/components/shell/Notifications";
 import { QuickAdd } from "@/components/shell/QuickAdd";
 import { UserMenu } from "@/components/shell/UserMenu";
@@ -24,20 +25,22 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const notices = buildNotifications(plan, plan.today, Object.fromEntries(wallets.map((w) => [w.id, w.name])), makeT(lang), localeOf(lang));
 
   return (
-    <AppShell
-      initialCollapsed={cookieStore.get(SIDEBAR_COOKIE)?.value === "1"}
-      header={
-        <header className="sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between gap-3 px-4 pt-[env(safe-area-inset-top)] md:justify-end md:pr-6 md:pl-0">
-          <p className="glass rounded-full px-4 py-1.5 text-[17px] font-semibold md:hidden">TaMoney</p>
-          <div className="glass flex items-center gap-1.5 rounded-full p-1">
-            <QuickAdd wallets={wallets} categories={categories} />
-            <Notifications notices={notices} bills={plan.bills} goals={plan.goals} wallets={wallets} />
-            <UserMenu profile={profile} email={user.email} />
-          </div>
-        </header>
-      }
-    >
-      {children}
-    </AppShell>
+    <PrivacyProvider initial={cookieStore.get(HIDE_BALANCE_COOKIE)?.value === "1"}>
+      <AppShell
+        initialCollapsed={cookieStore.get(SIDEBAR_COOKIE)?.value === "1"}
+        header={
+          <header className="sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between gap-3 px-4 pt-[env(safe-area-inset-top)] md:justify-end md:pr-6 md:pl-0">
+            <p className="glass rounded-full px-4 py-1.5 text-[17px] font-semibold md:hidden">TaMoney</p>
+            <div className="glass flex items-center gap-1.5 rounded-full p-1">
+              <QuickAdd wallets={wallets} categories={categories} />
+              <Notifications notices={notices} bills={plan.bills} goals={plan.goals} wallets={wallets} />
+              <UserMenu profile={profile} email={user.email} />
+            </div>
+          </header>
+        }
+      >
+        {children}
+      </AppShell>
+    </PrivacyProvider>
   );
 }

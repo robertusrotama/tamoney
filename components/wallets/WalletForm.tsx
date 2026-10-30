@@ -24,6 +24,9 @@ function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void })
   const [color, setColor] = useState(wallet?.color ?? "");
   const [pattern, setPattern] = useState(wallet?.pattern ?? "");
   const look = { type, color: color || null, pattern: pattern || null };
+  const cardType = type === "bank" || type === "credit";
+  // Stored card: keep it unless the user replaces or removes it.
+  const [cardMode, setCardMode] = useState<"keep" | "edit" | "clear">(wallet?.card_last4 ? "keep" : "edit");
 
   return (
     <form method="post" onSubmit={onSubmit} className="space-y-4">
@@ -46,10 +49,52 @@ function WalletForm({ wallet, onDone }: { wallet?: Wallet; onDone: () => void })
             options={(Object.keys(WALLET_TYPE_LABEL) as WalletType[]).map((v) => ({ value: v, label: WALLET_TYPE_LABEL[v], icon: WALLET_ICON[v] }))}
           />
         </Field>
-        <Field label={t("Saldo awal")}>
-          <AmountInput name="initial_balance" defaultValue={wallet?.initial_balance} required={false} />
+        <Field label={t("Saldo saat ini")} info={wallet ? t("Setiap perubahan saldo tercatat di riwayat dompet") : undefined}>
+          <AmountInput name="balance" defaultValue={wallet?.balance} required={false} />
         </Field>
       </div>
+
+      {cardType && (
+        <fieldset className="space-y-3 rounded-[16px] bg-surface-dim/50 p-3">
+          <legend className="flex items-center gap-1 px-1 text-[13px] font-medium text-on-surface-variant">
+            <Icon name="lock" className="text-[15px]" /> {t("Data kartu (terenkripsi)")}
+          </legend>
+          {cardMode === "keep" ? (
+            <div className="flex items-center gap-2">
+              <span className="flex-1 text-[15px] tabular-nums">•••• •••• •••• {wallet?.card_last4}</span>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setCardMode("edit")}>
+                {t("Ganti")}
+              </Button>
+              <Button type="button" variant="danger" size="sm" onClick={() => setCardMode("clear")}>
+                {t("Hapus")}
+              </Button>
+            </div>
+          ) : cardMode === "clear" ? (
+            <div className="flex items-center gap-2">
+              <input type="hidden" name="card_clear" value="1" />
+              <span className="flex-1 text-[15px] text-on-surface-variant">{t("Data kartu akan dihapus saat disimpan")}</span>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setCardMode("keep")}>
+                {t("Batal")}
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Field label={t("Nomor kartu")}>
+                <Input name="card_number" inputMode="numeric" autoComplete="off" placeholder="1234 5678 9012 3456" maxLength={23} />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label={t("Berlaku hingga")}>
+                  <Input name="card_expiry" inputMode="numeric" autoComplete="off" placeholder="BB/TT" maxLength={5} />
+                </Field>
+                <Field label={t("Nama di kartu")}>
+                  <Input name="card_holder" autoComplete="off" maxLength={40} placeholder={t("Opsional")} />
+                </Field>
+              </div>
+              <p className="px-1 text-[12px] text-on-surface-variant">{t("CVV tidak pernah disimpan.")}</p>
+            </>
+          )}
+        </fieldset>
+      )}
 
       <fieldset className="space-y-2">
         <legend className="px-1 text-[13px] text-on-surface-variant">{t("Warna kartu")}</legend>
