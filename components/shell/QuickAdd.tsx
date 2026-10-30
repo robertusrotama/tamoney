@@ -13,7 +13,7 @@ import type { Category, Wallet } from "@/lib/types";
 const noop = () => () => {};
 
 /** "Catat" in the toolbar (desktop) and a floating + (mobile); the form grows out of whichever was tapped. */
-export function QuickAdd({ wallets, categories }: { wallets: Wallet[]; categories: Category[] }) {
+export function QuickAdd({ wallets, categories, budgetPeriod }: { wallets: Wallet[]; categories: Category[]; budgetPeriod?: { id: string; label: string } }) {
   const d = useDialog();
   const t = useT();
   const mounted = useSyncExternalStore(noop, () => true, () => false); // document.body exists only on the client
@@ -40,7 +40,7 @@ export function QuickAdd({ wallets, categories }: { wallets: Wallet[]; categorie
           document.body,
         )}
       <Dialog open={d.open} origin={d.origin} onClose={d.close} title={t("Catat Transaksi")}>
-        <TxForm wallets={wallets} categories={categories} onDone={d.close} />
+        <TxForm wallets={wallets} categories={categories} onDone={d.close} budgetPeriod={budgetPeriod} />
       </Dialog>
     </>
   );

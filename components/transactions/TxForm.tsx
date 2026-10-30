@@ -9,6 +9,7 @@ import { DateField } from "@/components/ui/DateField";
 import { Field, FormError, Input } from "@/components/ui/Field";
 import { Picker } from "@/components/ui/Picker";
 import { WALLET_ICON } from "@/components/wallets/style";
+import { Check } from "@/components/ui/Check";
 import { PillTabs } from "@/components/ui/PillTabs";
 import { useFormDone } from "@/components/ui/useFormDone";
 import { TransferForm } from "@/components/wallets/TransferForm";
@@ -29,15 +30,21 @@ export function TxForm({
   categories,
   initial,
   onDone,
+  budgetPeriod,
 }: {
   wallets: Wallet[];
   categories: Category[];
   initial?: Tx;
   onDone?: () => void;
+  /** Running salary period: offers "Masukkan ke budget bulanan" for income. */
+  budgetPeriod?: { id: string; label: string };
 }) {
   const { state, pending, onSubmit, version } = useFormDone(saveTransaction, onDone);
   const t = useT();
   const [kind, setKind] = useState<Kind>(initial?.kind === "income" ? "income" : "expense");
+  // An edited income keeps the period it already tops up; a new one can join the running period.
+  const period = initial?.budget_period_id ? { id: initial.budget_period_id, label: "" } : budgetPeriod;
+  const [toBudget, setToBudget] = useState(!!initial?.budget_period_id);
   const [amount, setAmount] = useState(initial ? withDots(String(initial.amount)) : "");
   const [seenVersion, setSeenVersion] = useState(version);
   if (version !== seenVersion) {
@@ -126,6 +133,18 @@ export function TxForm({
         </Field>
       </div>
 
+      {kind === "income" && period && (
+        <>
+          <input type="hidden" name="budget_period" value={toBudget ? period.id : ""} />
+          <Check
+            checked={toBudget}
+            onChange={setToBudget}
+            hint={period.label ? t("Ditambahkan ke budget {month}, dibagi sesuai persentase pos", { month: period.label }) : t("Dibagi sesuai persentase pos")}
+          >
+            {t("Masukkan ke budget bulanan")}
+          </Check>
+        </>
+      )}
       <Field label={t("Catatan")}>
         <Input name="note" defaultValue={initial?.note ?? ""} maxLength={200} placeholder={t("Contoh: Makan siang mie ayam")} />
       </Field>

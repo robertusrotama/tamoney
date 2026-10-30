@@ -33,11 +33,12 @@ export type Tx = {
   occurred_at: string;
   goal_id?: string | null;
   bill_id?: string | null;
+  budget_period_id?: string | null;
 };
 
 export type BudgetGroup = { id: string; name: string; icon: string; pct_bp: number; is_savings: boolean; sort: number; archived_at?: string | null };
-/** allocations: group id → rupiah */
-export type BudgetPeriod = { id: string; month: string; start_date: string; salary: number; income_tx_id: string | null; allocations: Record<string, number> };
+/** allocations: group id → rupiah, as set at salary time; topup = income later put into this period's budget. */
+export type BudgetPeriod = { id: string; month: string; start_date: string; salary: number; income_tx_id: string | null; allocations: Record<string, number>; topup?: number };
 export type Cadence = "weekly" | "monthly" | "yearly";
 export type Bill = {
   id: string;

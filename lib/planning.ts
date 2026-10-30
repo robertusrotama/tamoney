@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { groupsFor, nominalEnd, periodRange, usage } from "./budget";
+import { groupsFor, nominalEnd, periodRange, usage, withTopup } from "./budget";
 import { deposited, goalStatus, periodNeed, saved, type GoalTx, type GoalWithProgress } from "./goals";
 import { addDays, isoRange } from "./period";
 import { getCategories, getTransactionsBetween } from "./queries";
@@ -59,18 +59,20 @@ export async function loadPeriodView(sb: Supabase, s: Pick<PlanningState, "allGr
   const [rows, categories] = await Promise.all([getTransactionsBetween(sb, start, end), getCategories(sb)]);
   const catGroup = Object.fromEntries(categories.map((c) => [c.id, c.budget_group_id]));
   const goalWallets = Object.fromEntries(s.goals.map((g) => [g.id, g.wallet_id]));
-  return { index, period, range, usage: usage(groupsFor(s.allGroups, period), period, rows.map((r) => ({ ...r, goal_id: r.goal_id ?? null })), catGroup, goalWallets) };
+  // Income put into this period tops up every pos by the current percentages.
+  const effective = { ...period, allocations: withTopup(period.allocations, period.topup ?? 0, s.allGroups.filter((g) => !g.archived_at)) };
+  return { index, period, range, usage: usage(groupsFor(s.allGroups, effective), effective, rows.map((r) => ({ ...r, goal_id: r.goal_id ?? null })), catGroup, goalWallets) };
 }
 
 /** Everything Budget, Rencana, Ringkasan and the notification bell read — once per request. */
 export const getPlanningState = cache(async (sb: Supabase): Promise<PlanningState> => {
   const today = todayWib();
-  const [profile, groups, periodRows, billRows, goalRows, goalTxRows] = await Promise.all([
+  const [profile, groups, periodRows, billRows, goalRows, goalTxRows, topupRows] = await Promise.all([
     sb.from("profiles").select("payday_day").maybeSingle(),
     sb.from("budget_groups").select("id,name,icon,pct_bp,is_savings,sort,archived_at").order("sort"),
     sb
       .from("budget_periods")
-      .select("id,month,start_date,salary,income_tx_id,budget_allocations(group_id,amount),transactions(wallet_id)")
+      .select("id,month,start_date,salary,income_tx_id,budget_allocations(group_id,amount),transactions!budget_periods_income_tx_id_user_id_fkey(wallet_id)")
       .order("start_date"),
     sb.from("bills").select("id,name,icon,amount,category_id,wallet_id,cadence,due_day,next_due,remind_days,archived_at").order("next_due"),
     sb
@@ -78,7 +80,10 @@ export const getPlanningState = cache(async (sb: Supabase): Promise<PlanningStat
       .select("id,name,icon,target,initial_amount,due_date,monthly_amount,wallet_id,source_wallet_id,achieved_at,archived_at,created_at")
       .order("created_at"),
     sb.from("transactions").select("goal_id,kind,amount,wallet_id,to_wallet_id,occurred_at").not("goal_id", "is", null),
+    sb.from("transactions").select("budget_period_id,amount").not("budget_period_id", "is", null),
   ]);
+  const topups = new Map<string, number>();
+  for (const r of must(topupRows) as { budget_period_id: string; amount: number }[]) topups.set(r.budget_period_id, (topups.get(r.budget_period_id) ?? 0) + Number(r.amount));
   const rows = must(periodRows) as unknown as PeriodRow[];
   const periods: BudgetPeriod[] = rows.map((p) => ({
     id: p.id,
@@ -86,6 +91,7 @@ export const getPlanningState = cache(async (sb: Supabase): Promise<PlanningStat
     start_date: p.start_date,
     income_tx_id: p.income_tx_id,
     salary: Number(p.salary),
+    topup: topups.get(p.id) ?? 0,
     allocations: Object.fromEntries(p.budget_allocations.map((a) => [a.group_id, Number(a.amount)])),
   }));
   const payday = profile.data?.payday_day ?? 25;

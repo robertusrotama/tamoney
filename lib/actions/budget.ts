@@ -19,7 +19,7 @@ export async function recordSalary(_: ActionState, fd: FormData): Promise<Action
   const { supabase } = await requireUser();
 
   // The salary's current wallet may stay even if archived since (editing an old month).
-  const { data: prev } = await supabase.from("budget_periods").select("transactions(wallet_id)").eq("month", `${s.month}-01`).maybeSingle();
+  const { data: prev } = await supabase.from("budget_periods").select("transactions!budget_periods_income_tx_id_user_id_fkey(wallet_id)").eq("month", `${s.month}-01`).maybeSingle();
   const keep = (prev?.transactions as unknown as { wallet_id: string } | null)?.wallet_id;
   const err = walletError([s.wallet_id], await getActiveWalletIds(supabase), keep ? [keep] : []);
   if (err) return { error: err };

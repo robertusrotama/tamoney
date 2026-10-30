@@ -49,6 +49,8 @@ export async function saveTransaction(_: ActionState, fd: FormData): Promise<Act
     category_id: t.category_id,
     note: t.note,
     occurred_at: toOccurredAt(t.occurred_at, prev?.occurred_at),
+    // "Masukkan ke budget bulanan": the form sends budget_period (period id, or "" when unticked) only where it offers it.
+    ...(fd.has("budget_period") && { budget_period_id: t.kind === "income" && fd.get("budget_period") ? String(fd.get("budget_period")) : null }),
   });
 }
 

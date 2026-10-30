@@ -63,6 +63,15 @@ export function groupsFor<G extends BudgetGroup>(groups: G[], period: BudgetPeri
   return groups.filter((g) => !g.archived_at || g.id in period.allocations);
 }
 
+/** Allocations after extra income was put into the budget: the topup is split like a salary and added per pos. */
+export function withTopup(allocations: Record<string, number>, topup: number, groups: Pick<BudgetGroup, "id" | "pct_bp" | "is_savings">[]): Record<string, number> {
+  if (topup <= 0) return allocations;
+  const extra = allocate(topup, groups);
+  const out = { ...allocations };
+  for (const [id, v] of Object.entries(extra)) out[id] = (out[id] ?? 0) + v;
+  return out;
+}
+
 /** Day before the payday of the month after `start` ("25 Okt – 24 Nov"). */
 export function nominalEnd(start: string, payday: number): string {
   const [y, m] = start.split("-").map(Number);

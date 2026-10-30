@@ -8,6 +8,7 @@ import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
 import { BalanceEye } from "@/components/ui/Privacy";
 import { WalletDialog } from "@/components/wallets/WalletForm";
+import { monthLabel } from "@/lib/budget";
 import { getPlanningState } from "@/lib/planning";
 import { getCategories, getProfile, getTransactionsBetween, getWallets } from "@/lib/queries";
 import { monthKey, monthRange, monthTotals, todayWib, wibDate, wibGreeting } from "@/lib/reports";
@@ -132,7 +133,11 @@ export default async function DashboardPage() {
             <div className="sticky top-20">
               <SectionHeader title={t("Catat Cepat")} />
               <Card className="p-5">
-                <TxForm wallets={wallets} categories={categories} />
+                <TxForm
+                  wallets={wallets}
+                  categories={categories}
+                  budgetPeriod={plan.current ? { id: plan.current.period.id, label: monthLabel(plan.current.period.month, localeOf(lang)) } : undefined}
+                />
               </Card>
             </div>
           </aside>

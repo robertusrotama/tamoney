@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { BudgetGroup, BudgetPeriod } from "./types";
-import { allocate, DEFAULT_POS, groupsFor, nominalEnd, periodRange, safePerDay, usage, type UsageRow } from "./budget";
+import { allocate, DEFAULT_POS, groupsFor, nominalEnd, withTopup, periodRange, safePerDay, usage, type UsageRow } from "./budget";
 
 const groups: BudgetGroup[] = DEFAULT_POS.map((p, i) => ({ ...p, id: p.name, sort: i }));
 
@@ -109,4 +109,15 @@ describe("groupsFor", () => {
     expect(groupsFor(gs, oct).map((g) => g.id)).toEqual([groups[1].id, groups[7].id]);
     expect(groupsFor(gs, nov).map((g) => g.id)).toEqual([groups[1].id]);
   });
+});
+
+describe("withTopup", () => {
+  it("splits extra income across pos by percentage and keeps totals exact", () => {
+    const base = allocate(12_000_000, groups);
+    const out = withTopup(base, 1_000_000, groups);
+    expect(Object.values(out).reduce((a, b) => a + b, 0)).toBe(13_000_000);
+    expect(out["Makanan"]).toBe(base["Makanan"] + 150_000);
+    expect(out["Tabungan & Investasi"] - base["Tabungan & Investasi"]).toBe(320_000); // rounding remainders land in savings
+  });
+  it("no topup leaves the allocations untouched", () => expect(withTopup({ a: 5 }, 0, groups)).toEqual({ a: 5 }));
 });

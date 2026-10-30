@@ -72,7 +72,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
         </div>
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            ["Gaji", <Money key="g" value={period.salary} />],
+            period.topup ? ["Gaji + pemasukan", <Money key="g" value={period.salary + period.topup} />] : ["Gaji", <Money key="g" value={period.salary} />],
             ["Terpakai", <Money key="t" value={usage.spent} />],
             running ? ["Aman per hari", <Money key="a" value={safePerDay(usage.pos, s.today, end)} />] : ["Periode", "Selesai"],
             running ? ["Hari tersisa", `${daysLeft} hari`] : ["Ditabung", <Money key="d" value={savings?.used ?? 0} />],
