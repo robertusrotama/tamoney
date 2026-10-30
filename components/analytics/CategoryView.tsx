@@ -89,6 +89,7 @@ export function CategoryView({
     period.start,
     period.end,
     chartUnit,
+    locale,
   );
   const names = new Map(wallets.map((w) => [w.id, w.name]));
   const walletName = (id: string) => names.get(id) ?? "—";

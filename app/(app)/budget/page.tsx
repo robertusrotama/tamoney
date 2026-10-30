@@ -6,7 +6,8 @@ import { Card, EmptyState } from "@/components/ui/EmptyState";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
 import { monthLabel, nominalEnd, rangeLabel, safePerDay } from "@/lib/budget";
-import { getT } from "@/lib/i18n-server";
+import { localeOf } from "@/lib/i18n";
+import { getLang, getT } from "@/lib/i18n-server";
 import { formatRupiah } from "@/lib/money";
 import { getPlanningState, loadPeriodView } from "@/lib/planning";
 import { getWallets } from "@/lib/queries";
@@ -18,7 +19,8 @@ const daysBetween = (a: string, b: string) => Math.round((new Date(`${b}T00:00:0
 
 export default async function BudgetPage({ searchParams }: PageProps<"/budget">) {
   const { supabase } = await requireUser();
-  const [s, wallets, sp, t] = await Promise.all([getPlanningState(supabase), getWallets(supabase), searchParams, getT()]);
+  const [s, wallets, sp, t, lang] = await Promise.all([getPlanningState(supabase), getWallets(supabase), searchParams, getT(), getLang()]);
+  const locale = localeOf(lang);
   const salaryProps = { groups: s.groups, periods: s.periods, wallets, today: s.today, payday: s.payday, salaryWallet: s.salaryWallet };
 
   const header = (
@@ -64,7 +66,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-[13px] font-semibold tracking-[0.04em] text-on-surface-variant uppercase">
-              {t("Gaji {month} · {range}", { month: monthLabel(period.month), range: rangeLabel(range.start, end) })}
+              {t("Gaji {month} · {range}", { month: monthLabel(period.month, locale), range: rangeLabel(range.start, end, locale) })}
             </p>
             <Money
               value={leftover}
@@ -74,7 +76,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
           </div>
           <PeriodPicker
             value={period.month.slice(0, 7)}
-            options={[...s.periods].reverse().map((p) => ({ value: p.month.slice(0, 7), label: monthLabel(p.month) }))}
+            options={[...s.periods].reverse().map((p) => ({ value: p.month.slice(0, 7), label: monthLabel(p.month, locale) }))}
           />
         </div>
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -96,7 +98,7 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
           <SalaryButton {...salaryProps} month={period.month.slice(0, 7)} variant="tonal" size="sm">
             <Icon name="edit" className="text-[16px]" /> {t("Ubah gaji")}
           </SalaryButton>
-          <DeleteSalaryButton periodId={period.id} label={monthLabel(period.month)} />
+          <DeleteSalaryButton periodId={period.id} label={monthLabel(period.month, locale)} />
         </div>
         {!running && leftover > 0 && (
           <Link

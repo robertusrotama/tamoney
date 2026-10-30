@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale } from "@/components/I18n";
 import { AmountInput } from "@/components/ui/AmountInput";
 import { Button } from "@/components/ui/Button";
 import { DateField } from "@/components/ui/DateField";
@@ -13,9 +14,11 @@ import { payBill } from "@/lib/actions/bills";
 import { todayWib } from "@/lib/reports";
 import type { Bill, Wallet } from "@/lib/types";
 
-const longDate = (d: string) => new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
+const longDate = (d: string, locale: string) =>
+  new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
 
 function PayBillForm({ bill, wallets, onDone }: { bill: Bill; wallets: Wallet[]; onDone: () => void }) {
+  const locale = useLocale();
   const { state, pending, onSubmit } = useFormDone(payBill, onDone);
   const today = todayWib();
   return (
@@ -28,7 +31,7 @@ function PayBillForm({ bill, wallets, onDone }: { bill: Bill; wallets: Wallet[];
         </span>
         <div>
           <p className="text-[17px] font-semibold">{bill.name}</p>
-          <p className="text-[13px] text-on-surface-variant">Jatuh tempo {longDate(bill.next_due)}</p>
+          <p className="text-[13px] text-on-surface-variant">Jatuh tempo {longDate(bill.next_due, locale)}</p>
         </div>
       </div>
       <AmountInput name="amount" defaultValue={bill.amount} large />

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CategoryView } from "@/components/analytics/CategoryView";
 import { PeriodProvider } from "@/components/analytics/Period";
+import { localeOf } from "@/lib/i18n";
+import { getLang } from "@/lib/i18n-server";
 import { isoRange, periodFromParams } from "@/lib/period";
 import { getCategories, getTransactionsBetween, getWallets } from "@/lib/queries";
 import { todayWib, wibDate, monthTotals } from "@/lib/reports";
@@ -16,7 +18,8 @@ export default async function KategoriPage({ params, searchParams }: PageProps<"
   const { id } = await params;
   const sp = await searchParams;
   const today = todayWib();
-  const period = periodFromParams(sp, today);
+  const lang = await getLang();
+  const period = periodFromParams(sp, today, localeOf(lang));
   const { start, end } = isoRange(period.prev.start, period.end);
 
   const { supabase } = await requireUser();

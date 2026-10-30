@@ -86,7 +86,7 @@ function SalaryForm({ groups, periods, wallets, today, payday, salaryWallet, mon
             label={t("Gaji bulan")}
             value={month}
             onChange={pickMonth}
-            options={months.map((m) => ({ value: m, label: monthLabel(m), icon: existing(m) ? "check_circle" : "calendar_month" }))}
+            options={months.map((m) => ({ value: m, label: monthLabel(m, locale), icon: existing(m) ? "check_circle" : "calendar_month" }))}
           />
         </Field>
         <Field label={t("Masuk ke dompet")}>

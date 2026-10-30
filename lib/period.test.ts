@@ -101,4 +101,8 @@ describe("quick ranges", () => {
     expect(c["Bulan lalu"]).toEqual({ p: "bulan", d: "2026-09-01" });
     expect(c["Tahun lalu"]).toEqual({ p: "tahun", d: "2025-01-01" });
   });
+  it("labels follow the UI locale", () => {
+    expect(periodFromParams({ p: "bulan", d: "2026-10-10" }, today, "en-GB").label).toBe("October 2026");
+    expect(periodFromParams({ p: "bulan", d: "2026-10-10" }, today).label).toBe("Oktober 2026");
+  });
 });

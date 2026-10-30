@@ -11,7 +11,8 @@ import { isoRange } from "@/lib/period";
 import { isRefund } from "@/lib/reports";
 import { getPlanningState, loadPeriodView } from "@/lib/planning";
 import { getCategories, getTransactionsBetween, getWallets } from "@/lib/queries";
-import { getT } from "@/lib/i18n-server";
+import { localeOf } from "@/lib/i18n";
+import { getLang, getT } from "@/lib/i18n-server";
 import { requireUser } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Pos budget · TaMoney" };
@@ -19,14 +20,16 @@ export const metadata: Metadata = { title: "Pos budget · TaMoney" };
 /** One pos in one salary period: what the money went to, by category, then every transaction. */
 export default async function PosPage({ params, searchParams }: PageProps<"/budget/[pos]">) {
   const { supabase } = await requireUser();
-  const [{ pos: posId }, sp, s, categories, wallets, tr] = await Promise.all([
+  const [{ pos: posId }, sp, s, categories, wallets, tr, lang] = await Promise.all([
     params,
     searchParams,
     getPlanningState(supabase),
     getCategories(supabase),
     getWallets(supabase, true),
     getT(),
+    getLang(),
   ]);
+  const locale = localeOf(lang);
   const group = s.allGroups.find((g) => g.id === posId);
   if (!group || !s.current) notFound();
 
@@ -69,7 +72,7 @@ export default async function PosPage({ params, searchParams }: PageProps<"/budg
         </Link>
         <h1 className="large-title">{group.name}</h1>
         <p className="text-[15px] text-on-surface-variant">
-          {tr("Gaji {month} · {range}", { month: monthLabel(view.period.month), range: rangeLabel(view.range.start, end) })}
+          {tr("Gaji {month} · {range}", { month: monthLabel(view.period.month, locale), range: rangeLabel(view.range.start, end, locale) })}
         </p>
       </div>
 

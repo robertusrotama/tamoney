@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { useLocale, useT } from "@/components/I18n";
 import { AmountInput } from "@/components/ui/AmountInput";
 import { Button, IconButton, type ButtonVariant } from "@/components/ui/Button";
 import { DateField } from "@/components/ui/DateField";
@@ -17,9 +18,24 @@ import { todayWib } from "@/lib/reports";
 import type { Goal, Wallet } from "@/lib/types";
 
 const nextYear = (d: string) => `${Number(d.slice(0, 4)) + 1}${d.slice(4)}`;
-const ICONS = ["savings", "health_and_safety", "flight", "home", "directions_car", "school", "trending_up", "laptop_mac", "favorite", "celebration", "child_care", "phone_iphone"];
+const ICONS = [
+  "savings",
+  "health_and_safety",
+  "flight",
+  "home",
+  "directions_car",
+  "school",
+  "trending_up",
+  "laptop_mac",
+  "favorite",
+  "celebration",
+  "child_care",
+  "phone_iphone",
+];
 
 function GoalForm({ goal, wallets, payday, periodMonth, onDone }: { goal?: Goal; wallets: Wallet[]; payday: number; periodMonth: string; onDone: () => void }) {
+  const t = useT();
+  const locale = useLocale();
   const { state, pending, onSubmit } = useFormDone(saveGoal, onDone);
   const today = todayWib();
   const [icon, setIcon] = useState(goal?.icon ?? "savings");
@@ -40,7 +56,14 @@ function GoalForm({ goal, wallets, payday, periodMonth, onDone }: { goal?: Goal;
       <input type="hidden" name="icon" value={icon} />
       <div className="flex gap-1.5 overflow-x-auto pb-1">
         {ICONS.map((i) => (
-          <IconButton key={i} aria-label={i} aria-pressed={i === icon} tone={i === icon ? "primary" : "muted"} className={i === icon ? "bg-primary-container" : "bg-surface-dim"} onClick={() => setIcon(i)}>
+          <IconButton
+            key={i}
+            aria-label={i}
+            aria-pressed={i === icon}
+            tone={i === icon ? "primary" : "muted"}
+            className={i === icon ? "bg-primary-container" : "bg-surface-dim"}
+            onClick={() => setIcon(i)}
+          >
             <Icon name={i} className="text-[20px]" filled={i === icon} />
           </IconButton>
         ))}
@@ -71,9 +94,12 @@ function GoalForm({ goal, wallets, payday, periodMonth, onDone }: { goal?: Goal;
             </Button>
           )}
         </Field>
-        <Field label="Setoran bulanan" info={hasDue ? "Opsional jika ada due date — kalau kosong, TaMoney menghitungnya dari target dan due date" : "Wajib tanpa due date"}>
+        <Field
+          label="Setoran bulanan"
+          info={hasDue ? "Opsional jika ada due date — kalau kosong, TaMoney menghitungnya dari target dan due date" : "Wajib tanpa due date"}
+        >
           <AmountInput name="monthly_amount" defaultValue={goal?.monthly_amount ?? undefined} required={false} />
-          {suggest > 0 && <p className="px-1 pt-1 text-[12px] text-primary">Saran: Rp {suggest.toLocaleString("id-ID")}/bulan</p>}
+          {suggest > 0 && <p className="px-1 pt-1 text-[12px] text-primary">{t("Saran: Rp {n}/bulan", { n: suggest.toLocaleString(locale) })}</p>}
         </Field>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

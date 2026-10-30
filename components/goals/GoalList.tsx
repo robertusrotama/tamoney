@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { useTransition } from "react";
+import { useLocale } from "@/components/I18n";
 import { Button, IconButton } from "@/components/ui/Button";
 import { useConfirm } from "@/components/ui/Confirm";
 import { Card, EmptyState } from "@/components/ui/EmptyState";
@@ -24,7 +25,8 @@ const monthsLeft = (today: string, due: string) => {
   const [y2, m2] = due.split("-").map(Number);
   return (y2 - y1) * 12 + (m2 - m1);
 };
-const monthYear = (d: string) => new Intl.DateTimeFormat("id-ID", { month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
+const monthYear = (d: string, locale: string) =>
+  new Intl.DateTimeFormat(locale, { month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
 
 /** Progress ring; the arc grows with a transform-free pathLength animation. */
 export function Ring({ value, size = 64, children }: { value: number; size?: number; children?: React.ReactNode }) {
@@ -51,7 +53,22 @@ export function Ring({ value, size = 64, children }: { value: number; size?: num
   );
 }
 
-function GoalCard({ goal, wallets, allWallets, payday, periodMonth, today }: { goal: GoalWithProgress; wallets: Wallet[]; allWallets: Wallet[]; payday: number; periodMonth: string; today: string }) {
+function GoalCard({
+  goal,
+  wallets,
+  allWallets,
+  payday,
+  periodMonth,
+  today,
+}: {
+  goal: GoalWithProgress;
+  wallets: Wallet[];
+  allWallets: Wallet[];
+  payday: number;
+  periodMonth: string;
+  today: string;
+}) {
+  const locale = useLocale();
   const [confirm, dialog] = useConfirm();
   const [pending, start] = useTransition();
   const wallet = allWallets.find((w) => w.id === goal.wallet_id)?.name;
@@ -59,7 +76,14 @@ function GoalCard({ goal, wallets, allWallets, payday, periodMonth, today }: { g
   const pct = Math.round((goal.saved / goal.target) * 100);
 
   const archive = async () => {
-    if (await confirm({ title: `Arsipkan ${goal.name}?`, message: "Goal tidak lagi ditampilkan. Setoran yang sudah tercatat tetap ada di riwayat transfer.", confirmLabel: "Arsipkan", destructive: true }))
+    if (
+      await confirm({
+        title: `Arsipkan ${goal.name}?`,
+        message: "Goal tidak lagi ditampilkan. Setoran yang sudah tercatat tetap ada di riwayat transfer.",
+        confirmLabel: "Arsipkan",
+        destructive: true,
+      })
+    )
       start(async () => void (await setGoalArchived(goal.id, true)));
   };
 
@@ -89,7 +113,7 @@ function GoalCard({ goal, wallets, allWallets, payday, periodMonth, today }: { g
         </p>
         {goal.due_date && (
           <p className="flex items-center gap-1.5">
-            <Icon name="event" className="text-[16px]" /> {monthYear(goal.due_date)}
+            <Icon name="event" className="text-[16px]" /> {monthYear(goal.due_date, locale)}
             {goal.due_date >= today ? ` · ${Math.max(0, monthsLeft(today, goal.due_date))} bln lagi` : " · lewat"}
           </p>
         )}
@@ -117,7 +141,21 @@ function GoalCard({ goal, wallets, allWallets, payday, periodMonth, today }: { g
   );
 }
 
-export function GoalList({ goals, wallets, allWallets, payday, periodMonth, today }: { goals: GoalWithProgress[]; wallets: Wallet[]; allWallets: Wallet[]; payday: number; periodMonth: string; today: string }) {
+export function GoalList({
+  goals,
+  wallets,
+  allWallets,
+  payday,
+  periodMonth,
+  today,
+}: {
+  goals: GoalWithProgress[];
+  wallets: Wallet[];
+  allWallets: Wallet[];
+  payday: number;
+  periodMonth: string;
+  today: string;
+}) {
   const [pending, start] = useTransition();
   const active = goals.filter((g) => !g.archived_at);
   const archived = goals.filter((g) => g.archived_at);
@@ -148,7 +186,9 @@ export function GoalList({ goals, wallets, allWallets, payday, periodMonth, toda
       {active.length === 0 ? (
         <Card>
           <EmptyState icon="flag" title="Buat goal pertama">
-            <p className="max-w-sm text-[15px]">Mis. Dana Darurat 3× pengeluaran bulanan, liburan, atau DP rumah. Tentukan target, tenggat, dan di mana uangnya disimpan.</p>
+            <p className="max-w-sm text-[15px]">
+              Mis. Dana Darurat 3× pengeluaran bulanan, liburan, atau DP rumah. Tentukan target, tenggat, dan di mana uangnya disimpan.
+            </p>
           </EmptyState>
         </Card>
       ) : (

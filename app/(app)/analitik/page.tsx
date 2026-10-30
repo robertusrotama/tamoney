@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { AnalyticsView } from "@/components/analytics/AnalyticsView";
 import { PeriodProvider } from "@/components/analytics/Period";
-import { getT } from "@/lib/i18n-server";
+import { localeOf } from "@/lib/i18n";
+import { getLang, getT } from "@/lib/i18n-server";
 import { isoRange, periodFromParams } from "@/lib/period";
 import { getCategories, getTransactionsBetween, getWallets } from "@/lib/queries";
 import { todayWib, wibDate } from "@/lib/reports";
@@ -15,7 +16,8 @@ const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) 
 export default async function AnalitikPage({ searchParams }: PageProps<"/analitik">) {
   const sp = await searchParams;
   const today = todayWib();
-  const period = periodFromParams(sp, today);
+  const lang = await getLang();
+  const period = periodFromParams(sp, today, localeOf(lang));
   const { start, end } = isoRange(period.prev.start, period.end);
 
   const { supabase } = await requireUser();

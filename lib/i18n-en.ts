@@ -470,4 +470,5 @@ export const EN: Record<string, string> = {
   "{n} hari": "{n} days",
   "{n} transaksi": "{n} transactions",
   "{pct}% dari semua {kind}": "{pct}% of all {kind}",
+  "Saran: Rp {n}/bulan": "Suggested: Rp {n}/month",
 };

@@ -31,10 +31,12 @@ const shiftMonth = (d: string, n: number) => {
   return fmt(new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + n, 1)));
 };
 
-const intl = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("id-ID", { ...opts, timeZone: "UTC" });
-const dayMon = (d: string) => intl({ day: "numeric", month: "short" }).format(toDate(d));
-const rangeLabel = (a: string, b: string) =>
-  a.slice(0, 4) === b.slice(0, 4) ? `${dayMon(a)} – ${dayMon(b)} ${b.slice(0, 4)}` : `${dayMon(a)} ${a.slice(0, 4)} – ${dayMon(b)} ${b.slice(0, 4)}`;
+const intl = (locale: string, opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(locale, { ...opts, timeZone: "UTC" });
+const dayMon = (d: string, locale: string) => intl(locale, { day: "numeric", month: "short" }).format(toDate(d));
+const rangeLabel = (a: string, b: string, locale: string) =>
+  a.slice(0, 4) === b.slice(0, 4)
+    ? `${dayMon(a, locale)} – ${dayMon(b, locale)} ${b.slice(0, 4)}`
+    : `${dayMon(a, locale)} ${a.slice(0, 4)} – ${dayMon(b, locale)} ${b.slice(0, 4)}`;
 
 function bounds(kind: PeriodKind, anchor: string): [string, string] {
   if (kind === "minggu") return [monday(anchor), addDays(monday(anchor), 6)];
@@ -43,7 +45,7 @@ function bounds(kind: PeriodKind, anchor: string): [string, string] {
 }
 
 /** Read the period from the URL (?p=minggu|bulan|tahun&d=… or ?p=rentang&dari=…&sampai=…). Old ?bulan=YYYY-MM still works. */
-export function periodFromParams(sp: Params, today: string): Period {
+export function periodFromParams(sp: Params, today: string, locale = "id-ID"): Period {
   const legacyMonth = one(sp.bulan);
   const kindRaw = one(sp.p) ?? (legacyMonth ? "bulan" : "bulan");
   const kind: PeriodKind = (["minggu", "bulan", "tahun", "rentang"] as const).includes(kindRaw as PeriodKind) ? (kindRaw as PeriodKind) : "bulan";
@@ -54,11 +56,11 @@ export function periodFromParams(sp: Params, today: string): Period {
     if (valid(a) && valid(b)) {
       if (a > b) [a, b] = [b, a];
       const len = daysBetween(a, b) + 1;
-      return { kind, start: a, end: b, label: rangeLabel(a, b), prev: { start: addDays(a, -len), end: addDays(a, -1) }, canNext: false };
+      return { kind, start: a, end: b, label: rangeLabel(a, b, locale), prev: { start: addDays(a, -len), end: addDays(a, -1) }, canNext: false };
     }
     // incomplete range → last 30 days
     const start = addDays(today, -29);
-    return { kind, start, end: today, label: rangeLabel(start, today), prev: { start: addDays(start, -30), end: addDays(start, -1) }, canNext: false };
+    return { kind, start, end: today, label: rangeLabel(start, today, locale), prev: { start: addDays(start, -30), end: addDays(start, -1) }, canNext: false };
   }
 
   const d = one(sp.d);
@@ -66,7 +68,11 @@ export function periodFromParams(sp: Params, today: string): Period {
   const [start, end] = bounds(kind, anchor);
   const [ps, pe] = bounds(kind, stepAnchor(kind, start, -1));
   const label =
-    kind === "minggu" ? rangeLabel(start, end) : kind === "tahun" ? start.slice(0, 4) : intl({ month: "long", year: "numeric" }).format(toDate(start));
+    kind === "minggu"
+      ? rangeLabel(start, end, locale)
+      : kind === "tahun"
+        ? start.slice(0, 4)
+        : intl(locale, { month: "long", year: "numeric" }).format(toDate(start));
   return { kind, start, end, label, prev: { start: ps, end: pe }, canNext: addDays(end, 1) <= today };
 }
 
@@ -100,7 +106,7 @@ export const bucketKey = (iso: string, unit: Unit) => {
 };
 
 /** Bars for a chart: one bucket per day / Monday-week / month across [start, end], zeros included. */
-export function series(rows: { amount: number; occurred_at: string }[], start: string, end: string, unit: Unit) {
+export function series(rows: { amount: number; occurred_at: string }[], start: string, end: string, unit: Unit, locale = "id-ID") {
   const keyOf = (date: string) => (unit === "hari" ? date : unit === "minggu" ? monday(date) : date.slice(0, 7));
   const totals = new Map<string, number>();
   for (const r of rows) {
@@ -111,7 +117,8 @@ export function series(rows: { amount: number; occurred_at: string }[], start: s
   let cur = unit === "hari" ? start : unit === "minggu" ? monday(start) : monthStart(start);
   while (cur <= end) {
     const key = keyOf(cur);
-    const label = unit === "hari" ? String(Number(cur.slice(8))) : unit === "minggu" ? dayMon(cur) : intl({ month: "short" }).format(toDate(cur));
+    const label =
+      unit === "hari" ? String(Number(cur.slice(8))) : unit === "minggu" ? dayMon(cur, locale) : intl(locale, { month: "short" }).format(toDate(cur));
     out.push({ key, label, total: totals.get(key) ?? 0 });
     cur = unit === "hari" ? addDays(cur, 1) : unit === "minggu" ? addDays(cur, 7) : shiftMonth(cur, 1);
   }
