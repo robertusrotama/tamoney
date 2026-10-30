@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import { useT } from "@/components/I18n";
 import { Button, IconButton } from "@/components/ui/Button";
 import { fieldClass } from "@/components/ui/Field";
 import { Ring, useFocusWithin } from "@/components/ui/FocusRing";
@@ -24,6 +25,7 @@ export function MultiSelect({
   selected: string[];
   onChange: (next: string[]) => void;
 }) {
+  const t = useT();
   const set = new Set(selected);
   const toggle = (v: string) => onChange(set.has(v) ? selected.filter((x) => x !== v) : [...selected, v]);
   const groups = [...new Set(options.map((o) => o.group ?? ""))];
@@ -35,7 +37,12 @@ export function MultiSelect({
         <>
           {label}
           {selected.length > 0 && (
-            <motion.span key={selected.length} initial={{ scale: 0.6 }} animate={{ scale: 1 }} className="rounded-full bg-primary px-1.5 text-[12px] text-on-primary tabular-nums">
+            <motion.span
+              key={selected.length}
+              initial={{ scale: 0.6 }}
+              animate={{ scale: 1 }}
+              className="rounded-full bg-primary px-1.5 text-[12px] text-on-primary tabular-nums"
+            >
               {selected.length}
             </motion.span>
           )}
@@ -46,10 +53,10 @@ export function MultiSelect({
         <span className="text-[13px] font-semibold text-on-surface-variant">{label}</span>
         <div className="-mr-2 flex">
           <Button variant="ghost" size="sm" onClick={() => onChange(options.map((o) => o.value))}>
-            Pilih semua
+            {t("Pilih semua")}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => onChange([])} disabled={!selected.length}>
-            Hapus
+            {t("Hapus")}
           </Button>
         </div>
       </div>
@@ -116,7 +123,8 @@ export function SingleSelect({
 }
 
 /** Search with our own clear button (the native one differs per browser). */
-export function SearchField({ value, onChange, placeholder = "Cari catatan atau kategori" }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+export function SearchField({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const t = useT();
   const { focused, focusProps } = useFocusWithin();
   return (
     <div {...focusProps} className={`${fieldClass} flex items-center gap-2 bg-card pr-1.5`}>
@@ -126,17 +134,17 @@ export function SearchField({ value, onChange, placeholder = "Cari catatan atau 
         type="text"
         inputMode="search"
         enterKeyHint="search"
-        aria-label="Cari"
+        aria-label={t("Cari")}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => e.key === "Escape" && onChange("")}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("Cari catatan atau kategori")}
         className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-on-surface-variant"
       />
       <AnimatePresence>
         {value && (
           <motion.span key="clear" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}>
-            <IconButton onClick={() => onChange("")} aria-label="Hapus pencarian" className="size-8">
+            <IconButton onClick={() => onChange("")} aria-label={t("Hapus pencarian")} className="size-8">
               <Icon name="cancel" className="text-[18px]" filled />
             </IconButton>
           </motion.span>

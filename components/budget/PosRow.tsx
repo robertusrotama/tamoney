@@ -3,16 +3,23 @@
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useT } from "@/components/I18n";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
 import { Picker } from "@/components/ui/Picker";
 import type { PosUsage } from "@/lib/budget";
 
 const BAR = { ok: "bg-primary", warn: "bg-warning", over: "bg-negative", saved: "bg-positive" };
-const TILE = { ok: "bg-primary-container text-primary", warn: "bg-warning-container text-warning", over: "bg-negative-container text-negative", saved: "bg-positive-container text-positive" };
+const TILE = {
+  ok: "bg-primary-container text-primary",
+  warn: "bg-warning-container text-warning",
+  over: "bg-negative-container text-negative",
+  saved: "bg-positive-container text-positive",
+};
 
 /** One pos: used / limit with a bar that grows from the left (transform only). */
 export function PosRow({ p, note, href }: { p: PosUsage; note?: string; href?: string }) {
+  const t = useT();
   const fill = p.limit > 0 ? Math.min(1, Math.max(0, p.used) / p.limit) : p.used > 0 ? 1 : 0;
   const savings = p.group.is_savings;
   const Row = href ? Link : "div";
@@ -29,11 +36,11 @@ export function PosRow({ p, note, href }: { p: PosUsage; note?: string; href?: s
               <Money value={p.used} />
             ) : p.left >= 0 ? (
               <>
-                Sisa <Money value={p.left} />
+                {t("Sisa")} <Money value={p.left} />
               </>
             ) : (
               <>
-                Lebih <Money value={-p.left} />
+                {t("Lebih")} <Money value={-p.left} />
               </>
             )}
           </p>
@@ -48,7 +55,7 @@ export function PosRow({ p, note, href }: { p: PosUsage; note?: string; href?: s
           />
         </div>
         <p className="mt-1 text-[13px] text-on-surface-variant tabular-nums">
-          {savings ? "Terkumpul" : "Terpakai"} <Money value={Math.max(0, p.used)} /> dari <Money value={p.limit} /> · {p.pct}%
+          {savings ? t("Terkumpul") : t("Terpakai")} <Money value={Math.max(0, p.used)} /> {t("dari")} <Money value={p.limit} /> · {p.pct}%
           {note && <span className="block">{note}</span>}
         </p>
       </div>
@@ -58,10 +65,16 @@ export function PosRow({ p, note, href }: { p: PosUsage; note?: string; href?: s
 }
 
 export function PeriodPicker({ value, options }: { value: string; options: { value: string; label: string }[] }) {
+  const t = useT();
   const router = useRouter();
   return (
     <div className="w-full sm:w-56">
-      <Picker label="Periode" value={value} onChange={(v) => router.push(`/budget?periode=${v}`)} options={options.map((o) => ({ ...o, icon: "calendar_month" }))} />
+      <Picker
+        label={t("Periode")}
+        value={value}
+        onChange={(v) => router.push(`/budget?periode=${v}`)}
+        options={options.map((o) => ({ ...o, icon: "calendar_month" }))}
+      />
     </div>
   );
 }

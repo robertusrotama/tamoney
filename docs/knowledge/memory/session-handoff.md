@@ -38,7 +38,7 @@ Auth (split-screen), Ringkasan (pengeluaran hari ini, kartu rencana), Budget gaj
 - Semua sudah di-deploy dan di-push ke branch `feat/fase-1-2`. PR ke `master` disiapkan lewat link (gh CLI belum login).
 
 ## Belum selesai / catatan
-- **i18n ID/EN ±50%**: inti (`lib/i18n.ts`, `lib/i18n-en.ts`, `useT`/`getT`, tes cakupan kunci) + shell, auth, Ringkasan, Dompet, transaksi, notifikasi. Sisa: Analitik, Budget, Rencana, Pengaturan, Pintasan + pemilih bahasa di Pengaturan → Tampilan.
+- **i18n ID/EN ±75%**: inti + shell, auth, Ringkasan, Dompet, transaksi, notifikasi, Analitik, Budget, Rencana, Pengaturan, Pintasan. Pemilih bahasa ada di Pengaturan → Tampilan (`LangPicker`, cookie `lang`). Sisa: nama bulan/tanggal masih `id-ID` di `lib/period.ts`, `lib/budget.ts` (`fmt`), `GoalList`, `GoalForm`, `BillList`, `PayBill`; label periode di `commonRanges`/`periodFromParams` belum ikut locale; nama warna avatar (`CARD_COLORS`) tetap Indonesia.
 - Minor dari review (ditunda): `record_salary` paralel bisa dobel income; edit goal men-stamp ulang `achieved_at`; tagihan terlambat bulan lalu tak masuk "tersisa bulan ini"; urutan tanggal gaji tidak divalidasi; query transfer goal tanpa paging; `deleteSalary` tidak atomik; edit transfer goal lewat form transfer biasa melewati cek dompet goal.
 - iOS Simulator butuh Xcode penuh + `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`.
 - Ledger eksekusi lama ada di `.superpowers/sdd/2026-10-29-budget-tagihan-goals/progress.md` (git-ignored).

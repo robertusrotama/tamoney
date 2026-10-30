@@ -6,6 +6,7 @@ import { Card, EmptyState } from "@/components/ui/EmptyState";
 import { Icon } from "@/components/ui/Icon";
 import { Money } from "@/components/ui/Money";
 import { monthLabel, nominalEnd, rangeLabel, safePerDay } from "@/lib/budget";
+import { getT } from "@/lib/i18n-server";
 import { formatRupiah } from "@/lib/money";
 import { getPlanningState, loadPeriodView } from "@/lib/planning";
 import { getWallets } from "@/lib/queries";
@@ -17,14 +18,14 @@ const daysBetween = (a: string, b: string) => Math.round((new Date(`${b}T00:00:0
 
 export default async function BudgetPage({ searchParams }: PageProps<"/budget">) {
   const { supabase } = await requireUser();
-  const [s, wallets, sp] = await Promise.all([getPlanningState(supabase), getWallets(supabase), searchParams]);
+  const [s, wallets, sp, t] = await Promise.all([getPlanningState(supabase), getWallets(supabase), searchParams, getT()]);
   const salaryProps = { groups: s.groups, periods: s.periods, wallets, today: s.today, payday: s.payday, salaryWallet: s.salaryWallet };
 
   const header = (
     <div className="flex flex-wrap items-center justify-between gap-3 px-1">
       <h1 className="large-title">Budget</h1>
       <SalaryButton {...salaryProps} variant="tonal">
-        <Icon name="payments" className="text-[18px]" /> Catat gaji
+        <Icon name="payments" className="text-[18px]" /> {t("Catat gaji")}
       </SalaryButton>
     </div>
   );
@@ -34,9 +35,9 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
       <div className="space-y-6">
         {header}
         <Card>
-          <EmptyState icon="pie_chart" title="Catat gaji untuk mulai periode budget">
+          <EmptyState icon="pie_chart" title={t("Catat gaji untuk mulai periode budget")}>
             <p className="max-w-sm text-[15px]">
-              Gaji dibagi otomatis ke pos seperti Makanan, Rumah & Kost, dan Tabungan. Persentasenya bisa diatur di Pengaturan.
+              {t("Gaji dibagi otomatis ke pos seperti Makanan, Rumah & Kost, dan Tabungan. Persentasenya bisa diatur di Pengaturan.")}
             </p>
           </EmptyState>
         </Card>
@@ -63,19 +64,27 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-[13px] font-semibold tracking-[0.04em] text-on-surface-variant uppercase">
-              Gaji {monthLabel(period.month)} · {rangeLabel(range.start, end)}
+              {t("Gaji {month} · {range}", { month: monthLabel(period.month), range: rangeLabel(range.start, end) })}
             </p>
-            <Money value={leftover} className={`block text-[clamp(2rem,1.5rem+2.5vw,2.75rem)] leading-tight font-bold tracking-[-0.03em] ${leftover < 0 ? "text-negative" : ""}`} />
-            <p className="text-[15px] text-on-surface-variant">{leftover < 0 ? "lebih dari budget belanja" : "sisa untuk belanja"}</p>
+            <Money
+              value={leftover}
+              className={`block text-[clamp(2rem,1.5rem+2.5vw,2.75rem)] leading-tight font-bold tracking-[-0.03em] ${leftover < 0 ? "text-negative" : ""}`}
+            />
+            <p className="text-[15px] text-on-surface-variant">{leftover < 0 ? t("lebih dari budget belanja") : t("sisa untuk belanja")}</p>
           </div>
-          <PeriodPicker value={period.month.slice(0, 7)} options={[...s.periods].reverse().map((p) => ({ value: p.month.slice(0, 7), label: monthLabel(p.month) }))} />
+          <PeriodPicker
+            value={period.month.slice(0, 7)}
+            options={[...s.periods].reverse().map((p) => ({ value: p.month.slice(0, 7), label: monthLabel(p.month) }))}
+          />
         </div>
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            period.topup ? ["Gaji + pemasukan", <Money key="g" value={period.salary + period.topup} />] : ["Gaji", <Money key="g" value={period.salary} />],
-            ["Terpakai", <Money key="t" value={usage.spent} />],
-            running ? ["Aman per hari", <Money key="a" value={safePerDay(usage.pos, s.today, end)} />] : ["Periode", "Selesai"],
-            running ? ["Hari tersisa", `${daysLeft} hari`] : ["Ditabung", <Money key="d" value={savings?.used ?? 0} />],
+            period.topup
+              ? [t("Gaji + pemasukan"), <Money key="g" value={period.salary + period.topup} />]
+              : [t("Gaji"), <Money key="g" value={period.salary} />],
+            [t("Terpakai"), <Money key="t" value={usage.spent} />],
+            running ? [t("Aman per hari"), <Money key="a" value={safePerDay(usage.pos, s.today, end)} />] : [t("Periode"), t("Selesai")],
+            running ? [t("Hari tersisa"), t("{n} hari", { n: daysLeft })] : [t("Ditabung"), <Money key="d" value={savings?.used ?? 0} />],
           ].map(([k, v]) => (
             <div key={k as string} className="rounded-[12px] bg-surface-dim/60 px-3 py-2">
               <dt className="text-[13px] text-on-surface-variant">{k}</dt>
@@ -85,15 +94,18 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
         </dl>
         <div className="flex flex-wrap items-center gap-2">
           <SalaryButton {...salaryProps} month={period.month.slice(0, 7)} variant="tonal" size="sm">
-            <Icon name="edit" className="text-[16px]" /> Ubah gaji
+            <Icon name="edit" className="text-[16px]" /> {t("Ubah gaji")}
           </SalaryButton>
           <DeleteSalaryButton periodId={period.id} label={monthLabel(period.month)} />
         </div>
         {!running && leftover > 0 && (
-          <Link href="/rencana?tab=goals" className="flex items-center gap-2 rounded-[12px] bg-positive-container px-3 py-2.5 text-[15px] font-medium text-positive">
+          <Link
+            href="/rencana?tab=goals"
+            className="flex items-center gap-2 rounded-[12px] bg-positive-container px-3 py-2.5 text-[15px] font-medium text-positive"
+          >
             <Icon name="savings" className="text-[20px]" filled />
             <span className="flex-1">
-              Sisa <Money value={leftover} /> — pindahkan ke goal
+              {t("Sisa")} <Money value={leftover} /> — {t("pindahkan ke goal")}
             </span>
             <Icon name="chevron_right" className="text-[20px]" />
           </Link>
@@ -102,9 +114,9 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
 
       <section>
         <div className="mb-2 flex items-center justify-between px-1">
-          <h2 className="text-[20px] font-bold tracking-[-0.01em]">Pos budget</h2>
+          <h2 className="text-[20px] font-bold tracking-[-0.01em]">{t("Pos budget")}</h2>
           <SalaryButton {...salaryProps} month={period.month.slice(0, 7)} variant="ghost">
-            Ubah alokasi
+            {t("Ubah alokasi")}
           </SalaryButton>
         </div>
         <div className="divide-y divide-outline overflow-hidden rounded-[14px] bg-card">
@@ -113,7 +125,11 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
               key={p.group.id}
               p={p}
               href={`/budget/${p.group.id}?periode=${period.month.slice(0, 7)}`}
-              note={p.group.is_savings && goalNeed > 0 ? `Kebutuhan setoran goal ${formatRupiah(goalNeed)} dari alokasi ${formatRupiah(p.limit)}` : undefined}
+              note={
+                p.group.is_savings && goalNeed > 0
+                  ? t("Kebutuhan setoran goal {need} dari alokasi {limit}", { need: formatRupiah(goalNeed), limit: formatRupiah(p.limit) })
+                  : undefined
+              }
             />
           ))}
           {usage.unassigned > 0 && (
@@ -122,8 +138,8 @@ export default async function BudgetPage({ searchParams }: PageProps<"/budget">)
                 <Icon name="help" className="text-[20px]" />
               </span>
               <span className="flex-1">
-                <span className="block text-[17px]">Belum masuk pos</span>
-                <span className="text-[13px] text-on-surface-variant">Atur kategorinya di Pengaturan</span>
+                <span className="block text-[17px]">{t("Belum masuk pos")}</span>
+                <span className="text-[13px] text-on-surface-variant">{t("Atur kategorinya di Pengaturan")}</span>
               </span>
               <Money value={usage.unassigned} className="text-[15px] font-semibold" />
               <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />

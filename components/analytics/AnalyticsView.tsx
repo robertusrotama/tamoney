@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRef, useState, type ReactNode } from "react";
-import { useT } from "@/components/I18n";
+import { useLocale, useT } from "@/components/I18n";
 import { Pagination } from "@/components/ui/Pagination";
 import { useMedia } from "@/components/ui/useMedia";
 import { TxActions } from "@/components/transactions/TxActions";
@@ -45,8 +45,8 @@ export function Delta({ value, invert }: { value: number | null; invert?: boolea
   );
 }
 
-export const dayHeader = (d: string) =>
-  new Intl.DateTimeFormat("id-ID", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
+export const dayHeader = (d: string, locale: string) =>
+  new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
 
 /** Filter bar shared by Analitik and the category deep dive: search, multi-select category/wallet, single kind. */
 export function FilterBar({
@@ -65,6 +65,7 @@ export function FilterBar({
   wallets: Wallet[];
   show?: { categories?: boolean; kind?: boolean };
 }) {
+  const t = useT();
   const active = !!(f.q || f.kategori || f.dompet || (f.jenis && f.jenis !== "all"));
   return (
     <div className="space-y-2.5">
@@ -77,24 +78,32 @@ export function FilterBar({
       <div className="flex flex-wrap items-center gap-2">
         {show.categories && (
           <MultiSelect
-            label="Kategori"
+            label={t("Kategori")}
             selected={csv(f.kategori)}
             onChange={(v) => set({ kategori: v.join(",") })}
-            options={categories.map((c) => ({ value: c.id, label: c.name, icon: c.icon, group: c.kind === "expense" ? "Pengeluaran" : "Pemasukan" }))}
+            options={categories.map((c) => ({ value: c.id, label: c.name, icon: c.icon, group: c.kind === "expense" ? t("Pengeluaran") : t("Pemasukan") }))}
           />
         )}
         <MultiSelect
-          label="Dompet"
+          label={t("Dompet")}
           selected={csv(f.dompet)}
           onChange={(v) => set({ dompet: v.join(",") })}
-          options={wallets.map((w) => ({ value: w.id, label: w.name, hint: w.archived_at ? "Arsip" : undefined }))}
+          options={wallets.map((w) => ({ value: w.id, label: w.name, hint: w.archived_at ? t("Arsip") : undefined }))}
         />
-        {show.kind && <SingleSelect label="Jenis" value={f.jenis || "all"} defaultValue="all" onChange={(jenis) => set({ jenis })} options={KIND_OPTIONS} />}
+        {show.kind && (
+          <SingleSelect
+            label={t("Jenis")}
+            value={f.jenis || "all"}
+            defaultValue="all"
+            onChange={(jenis) => set({ jenis })}
+            options={KIND_OPTIONS.map((o) => ({ ...o, label: t(o.label) }))}
+          />
+        )}
         <AnimatePresence>
           {active && (
             <motion.span key="reset" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>
               <Button variant="ghost" size="sm" className="h-9" onClick={() => set({ q: "", kategori: "", dompet: "", jenis: "" })}>
-                <Icon name="close" className="text-[16px]" /> Reset
+                <Icon name="close" className="text-[16px]" /> {t("Reset")}
               </Button>
             </motion.span>
           )}
@@ -127,6 +136,7 @@ export function AnalyticsView({
 }) {
   const pending = usePeriodPending();
   const t = useT();
+  const locale = useLocale();
   const [f, set] = useUrlState(initial);
   const [limit, setLimit] = useState(PAGE);
   const [page, setPage] = useState(1);
@@ -171,14 +181,18 @@ export function AnalyticsView({
       ) : (
         <section className="grid overflow-hidden rounded-[14px] bg-card sm:grid-cols-3">
           {[
-            { label: "Pemasukan", value: now.income, delta: <Delta value={pctChange(now.income, before.income)} /> },
-            { label: "Pengeluaran", value: now.expense, delta: <Delta value={pctChange(now.expense, before.expense)} invert /> },
-            { label: now.net >= 0 ? "Surplus" : "Defisit", value: now.net, delta: null, signed: true },
+            { label: t("Pemasukan"), value: now.income, delta: <Delta value={pctChange(now.income, before.income)} /> },
+            { label: t("Pengeluaran"), value: now.expense, delta: <Delta value={pctChange(now.expense, before.expense)} invert /> },
+            { label: now.net >= 0 ? t("Surplus") : t("Defisit"), value: now.net, delta: null, signed: true },
           ].map((c) => (
             <div key={c.label} className="border-b border-outline p-4 last:border-0 sm:border-r sm:border-b-0 sm:last:border-r-0">
               <Label>{c.label}</Label>
               <Money value={c.value} sign={c.signed ? "auto" : "none"} className="block text-[24px] font-bold tracking-[-0.02em]" />
-              {c.delta && <p className="text-[13px] text-on-surface-variant">{c.delta} vs periode sebelumnya</p>}
+              {c.delta && (
+                <p className="text-[13px] text-on-surface-variant">
+                  {c.delta} {t("vs periode sebelumnya")}
+                </p>
+              )}
             </div>
           ))}
         </section>
@@ -187,7 +201,7 @@ export function AnalyticsView({
       <div className="grid items-start gap-8 lg:grid-cols-[1fr_340px]">
         {/* Kategori first in the DOM on mobile reads top→bottom; on desktop it sits right */}
         <section className="min-w-0 lg:order-2 lg:sticky lg:top-20">
-          <h2 className={`mb-2 px-1 ${h2}`}>Kategori</h2>
+          <h2 className={`mb-2 px-1 ${h2}`}>{t("Kategori")}</h2>
           <Card>
             {pending ? (
               <div className="space-y-3">
@@ -196,14 +210,17 @@ export function AnalyticsView({
                 <Bone className="h-4 w-4/5" />
               </div>
             ) : breakdown.length === 0 ? (
-              <EmptyState icon="donut_large" title="Belum ada pengeluaran" />
+              <EmptyState icon="donut_large" title={t("Belum ada pengeluaran")} />
             ) : (
               <>
                 <CategoryDonut data={breakdown} links={breakdown.map((c) => `/analitik/kategori/${c.categoryId}?${periodQs}`)} />
                 <ol>
                   {breakdown.map((c, i) => (
                     <li key={c.categoryId} className="border-b border-outline last:border-0">
-                      <Link href={`/analitik/kategori/${c.categoryId}?${periodQs}`} className="-mx-2 flex items-center gap-3 rounded-[10px] px-2 py-2 hover:bg-surface-dim">
+                      <Link
+                        href={`/analitik/kategori/${c.categoryId}?${periodQs}`}
+                        className="-mx-2 flex items-center gap-3 rounded-[10px] px-2 py-2 hover:bg-surface-dim"
+                      >
                         <span className="size-2.5 shrink-0 rounded-full" style={{ background: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }} />
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-[15px]">{c.name}</p>
@@ -225,7 +242,7 @@ export function AnalyticsView({
         <section ref={listTop} className="min-w-0 scroll-mt-20 lg:order-1">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-3 px-1">
             <h2 className={h2}>
-              Riwayat <span className="text-[15px] font-medium text-on-surface-variant tabular-nums">{cur.length}</span>
+              {t("Riwayat")} <span className="text-[15px] font-medium text-on-surface-variant tabular-nums">{cur.length}</span>
             </h2>
             <div className="w-full sm:w-80">
               <SortControl by={by} dir={dir} onChange={(urut, arah) => set({ urut, arah })} />
@@ -235,13 +252,13 @@ export function AnalyticsView({
             <ListBones rows={8} />
           ) : sorted.length === 0 ? (
             <Card>
-              <EmptyState icon="receipt_long" title="Tidak ada transaksi" />
+              <EmptyState icon="receipt_long" title={t("Tidak ada transaksi")} />
             </Card>
           ) : (
             <div className="space-y-5">
               {groups.map((g) => (
                 <div key={g.key}>
-                  {g.key !== "all" && <p className="mb-1.5 px-1 text-[13px] font-semibold text-on-surface-variant uppercase">{dayHeader(g.key)}</p>}
+                  {g.key !== "all" && <p className="mb-1.5 px-1 text-[13px] font-semibold text-on-surface-variant uppercase">{dayHeader(g.key, locale)}</p>}
                   <TxList>
                     {g.items.map((t) => (
                       <TxRow

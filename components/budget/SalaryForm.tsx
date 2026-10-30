@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type ReactNode } from "react";
+import { useLocale, useT } from "@/components/I18n";
 import { AmountInput, withDots } from "@/components/ui/AmountInput";
 import { Button, type ButtonVariant } from "@/components/ui/Button";
 import { useConfirm } from "@/components/ui/Confirm";
@@ -37,6 +38,8 @@ export function nextSalaryMonth(today: string, payday: number, periods: BudgetPe
 }
 
 function SalaryForm({ groups, periods, wallets, today, payday, salaryWallet, month: initialMonth, onDone }: Props & { month: string; onDone: () => void }) {
+  const t = useT();
+  const locale = useLocale();
   const { state, pending, onSubmit } = useFormDone(recordSalary, onDone);
   const existing = (m: string) => periods.find((p) => p.month.startsWith(m));
   const dateFor = (m: string) => {
@@ -77,36 +80,36 @@ function SalaryForm({ groups, periods, wallets, today, payday, salaryWallet, mon
   return (
     <form method="post" onSubmit={onSubmit} className="space-y-4" key={month}>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Gaji bulan">
+        <Field label={t("Gaji bulan")}>
           <Picker
             name="month"
-            label="Gaji bulan"
+            label={t("Gaji bulan")}
             value={month}
             onChange={pickMonth}
             options={months.map((m) => ({ value: m, label: monthLabel(m), icon: existing(m) ? "check_circle" : "calendar_month" }))}
           />
         </Field>
-        <Field label="Masuk ke dompet">
+        <Field label={t("Masuk ke dompet")}>
           <Picker
             name="wallet_id"
-            label="Masuk ke dompet"
-            placeholder="Pilih dompet"
+            label={t("Masuk ke dompet")}
+            placeholder={t("Pilih dompet")}
             defaultValue={salaryWallet && wallets.some((w) => w.id === salaryWallet) ? salaryWallet : ""}
             options={wallets.map((w) => ({ value: w.id, label: w.name, icon: WALLET_ICON[w.type] }))}
           />
         </Field>
       </div>
       <AmountInput name="amount" value={salary} onChange={changeSalary} large />
-      <Field label="Tanggal diterima">
-        <DateField name="occurred_at" label="Tanggal diterima" today={today} defaultValue={dateFor(month)} />
+      <Field label={t("Tanggal diterima")}>
+        <DateField name="occurred_at" label={t("Tanggal diterima")} today={today} defaultValue={dateFor(month)} />
       </Field>
 
       <div>
         <div className="mb-1.5 flex items-center justify-between">
-          <p className="text-[13px] font-semibold tracking-[0.04em] text-on-surface-variant uppercase">Alokasi</p>
+          <p className="text-[13px] font-semibold tracking-[0.04em] text-on-surface-variant uppercase">{t("Alokasi")}</p>
           {touched && (
             <Button type="button" variant="ghost" size="sm" onClick={recompute}>
-              <Icon name="refresh" className="text-[16px]" /> Hitung ulang
+              <Icon name="refresh" className="text-[16px]" /> {t("Hitung ulang")}
             </Button>
           )}
         </div>
@@ -116,7 +119,7 @@ function SalaryForm({ groups, periods, wallets, today, payday, salaryWallet, mon
               <Icon name={g.icon} className="text-[20px] text-on-surface-variant" />
               <span className="min-w-0 flex-1 truncate text-[15px]">
                 {g.name}
-                <span className="ml-1.5 text-[13px] text-on-surface-variant tabular-nums">{(g.pct_bp / 100).toLocaleString("id-ID")}%</span>
+                <span className="ml-1.5 text-[13px] text-on-surface-variant tabular-nums">{(g.pct_bp / 100).toLocaleString(locale)}%</span>
               </span>
               <span className="w-40 shrink-0">
                 <AmountInput
@@ -133,20 +136,27 @@ function SalaryForm({ groups, periods, wallets, today, payday, salaryWallet, mon
           ))}
         </div>
         <p className={`mt-2 text-right text-[13px] tabular-nums ${total === target ? "text-on-surface-variant" : "font-semibold text-negative"}`}>
-          Total <Money value={total} /> dari <Money value={target} />
+          {t("Total")} <Money value={total} /> {t("dari")} <Money value={target} />
         </p>
       </div>
 
       <FormError message={state.error} />
       <Button type="submit" disabled={pending || total !== target || target === 0} className="w-full">
-        {pending ? "Menyimpan…" : existing(month) ? "Simpan perubahan" : "Catat gaji"}
+        {pending ? t("Menyimpan…") : existing(month) ? t("Simpan perubahan") : t("Catat gaji")}
       </Button>
     </form>
   );
 }
 
 /** Button + dialog. `month` fixed = edit that month; otherwise the next salary month. */
-export function SalaryButton({ month, variant = "primary", size, children, ...props }: Props & { month?: string; variant?: ButtonVariant; size?: "sm" | "md"; children: ReactNode }) {
+export function SalaryButton({
+  month,
+  variant = "primary",
+  size,
+  children,
+  ...props
+}: Props & { month?: string; variant?: ButtonVariant; size?: "sm" | "md"; children: ReactNode }) {
+  const t = useT();
   const d = useDialog();
   const m = month ?? nextSalaryMonth(props.today, props.payday, props.periods);
   return (
@@ -154,7 +164,7 @@ export function SalaryButton({ month, variant = "primary", size, children, ...pr
       <Button variant={variant} size={size} onClick={d.show}>
         {children}
       </Button>
-      <Dialog open={d.open} origin={d.origin} onClose={d.close} title={props.periods.some((p) => p.month.startsWith(m)) ? "Ubah alokasi" : "Catat gaji"}>
+      <Dialog open={d.open} origin={d.origin} onClose={d.close} title={props.periods.some((p) => p.month.startsWith(m)) ? t("Ubah alokasi") : t("Catat gaji")}>
         <SalaryForm {...props} month={m} onDone={d.close} />
       </Dialog>
     </>
@@ -163,12 +173,20 @@ export function SalaryButton({ month, variant = "primary", size, children, ...pr
 
 /** Deletes the shown month's salary after a confirm; the period and its salary transaction go together. */
 export function DeleteSalaryButton({ periodId, label }: { periodId: string; label: string }) {
+  const t = useT();
   const [confirm, dialog] = useConfirm();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string>();
   const router = useRouter();
   const run = async () => {
-    if (!(await confirm({ title: `Hapus gaji ${label}?`, message: "Periode budget dan transaksi gajinya ikut dihapus. Transaksi lain tidak berubah.", confirmLabel: "Hapus", destructive: true })))
+    if (
+      !(await confirm({
+        title: t("Hapus gaji {month}?", { month: label }),
+        message: t("Periode budget dan transaksi gajinya ikut dihapus. Transaksi lain tidak berubah."),
+        confirmLabel: t("Hapus"),
+        destructive: true,
+      }))
+    )
       return;
     start(async () => {
       const res = await deleteSalary(periodId);
@@ -179,7 +197,7 @@ export function DeleteSalaryButton({ periodId, label }: { periodId: string; labe
   return (
     <>
       <Button variant="danger" size="sm" onClick={run} disabled={pending}>
-        <Icon name="delete" className="text-[16px]" /> Hapus gaji
+        <Icon name="delete" className="text-[16px]" /> {t("Hapus gaji")}
       </Button>
       {error && <span className="text-[13px] text-negative">{error}</span>}
       {dialog}

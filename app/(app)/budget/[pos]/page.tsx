@@ -11,6 +11,7 @@ import { isoRange } from "@/lib/period";
 import { isRefund } from "@/lib/reports";
 import { getPlanningState, loadPeriodView } from "@/lib/planning";
 import { getCategories, getTransactionsBetween, getWallets } from "@/lib/queries";
+import { getT } from "@/lib/i18n-server";
 import { requireUser } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Pos budget · TaMoney" };
@@ -18,7 +19,14 @@ export const metadata: Metadata = { title: "Pos budget · TaMoney" };
 /** One pos in one salary period: what the money went to, by category, then every transaction. */
 export default async function PosPage({ params, searchParams }: PageProps<"/budget/[pos]">) {
   const { supabase } = await requireUser();
-  const [{ pos: posId }, sp, s, categories, wallets] = await Promise.all([params, searchParams, getPlanningState(supabase), getCategories(supabase), getWallets(supabase, true)]);
+  const [{ pos: posId }, sp, s, categories, wallets, tr] = await Promise.all([
+    params,
+    searchParams,
+    getPlanningState(supabase),
+    getCategories(supabase),
+    getWallets(supabase, true),
+    getT(),
+  ]);
   const group = s.allGroups.find((g) => g.id === posId);
   if (!group || !s.current) notFound();
 
@@ -41,12 +49,17 @@ export default async function PosPage({ params, searchParams }: PageProps<"/budg
   for (const t of rows) {
     const key = t.kind === "transfer" ? "goal" : t.category_id!;
     const sign = isRefund(t) || (t.kind === "transfer" && t.wallet_id === goalWallets.get(t.goal_id!)) ? -1 : 1;
-    const cur = byCat.get(key) ?? { name: key === "goal" ? "Setoran goal" : (t.category_name ?? "—"), icon: key === "goal" ? "savings" : (t.category_icon ?? "more_horiz"), total: 0, n: 0 };
+    const cur = byCat.get(key) ?? {
+      name: key === "goal" ? tr("Setoran goal") : (t.category_name ?? "—"),
+      icon: key === "goal" ? "savings" : (t.category_icon ?? "more_horiz"),
+      total: 0,
+      n: 0,
+    };
     byCat.set(key, { ...cur, total: cur.total + sign * t.amount, n: cur.n + 1 });
   }
   const breakdown = [...byCat.values()].sort((a, b) => b.total - a.total);
   const names = new Map(wallets.map((w) => [w.id, w.name]));
-  const walletName = (id: string) => names.get(id) ?? "Diarsipkan";
+  const walletName = (id: string) => names.get(id) ?? tr("Diarsipkan");
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -56,7 +69,7 @@ export default async function PosPage({ params, searchParams }: PageProps<"/budg
         </Link>
         <h1 className="large-title">{group.name}</h1>
         <p className="text-[15px] text-on-surface-variant">
-          Gaji {monthLabel(view.period.month)} · {rangeLabel(view.range.start, end)}
+          {tr("Gaji {month} · {range}", { month: monthLabel(view.period.month), range: rangeLabel(view.range.start, end) })}
         </p>
       </div>
 
@@ -66,7 +79,7 @@ export default async function PosPage({ params, searchParams }: PageProps<"/budg
 
       {breakdown.length > 0 && (
         <section>
-          <h2 className="mb-2 px-1 text-[20px] font-bold tracking-[-0.01em]">Dipakai untuk</h2>
+          <h2 className="mb-2 px-1 text-[20px] font-bold tracking-[-0.01em]">{tr("Dipakai untuk")}</h2>
           <div className="divide-y divide-outline overflow-hidden rounded-[14px] bg-card">
             {breakdown.map((c) => (
               <div key={c.name} className="flex items-center gap-3 px-4 py-2.5">
@@ -75,7 +88,7 @@ export default async function PosPage({ params, searchParams }: PageProps<"/budg
                 </span>
                 <span className="flex-1">
                   <span className="block text-[17px]">{c.name}</span>
-                  <span className="text-[13px] text-on-surface-variant">{c.n} transaksi</span>
+                  <span className="text-[13px] text-on-surface-variant">{tr("{n} transaksi", { n: c.n })}</span>
                 </span>
                 <span className="text-right">
                   <Money value={c.total} className="block text-[15px] font-semibold" />
@@ -88,11 +101,13 @@ export default async function PosPage({ params, searchParams }: PageProps<"/budg
       )}
 
       <section>
-        <h2 className="mb-2 px-1 text-[20px] font-bold tracking-[-0.01em]">Transaksi</h2>
+        <h2 className="mb-2 px-1 text-[20px] font-bold tracking-[-0.01em]">{tr("Transaksi")}</h2>
         {rows.length === 0 ? (
           <Card>
-            <EmptyState icon="receipt_long" title="Belum ada transaksi di pos ini">
-              <p className="text-[15px]">{inPos.size === 0 && !group.is_savings ? "Pos ini belum punya kategori. Atur di Pengaturan." : "Periode ini masih bersih."}</p>
+            <EmptyState icon="receipt_long" title={tr("Belum ada transaksi di pos ini")}>
+              <p className="text-[15px]">
+                {inPos.size === 0 && !group.is_savings ? tr("Pos ini belum punya kategori. Atur di Pengaturan.") : tr("Periode ini masih bersih.")}
+              </p>
             </EmptyState>
           </Card>
         ) : (

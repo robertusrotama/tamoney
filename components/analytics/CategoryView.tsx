@@ -2,6 +2,8 @@
 
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useLocale, useT } from "@/components/I18n";
+import type { T } from "@/lib/i18n";
 import { TxActions } from "@/components/transactions/TxActions";
 import { TxList, TxRow } from "@/components/transactions/TxRow";
 import { Card, EmptyState, Label } from "@/components/ui/EmptyState";
@@ -26,18 +28,18 @@ const GROUPS: { value: Grouping; label: string }[] = [
   { value: "semua", label: "Semua" },
 ];
 
-const intl = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("id-ID", { ...o, timeZone: "UTC" });
-const groupTitle = (key: string, g: Grouping) => {
-  if (g === "hari") return dayHeader(key);
-  if (g === "bulan") return intl({ month: "long", year: "numeric" }).format(new Date(`${key}-01T00:00:00Z`));
+const intl = (locale: string, o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(locale, { ...o, timeZone: "UTC" });
+const groupTitle = (key: string, g: Grouping, locale: string, t: T) => {
+  if (g === "hari") return dayHeader(key, locale);
+  if (g === "bulan") return intl(locale, { month: "long", year: "numeric" }).format(new Date(`${key}-01T00:00:00Z`));
   const s = new Date(`${key}T00:00:00Z`);
   const e = new Date(s.getTime() + 6 * 86_400_000);
-  return `Minggu ${intl({ day: "numeric", month: "short" }).format(s)} – ${intl({ day: "numeric", month: "short" }).format(e)}`;
+  const day = { day: "numeric", month: "short" } as const;
+  return t("Minggu {from} – {to}", { from: intl(locale, day).format(s), to: intl(locale, day).format(e) });
 };
 
 /** Default bucket size for a period: days for a week/month, weeks for long ranges, months for a year. */
-const defaultUnit = (p: Period): Unit =>
-  p.kind === "tahun" ? "bulan" : (Date.parse(p.end) - Date.parse(p.start)) / 86_400_000 > 62 ? "minggu" : "hari";
+const defaultUnit = (p: Period): Unit => (p.kind === "tahun" ? "bulan" : (Date.parse(p.end) - Date.parse(p.start)) / 86_400_000 > 62 ? "minggu" : "hari");
 
 /** Category deep dive body: rows for one category in the period; grouping/sort/filters are instant. */
 export function CategoryView({
@@ -62,6 +64,8 @@ export function CategoryView({
   initial: FilterInit & { kelompok: string };
 }) {
   const pending = usePeriodPending();
+  const t = useT();
+  const locale = useLocale();
   const [f, set] = useUrlState(initial);
   const grouping = (GROUPS.some((g) => g.value === f.kelompok) ? f.kelompok : defaultUnit(period)) as Grouping;
   const by = (f.urut || "tanggal") as SortBy;
@@ -72,14 +76,23 @@ export function CategoryView({
   // A friend's payback in this category counts against it (negative), like in the reports.
   const signed = (t: TxWithCategory) => (isRefund(t) ? -t.amount : t.amount);
   const total = mine.reduce((s, t) => s + signed(t), 0);
-  const delta = pctChange(total, prev.reduce((s, t) => s + signed(t), 0));
+  const delta = pctChange(
+    total,
+    prev.reduce((s, t) => s + signed(t), 0),
+  );
   const biggest = mine.reduce<TxWithCategory | null>((m, t) => (!isRefund(t) && (!m || t.amount > m.amount) ? t : m), null);
   const sorted = sortTxs(mine, by, dir);
   const groups = groupTxs(sorted, grouping, by === "tanggal" ? dir : "desc");
   const chartUnit = grouping === "semua" ? defaultUnit(period) : grouping;
-  const bars = series(mine.map((t) => ({ ...t, amount: signed(t) })), period.start, period.end, chartUnit);
+  const bars = series(
+    mine.map((t) => ({ ...t, amount: signed(t) })),
+    period.start,
+    period.end,
+    chartUnit,
+  );
   const names = new Map(wallets.map((w) => [w.id, w.name]));
   const walletName = (id: string) => names.get(id) ?? "—";
+  const kind = category.kind === "expense" ? t("pengeluaran") : t("pemasukan");
   const expense = category.kind === "expense";
   const tone = expense ? "var(--c-negative)" : "var(--c-positive)";
   const h2 = "text-[20px] font-bold tracking-[-0.01em]";
@@ -91,7 +104,7 @@ export function CategoryView({
           href={`/analitik?${new URLSearchParams(periodParams(period, 0))}`}
           className="inline-flex items-center gap-0.5 rounded-full pr-2 text-[17px] text-primary hover:opacity-70"
         >
-          <Icon name="chevron_left" className="text-[22px]" /> Analitik
+          <Icon name="chevron_left" className="text-[22px]" /> {t("Analitik")}
         </Link>
         <div className="flex items-center gap-3">
           <span className={`flex size-11 items-center justify-center rounded-[12px] text-white ${expense ? "bg-negative" : "bg-positive"}`}>
@@ -101,33 +114,40 @@ export function CategoryView({
         </div>
       </div>
 
-      <FilterBar f={f} set={set} categories={categories} wallets={wallets} show={{ categories: false, kind: false }} date={<PeriodBar period={period} today={today} />} />
+      <FilterBar
+        f={f}
+        set={set}
+        categories={categories}
+        wallets={wallets}
+        show={{ categories: false, kind: false }}
+        date={<PeriodBar period={period} today={today} />}
+      />
 
       {pending ? (
         <Bone className="h-[104px] rounded-[14px]" />
       ) : (
         <section className="grid overflow-hidden rounded-[14px] bg-card sm:grid-cols-4">
           <div className="border-b border-outline p-4 sm:col-span-2 sm:border-r sm:border-b-0">
-            <Label>Total {expense ? "pengeluaran" : "pemasukan"}</Label>
+            <Label>{t("Total {kind}", { kind })}</Label>
             <Money value={total} className="block text-[32px] leading-tight font-bold tracking-[-0.025em]" />
             <p className="text-[13px] text-on-surface-variant">
-              {kindTotal ? Math.round((total / kindTotal) * 100) : 0}% dari semua {expense ? "pengeluaran" : "pemasukan"} · <Delta value={delta} invert={expense} /> vs
-              periode sebelumnya
+              {t("{pct}% dari semua {kind}", { pct: kindTotal ? Math.round((total / kindTotal) * 100) : 0, kind })} · <Delta value={delta} invert={expense} />{" "}
+              {t("vs periode sebelumnya")}
             </p>
           </div>
           <div className="border-b border-outline p-4 sm:border-r sm:border-b-0">
-            <Label>Transaksi · rata-rata</Label>
+            <Label>{t("Transaksi · rata-rata")}</Label>
             <p className="text-[24px] font-bold tracking-[-0.02em] tabular-nums">{mine.length}</p>
             <p className="text-[13px] text-on-surface-variant">
-              <Money value={mine.length ? Math.round(total / mine.length) : 0} /> / transaksi
+              <Money value={mine.length ? Math.round(total / mine.length) : 0} /> {t("/ transaksi")}
             </p>
           </div>
           <div className="p-4">
-            <Label>Terbesar</Label>
+            <Label>{t("Terbesar")}</Label>
             {biggest ? (
               <a href={`#tx-${biggest.id}`} className="block rounded-[8px] hover:opacity-80">
                 <Money value={biggest.amount} className="block text-[24px] font-bold tracking-[-0.02em]" />
-                <p className="truncate text-[13px] text-primary">{biggest.note || "Lihat transaksi"}</p>
+                <p className="truncate text-[13px] text-primary">{biggest.note || t("Lihat transaksi")}</p>
               </a>
             ) : (
               <p className="text-[24px] font-bold">—</p>
@@ -138,16 +158,16 @@ export function CategoryView({
 
       <section>
         <div className="mb-2 flex flex-wrap items-center justify-between gap-3 px-1">
-          <h2 className={h2}>Per {chartUnit === "hari" ? "Hari" : chartUnit === "minggu" ? "Minggu" : "Bulan"}</h2>
+          <h2 className={h2}>{t("Per {unit}", { unit: chartUnit === "hari" ? t("Hari") : chartUnit === "minggu" ? t("Minggu") : t("Bulan") })}</h2>
           <div className="w-full sm:w-80">
-            <Segmented value={grouping} onChange={(kelompok) => set({ kelompok })} options={GROUPS} />
+            <Segmented value={grouping} onChange={(kelompok) => set({ kelompok })} options={GROUPS.map((g) => ({ ...g, label: t(g.label) }))} />
           </div>
         </div>
         <Card>
           {pending ? (
             <Bone className="h-[180px]" />
           ) : mine.length === 0 ? (
-            <EmptyState icon="bar_chart" title="Tidak ada transaksi di periode ini" />
+            <EmptyState icon="bar_chart" title={t("Tidak ada transaksi di periode ini")} />
           ) : (
             <DrillChart data={bars} color={tone} />
           )}
@@ -157,7 +177,7 @@ export function CategoryView({
       <section>
         <div className="mb-2 flex flex-wrap items-center justify-between gap-3 px-1">
           <h2 className={h2}>
-            Transaksi <span className="text-[15px] font-medium text-on-surface-variant tabular-nums">{mine.length}</span>
+            {t("Transaksi")} <span className="text-[15px] font-medium text-on-surface-variant tabular-nums">{mine.length}</span>
           </h2>
           <div className="w-full sm:w-80">
             <SortControl by={by} dir={dir} onChange={(urut, arah) => set({ urut, arah })} />
@@ -167,7 +187,7 @@ export function CategoryView({
           <ListBones rows={6} />
         ) : sorted.length === 0 ? (
           <Card>
-            <EmptyState icon="receipt_long" title="Tidak ada transaksi yang cocok" />
+            <EmptyState icon="receipt_long" title={t("Tidak ada transaksi yang cocok")} />
           </Card>
         ) : (
           <div className="space-y-5">
@@ -175,7 +195,7 @@ export function CategoryView({
               <motion.div key={g.key} id={`g-${g.key}`} layout="position" className="scroll-mt-20">
                 {grouping !== "semua" && (
                   <div className="mb-1.5 flex items-baseline justify-between px-1">
-                    <p className="text-[13px] font-semibold text-on-surface-variant uppercase">{groupTitle(g.key, grouping)}</p>
+                    <p className="text-[13px] font-semibold text-on-surface-variant uppercase">{groupTitle(g.key, grouping, locale, t)}</p>
                     <Money value={g.total} className="text-[13px] font-semibold text-on-surface-variant" />
                   </div>
                 )}

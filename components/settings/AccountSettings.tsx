@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useT } from "@/components/I18n";
 import { Avatar, AVATARS, type Profile } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Field, FormError, Input, PasswordField } from "@/components/ui/Field";
@@ -12,10 +13,12 @@ import { THEME_COOKIE, type Theme } from "@/components/shell/prefs";
 import { CARD_COLORS, type CardColor } from "@/components/wallets/style";
 import { changePassword, saveProfile } from "@/lib/actions/account";
 import { signOut } from "@/lib/actions/auth";
+import { LANG_COOKIE, type Lang } from "@/lib/i18n";
 
 const card = "rounded-[14px] bg-card p-4";
 
 export function ProfileForm({ profile }: { profile: Profile }) {
+  const t = useT();
   const { state, pending, onSubmit } = useFormDone(saveProfile);
   const [name, setName] = useState(profile.display_name);
   const [avatar, setAvatar] = useState(profile.avatar ?? "");
@@ -31,7 +34,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
           <Avatar profile={preview} size={72} />
         </motion.div>
         <div className="flex-1">
-          <Field label="Nama tampilan">
+          <Field label={t("Nama tampilan")}>
             <Input name="display_name" value={name} onChange={(e) => setName(e.target.value)} maxLength={50} required />
           </Field>
         </div>
@@ -44,7 +47,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
             type="button"
             role="radio"
             aria-checked={!avatar}
-            aria-label="Inisial nama"
+            aria-label={t("Inisial nama")}
             onClick={() => setAvatar("")}
             className={`flex aspect-square items-center justify-center rounded-full text-[15px] font-semibold ${!avatar ? "bg-primary-container text-primary ring-2 ring-primary" : "bg-surface-dim text-on-surface-variant"}`}
           >
@@ -56,7 +59,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
               type="button"
               role="radio"
               aria-checked={avatar === a}
-              aria-label={`Avatar ${a}`}
+              aria-label={t("Avatar {a}", { a })}
               whileTap={{ scale: 0.9 }}
               onClick={() => {
                 setAvatar(a);
@@ -71,8 +74,8 @@ export function ProfileForm({ profile }: { profile: Profile }) {
       </div>
 
       <div>
-        <p className="mb-2 text-[13px] font-medium text-on-surface-variant">Warna</p>
-        <div role="radiogroup" aria-label="Warna avatar" className="flex flex-wrap gap-2">
+        <p className="mb-2 text-[13px] font-medium text-on-surface-variant">{t("Warna")}</p>
+        <div role="radiogroup" aria-label={t("Warna avatar")} className="flex flex-wrap gap-2">
           {(Object.keys(CARD_COLORS) as CardColor[]).map((c) => (
             <button
               key={c}
@@ -90,9 +93,9 @@ export function ProfileForm({ profile }: { profile: Profile }) {
 
       <FormError message={state.error} />
       <div className="flex items-center justify-end gap-3">
-        {state.ok && <span className="text-[13px] text-positive">Tersimpan</span>}
+        {state.ok && <span className="text-[13px] text-positive">{t("Tersimpan")}</span>}
         <Button type="submit" disabled={pending}>
-          {pending ? "Menyimpan…" : "Simpan profil"}
+          {pending ? t("Menyimpan…") : t("Simpan profil")}
         </Button>
       </div>
     </form>
@@ -100,28 +103,29 @@ export function ProfileForm({ profile }: { profile: Profile }) {
 }
 
 export function PasswordForm({ email }: { email: string }) {
+  const t = useT();
   const { state, pending, onSubmit, version } = useFormDone(changePassword);
   return (
     <form method="post" onSubmit={onSubmit} key={version} className={`${card} space-y-4`}>
       <Field label="Email">
         <Input value={email} readOnly disabled autoComplete="username" />
       </Field>
-      <Field label="Password saat ini">
+      <Field label={t("Password saat ini")}>
         <PasswordField name="current" autoComplete="current-password" required />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Password baru" hint="Minimal 8 karakter">
+        <Field label={t("Password baru")} hint={t("Minimal 8 karakter")}>
           <PasswordField name="password" autoComplete="new-password" required minLength={8} />
         </Field>
-        <Field label="Ulangi password baru">
+        <Field label={t("Ulangi password baru")}>
           <PasswordField name="confirm" autoComplete="new-password" required minLength={8} />
         </Field>
       </div>
       <FormError message={state.error} />
       <div className="flex items-center justify-end gap-3">
-        {version > 0 && !state.error && <span className="text-[13px] text-positive">Password diganti</span>}
+        {version > 0 && !state.error && <span className="text-[13px] text-positive">{t("Password diganti")}</span>}
         <Button type="submit" disabled={pending}>
-          {pending ? "Menyimpan…" : "Ganti password"}
+          {pending ? t("Menyimpan…") : t("Ganti password")}
         </Button>
       </div>
     </form>
@@ -130,13 +134,14 @@ export function PasswordForm({ email }: { email: string }) {
 
 /** Applies at once (data-theme on <html>) and remembers it in a cookie the root layout reads. */
 export function ThemePicker({ initial }: { initial: Theme }) {
+  const t = useT();
   const [theme, setTheme] = useState(initial);
   const router = useRouter();
-  const pick = (t: Theme) => {
-    setTheme(t);
-    if (t === "system") delete document.documentElement.dataset.theme;
-    else document.documentElement.dataset.theme = t;
-    document.cookie = `${THEME_COOKIE}=${t}; path=/; max-age=31536000; samesite=lax`;
+  const pick = (v: Theme) => {
+    setTheme(v);
+    if (v === "system") delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = v;
+    document.cookie = `${THEME_COOKIE}=${v}; path=/; max-age=31536000; samesite=lax`;
     router.refresh(); // server re-renders <html data-theme> from the cookie, so nothing can put the old theme back
   };
   return (
@@ -144,19 +149,41 @@ export function ThemePicker({ initial }: { initial: Theme }) {
       value={theme}
       onChange={pick}
       options={[
-        { value: "system", label: "Sistem" },
-        { value: "light", label: "Terang" },
-        { value: "dark", label: "Gelap" },
+        { value: "system", label: t("Sistem") },
+        { value: "light", label: t("Terang") },
+        { value: "dark", label: t("Gelap") },
+      ]}
+    />
+  );
+}
+
+/** Switches UI language. Cookie read by the root layout; names of wallets and categories stay as typed. */
+export function LangPicker({ initial }: { initial: Lang }) {
+  const [lang, setLang] = useState(initial);
+  const router = useRouter();
+  const pick = (v: Lang) => {
+    setLang(v);
+    document.cookie = `${LANG_COOKIE}=${v}; path=/; max-age=31536000; samesite=lax`;
+    router.refresh();
+  };
+  return (
+    <Segmented
+      value={lang}
+      onChange={pick}
+      options={[
+        { value: "id", label: "Indonesia" },
+        { value: "en", label: "English" },
       ]}
     />
   );
 }
 
 export function SignOutButton() {
+  const t = useT();
   return (
     <form action={signOut}>
       <Button type="submit" variant="danger" className="w-full">
-        Keluar
+        {t("Keluar")}
       </Button>
     </form>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useT } from "@/components/I18n";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { IconButton } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
@@ -10,6 +11,7 @@ import { formatRupiah } from "@/lib/money";
 
 /** Sort field + a direction toggle whose arrow flips with a spring. Pure client state: instant. */
 export function SortControl({ by, dir, onChange }: { by: SortBy; dir: Dir; onChange: (by: SortBy, dir: Dir) => void }) {
+  const t = useT();
   return (
     <div className="flex items-center gap-2">
       <div className="min-w-0 flex-1">
@@ -17,15 +19,15 @@ export function SortControl({ by, dir, onChange }: { by: SortBy; dir: Dir; onCha
           value={by}
           onChange={(v) => onChange(v, v === "nama" ? "asc" : "desc")} // sensible default direction per field
           options={[
-            { value: "tanggal", label: "Tanggal" },
-            { value: "nominal", label: "Nominal" },
-            { value: "nama", label: "Nama" },
+            { value: "tanggal", label: t("Tanggal") },
+            { value: "nominal", label: t("Nominal") },
+            { value: "nama", label: t("Nama") },
           ]}
         />
       </div>
       <IconButton
         onClick={() => onChange(by, dir === "asc" ? "desc" : "asc")}
-        aria-label={dir === "asc" ? "Urutan naik — ubah ke turun" : "Urutan turun — ubah ke naik"}
+        aria-label={dir === "asc" ? t("Urutan naik — ubah ke turun") : t("Urutan turun — ubah ke naik")}
         tone="primary"
         className="bg-surface-dim"
       >
@@ -48,7 +50,14 @@ export function DrillChart({ data, color }: { data: { key: string; label: string
           cursor={{ fill: "var(--c-fill)", radius: 6 }}
           formatter={(v: unknown) => formatRupiah(Number(v))}
           labelFormatter={(l) => String(l)}
-          contentStyle={{ borderRadius: 12, border: "none", fontSize: 13, background: "var(--c-card)", color: "var(--c-label)", boxShadow: "0 10px 30px -8px rgb(0 0 0 / 0.3)" }}
+          contentStyle={{
+            borderRadius: 12,
+            border: "none",
+            fontSize: 13,
+            background: "var(--c-card)",
+            color: "var(--c-label)",
+            boxShadow: "0 10px 30px -8px rgb(0 0 0 / 0.3)",
+          }}
         />
         <Bar
           dataKey="total"

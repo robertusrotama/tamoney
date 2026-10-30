@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useState, useTransition, type ReactNode } from "react";
-import { useT } from "@/components/I18n";
+import { useLocale, useT } from "@/components/I18n";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 import { IconButton } from "@/components/ui/Button";
@@ -61,11 +61,13 @@ const UNITS: { value: QuickUnit; label: string }[] = [
 ];
 
 const sectionTitle = "px-1 pb-1.5 text-[12px] font-semibold tracking-[0.04em] text-on-surface-variant uppercase";
-const link = "rounded-[10px] px-2 py-1.5 text-left text-[14px] text-primary hover:bg-primary-container focus-visible:bg-primary-container focus-visible:outline-none";
+const link =
+  "rounded-[10px] px-2 py-1.5 text-left text-[14px] text-primary hover:bg-primary-container focus-visible:bg-primary-container focus-visible:outline-none";
 
 /** Kibana-style panel: quick select, commonly used, recently used, and an absolute range calendar. */
 function RangePanel({ period, today, onPick }: { period: Period; today: string; onPick: (r: Saved) => void }) {
   const t = useT();
+  const locale = useLocale();
   const [n, setN] = useState("7");
   const [unit, setUnit] = useState<QuickUnit>("hari");
   const [custom, setCustom] = useState(false);
@@ -82,7 +84,7 @@ function RangePanel({ period, today, onPick }: { period: Period; today: string; 
           start={period.start}
           end={period.end}
           today={today}
-          onApply={(s, e) => onPick({ label: rangeText(s, e), params: { p: "rentang", dari: s, sampai: e } })}
+          onApply={(s, e) => onPick({ label: rangeText(s, e, locale), params: { p: "rentang", dari: s, sampai: e } })}
         />
       </div>
     );
@@ -95,12 +97,23 @@ function RangePanel({ period, today, onPick }: { period: Period; today: string; 
           <div className="flex items-center gap-2">
             <span className="text-[15px]">{t("Terakhir")}</span>
             <div className="w-20">
-              <Input inputMode="numeric" aria-label={t("Jumlah")} value={n} onChange={(e) => setN(e.target.value.replace(/\D/g, "").slice(0, 3))} className="h-10 text-center" />
+              <Input
+                inputMode="numeric"
+                aria-label={t("Jumlah")}
+                value={n}
+                onChange={(e) => setN(e.target.value.replace(/\D/g, "").slice(0, 3))}
+                className="h-10 text-center"
+              />
             </div>
             <Button
               size="sm"
               className="ml-auto"
-              onClick={() => onPick({ label: t("{n} {unit} terakhir", { n: count, unit: t(UNITS.find((u) => u.value === unit)!.label).toLowerCase() }), params: lastN(today, count, unit) })}
+              onClick={() =>
+                onPick({
+                  label: t("{n} {unit} terakhir", { n: count, unit: t(UNITS.find((u) => u.value === unit)!.label).toLowerCase() }),
+                  params: lastN(today, count, unit),
+                })
+              }
             >
               {t("Terapkan")}
             </Button>
@@ -140,8 +153,9 @@ function RangePanel({ period, today, onPick }: { period: Period; today: string; 
   );
 }
 
-const rangeText = (s: string, e: string) => {
-  const f = (d: string) => new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
+const rangeText = (s: string, e: string, locale: string) => {
+  const f = (d: string) =>
+    new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
   return `${f(s)} – ${f(e)}`;
 };
 
